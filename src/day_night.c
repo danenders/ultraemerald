@@ -289,7 +289,6 @@ void ProcessImmediateTimeEvents(void)
     if (sDNSystemControl.timeOfDay != timeOfDay)
     {
         sDNSystemControl.timeOfDay = timeOfDay;
-        ChooseAmbientCrySpecies();  // so a time-of-day appropriate mon is chosen
         ForceTimeBasedEvents();     // for misc events that should run on time of day boundaries
     }
 }

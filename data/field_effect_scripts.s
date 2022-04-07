@@ -255,9 +255,9 @@ gFieldEffectScript_UseDive::
 	field_eff_callnative FldEff_UseDive
 	field_eff_end
 
-gFieldEffectScript_Pokeball:: @ 82DBC4B
-	field_eff_loadpalnotint gSpritePalette_Pokeball
-	field_eff_callnative FldEff_Pokeball
+gFieldEffectScript_PokeballTrail::
+	field_eff_loadpal gSpritePalette_Pokeball
+	field_eff_callnative FldEff_PokeballTrail
 	field_eff_end
 
 gFieldEffectScript_HeartIcon::

@@ -97,13 +97,13 @@ extern const struct MapLayout *const gMapLayouts[];
 extern const struct MapHeader *const *const gMapGroups[];
 
 static void Overworld_ResetStateAfterWhiteOut(void);
+static void ChooseAmbientCrySpecies(void);
 static void CB2_ReturnToFieldLocal(void);
 static void CB2_ReturnToFieldLink(void);
 static void CB2_LoadMapOnReturnToFieldCableClub(void);
 static void CB2_LoadMap2(void);
 static void VBlankCB_Field(void);
 static void SpriteCB_LinkPlayer(struct Sprite *sprite);
-static void ChooseAmbientCrySpecies(void);
 static void DoMapLoadLoop(u8 *state);
 static bool32 LoadMapInStepsLocal(u8 *state, bool32);
 static bool32 LoadMapInStepsLink(u8 *state);
@@ -1305,7 +1305,7 @@ void UpdateAmbientCry(s16 *state, u16 *delayCounter)
     }
 }
 
-void ChooseAmbientCrySpecies(void)
+static void ChooseAmbientCrySpecies(void)
 {
     if ((gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(ROUTE130)
      && gSaveBlock1Ptr->location.mapNum == MAP_NUM(ROUTE130))
