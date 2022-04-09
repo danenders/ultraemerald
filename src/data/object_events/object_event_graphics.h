@@ -360,3 +360,23 @@ const u32 gObjectEventPic_Lugia[] = INCBIN_U32("graphics/object_events/pics/poke
 const u16 gObjectEventPal_Lugia[] = INCBIN_U16("graphics/object_events/palettes/lugia.gbapal");
 const u32 gObjectEventPic_HoOh[] = INCBIN_U32("graphics/object_events/pics/pokemon/ho_oh.4bpp");
 const u16 gObjectEventPal_HoOh[] = INCBIN_U16("graphics/object_events/palettes/ho_oh.gbapal");
+
+
+//Costumes
+const u32 gObjectEventPic_RubySapphireBrendanFieldMove[] = INCBIN_U32("graphics/object_events/pics/people/ruby_sapphire_brendan/field_move.4bpp");
+const u32 gObjectEventPic_RubySapphireBrendanSurfing[] = INCBIN_U32("graphics/object_events/pics/people/ruby_sapphire_brendan/surfing.4bpp");
+const u32 gObjectEventPic_RubySapphireBrendanMachBike[] = INCBIN_U32("graphics/object_events/pics/people/ruby_sapphire_brendan/mach_bike.4bpp");
+const u32 gObjectEventPic_RubySapphireBrendanAcroBike[] = INCBIN_U32("graphics/object_events/pics/people/ruby_sapphire_brendan/acro_bike.4bpp");
+const u32 gObjectEventPic_RubySapphireBrendanFishing[] = INCBIN_U32("graphics/object_events/pics/people/ruby_sapphire_brendan/fishing.4bpp");
+const u32 gObjectEventPic_RubySapphireBrendanWatering[] = INCBIN_U32("graphics/object_events/pics/people/ruby_sapphire_brendan/watering.4bpp");
+const u32 gObjectEventPic_RubySapphireBrendanDecorating[] = INCBIN_U32("graphics/object_events/pics/people/ruby_sapphire_brendan/decorating.4bpp");
+const u32 gObjectEventPic_RubySapphireBrendanUnderwater[] = INCBIN_U32("graphics/object_events/pics/people/ruby_sapphire_brendan/underwater.4bpp");
+
+const u32 gObjectEventPic_RubySapphireMayFieldMove[] = INCBIN_U32("graphics/object_events/pics/people/ruby_sapphire_may/field_move.4bpp");
+const u32 gObjectEventPic_RubySapphireMaySurfing[] = INCBIN_U32("graphics/object_events/pics/people/ruby_sapphire_may/surfing.4bpp");
+const u32 gObjectEventPic_RubySapphireMayMachBike[] = INCBIN_U32("graphics/object_events/pics/people/ruby_sapphire_may/mach_bike.4bpp");
+const u32 gObjectEventPic_RubySapphireMayAcroBike[] = INCBIN_U32("graphics/object_events/pics/people/ruby_sapphire_may/acro_bike.4bpp");
+const u32 gObjectEventPic_RubySapphireMayFishing[] = INCBIN_U32("graphics/object_events/pics/people/ruby_sapphire_may/fishing.4bpp");
+const u32 gObjectEventPic_RubySapphireMayWatering[] = INCBIN_U32("graphics/object_events/pics/people/ruby_sapphire_may/watering.4bpp");
+const u32 gObjectEventPic_RubySapphireMayDecorating[] = INCBIN_U32("graphics/object_events/pics/people/ruby_sapphire_may/decorating.4bpp");
+const u32 gObjectEventPic_RubySapphireMayUnderwater[] = INCBIN_U32("graphics/object_events/pics/people/ruby_sapphire_may/underwater.4bpp");

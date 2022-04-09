@@ -287,15 +287,34 @@
 #define OBJ_EVENT_GFX_MEW                        	237
 #define OBJ_EVENT_GFX_DEOXYS                     	238
 
+//Costumes (Test)
+#define OBJ_EVENT_GFX_RS_BRENDAN_FIELD_MOVE      	239
+#define OBJ_EVENT_GFX_RS_BRENDAN_SURFING         	240
+#define OBJ_EVENT_GFX_RS_BRENDAN_MACH_BIKE       	241
+#define OBJ_EVENT_GFX_RS_BRENDAN_ACRO_BIKE       	242
+#define OBJ_EVENT_GFX_RS_BRENDAN_FISHING         	243
+#define OBJ_EVENT_GFX_RS_BRENDAN_WATERING        	244
+#define OBJ_EVENT_GFX_RS_BRENDAN_DECORATING      	245
+#define OBJ_EVENT_GFX_RS_BRENDAN_UNDERWATER      	246
 
-#define NUM_OBJ_EVENT_GFX                        239
+#define OBJ_EVENT_GFX_RS_MAY_FIELD_MOVE          	247
+#define OBJ_EVENT_GFX_RS_MAY_SURFING             	248
+#define OBJ_EVENT_GFX_RS_MAY_MACH_BIKE           	249
+#define OBJ_EVENT_GFX_RS_MAY_ACRO_BIKE           	250
+#define OBJ_EVENT_GFX_RS_MAY_FISHING             	251
+#define OBJ_EVENT_GFX_RS_MAY_WATERING            	252
+#define OBJ_EVENT_GFX_RS_MAY_DECORATING          	253
+#define OBJ_EVENT_GFX_RS_MAY_UNDERWATER          	254
+
+
+#define NUM_OBJ_EVENT_GFX                        	255 //Original cap is 239
 
 
 // These are dynamic object gfx ids.
 // They correspond with the values of the VAR_OBJ_GFX_ID_X vars.
 // More info about them in include/constants/vars.h
 #define OBJ_EVENT_GFX_VARS   (NUM_OBJ_EVENT_GFX + 1)
-#define OBJ_EVENT_GFX_VAR_0  (OBJ_EVENT_GFX_VARS + 0x0) // 240
+#define OBJ_EVENT_GFX_VAR_0  (OBJ_EVENT_GFX_VARS + 0x0) // Originally 240
 #define OBJ_EVENT_GFX_VAR_1  (OBJ_EVENT_GFX_VARS + 0x1)
 #define OBJ_EVENT_GFX_VAR_2  (OBJ_EVENT_GFX_VARS + 0x2)
 #define OBJ_EVENT_GFX_VAR_3  (OBJ_EVENT_GFX_VARS + 0x3)
@@ -310,7 +329,7 @@
 #define OBJ_EVENT_GFX_VAR_C  (OBJ_EVENT_GFX_VARS + 0xC)
 #define OBJ_EVENT_GFX_VAR_D  (OBJ_EVENT_GFX_VARS + 0xD)
 #define OBJ_EVENT_GFX_VAR_E  (OBJ_EVENT_GFX_VARS + 0xE)
-#define OBJ_EVENT_GFX_VAR_F  (OBJ_EVENT_GFX_VARS + 0xF) // 255
+#define OBJ_EVENT_GFX_VAR_F  (OBJ_EVENT_GFX_VARS + 0xF) // Originally 255
 
 #define SHADOW_SIZE_S   0
 #define SHADOW_SIZE_M   1

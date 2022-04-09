@@ -239,6 +239,25 @@ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Giddy;
 const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_UnusedMauvilleOldMan1;
 const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_UnusedMauvilleOldMan2;
 
+//Costumes
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RubySapphireBrendanFieldMove;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RubySapphireBrendanSurfing;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RubySapphireBrendanMachBike;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RubySapphireBrendanAcroBike;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RubySapphireBrendanFishing;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RubySapphireBrendanWatering;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RubySapphireBrendanDecorating;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RubySapphireBrendanUnderwater;
+
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RubySapphireMayFieldMove;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RubySapphireMaySurfing;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RubySapphireMayMachBike;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RubySapphireMayAcroBike;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RubySapphireMayFishing;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RubySapphireMayWatering;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RubySapphireMayDecorating;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RubySapphireMayUnderwater;
+
 
 const struct ObjectEventGraphicsInfo *const gObjectEventGraphicsInfoPointers[NUM_OBJ_EVENT_GFX] = {
     [OBJ_EVENT_GFX_BRENDAN_NORMAL] =           &gObjectEventGraphicsInfo_BrendanNormal,
@@ -474,6 +493,22 @@ const struct ObjectEventGraphicsInfo *const gObjectEventGraphicsInfoPointers[NUM
     [OBJ_EVENT_GFX_LINK_RS_MAY] =              &gObjectEventGraphicsInfo_RubySapphireMay,
     [OBJ_EVENT_GFX_LUGIA] =                    &gObjectEventGraphicsInfo_Lugia,
     [OBJ_EVENT_GFX_HOOH] =                     &gObjectEventGraphicsInfo_HoOh,
+    [OBJ_EVENT_GFX_RS_BRENDAN_FIELD_MOVE] =    &gObjectEventGraphicsInfo_RubySapphireBrendanFieldMove,
+    [OBJ_EVENT_GFX_RS_BRENDAN_SURFING] =       &gObjectEventGraphicsInfo_RubySapphireBrendanSurfing,
+    [OBJ_EVENT_GFX_RS_BRENDAN_MACH_BIKE] =     &gObjectEventGraphicsInfo_RubySapphireBrendanMachBike,
+    [OBJ_EVENT_GFX_RS_BRENDAN_ACRO_BIKE] =     &gObjectEventGraphicsInfo_RubySapphireBrendanAcroBike,
+    [OBJ_EVENT_GFX_RS_BRENDAN_FISHING] =       &gObjectEventGraphicsInfo_RubySapphireBrendanFishing,
+    [OBJ_EVENT_GFX_RS_BRENDAN_WATERING] =      &gObjectEventGraphicsInfo_RubySapphireBrendanWatering,
+    [OBJ_EVENT_GFX_RS_BRENDAN_DECORATING] =    &gObjectEventGraphicsInfo_RubySapphireBrendanDecorating,
+    [OBJ_EVENT_GFX_RS_BRENDAN_UNDERWATER] =    &gObjectEventGraphicsInfo_RubySapphireBrendanUnderwater,
+    [OBJ_EVENT_GFX_RS_MAY_FIELD_MOVE] =        &gObjectEventGraphicsInfo_RubySapphireMayFieldMove,
+    [OBJ_EVENT_GFX_RS_MAY_SURFING] =           &gObjectEventGraphicsInfo_RubySapphireMaySurfing,
+    [OBJ_EVENT_GFX_RS_MAY_MACH_BIKE] =         &gObjectEventGraphicsInfo_RubySapphireMayMachBike,
+    [OBJ_EVENT_GFX_RS_MAY_ACRO_BIKE] =         &gObjectEventGraphicsInfo_RubySapphireMayAcroBike,
+    [OBJ_EVENT_GFX_RS_MAY_FISHING] =           &gObjectEventGraphicsInfo_RubySapphireMayFishing,
+    [OBJ_EVENT_GFX_RS_MAY_WATERING] =          &gObjectEventGraphicsInfo_RubySapphireMayWatering,
+    [OBJ_EVENT_GFX_RS_MAY_DECORATING] =        &gObjectEventGraphicsInfo_RubySapphireMayDecorating,
+    [OBJ_EVENT_GFX_RS_MAY_UNDERWATER] =        &gObjectEventGraphicsInfo_RubySapphireMayUnderwater,
 };
 
 const struct ObjectEventGraphicsInfo *const gMauvilleOldManGraphicsInfoPointers[] = {
@@ -485,3 +520,5 @@ const struct ObjectEventGraphicsInfo *const gMauvilleOldManGraphicsInfoPointers[
     [MAUVILLE_MAN_UNUSED1]     = &gObjectEventGraphicsInfo_UnusedMauvilleOldMan1,
     [MAUVILLE_MAN_UNUSED2]     = &gObjectEventGraphicsInfo_UnusedMauvilleOldMan2,
 };
+
+
