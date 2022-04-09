@@ -1464,18 +1464,19 @@ void CreateRegionMapPlayerIcon(u16 tileTag, u16 paletteTag)
             sheet.data = sRegionMapPlayerIcon_MayGfx;
             palette.data = sRegionMapPlayerIcon_MayPal;
         }
-        break;
-    case COSTUME_1:
-        if (gSaveBlock2Ptr->playerGender == FEMALE)
-        {
-            sheet.data = sRegionMapPlayerIcon_MayGfx;
-            palette.data = sRegionMapPlayerIcon_MayPal;
-        }
         else
         {
             sheet.data = sRegionMapPlayerIcon_BrendanGfx;
-            palette.data = sRegionMapPlayerIcon_BrendanPal;
+            palette.data = sRegionMapPlayerIcon_BrendanPal;    
         }
+        break;
+    case COSTUME_1:
+        sheet.data = sRegionMapPlayerIcon_BrendanGfx;
+        palette.data = sRegionMapPlayerIcon_BrendanPal;
+        break;
+    case COSTUME_2:
+        sheet.data = sRegionMapPlayerIcon_MayGfx;
+        palette.data = sRegionMapPlayerIcon_MayPal;
         break;
     }
 

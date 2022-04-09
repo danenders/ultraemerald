@@ -149,6 +149,7 @@
 
 #define DEFAULT_COSTUME 0
 #define COSTUME_1       1
-#define COSTUME_COUNT   2
+#define COSTUME_2       2
+#define COSTUME_COUNT   3
 
 #endif // GUARD_CONSTANTS_GLOBAL_H

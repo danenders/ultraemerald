@@ -15,3 +15,12 @@ EventScript_CostumeSwap_Costume1::
 	fadescreen FADE_FROM_BLACK
 	releaseall
 	end
+
+EventScript_CostumeSwap_Costume2::
+	lockall
+	fadescreen FADE_TO_BLACK
+	setvar VAR_TEMP_1, COSTUME_2
+	special SwapPlayersCostume
+	fadescreen FADE_FROM_BLACK
+	releaseall
+	end
