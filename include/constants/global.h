@@ -147,4 +147,8 @@
 #define CONNECTION_DIVE     5
 #define CONNECTION_EMERGE   6
 
+#define DEFAULT_COSTUME 0
+#define COSTUME_1       1
+#define COSTUME_COUNT   2
+
 #endif // GUARD_CONSTANTS_GLOBAL_H

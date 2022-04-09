@@ -277,6 +277,12 @@ static const u8 sTrainerCardTextColors[] = {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_D
 static const u8 sTrainerCardStatColors[] = {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_RED, TEXT_COLOR_LIGHT_RED};
 static const u8 sTimeColonInvisibleTextColors[6] = {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_TRANSPARENT, TEXT_COLOR_TRANSPARENT};
 
+static const u8 sCostumeFrontPics[COSTUME_COUNT][GENDER_COUNT] = 
+{
+    [DEFAULT_COSTUME] = {TRAINER_PIC_BRENDAN, TRAINER_PIC_MAY},
+    [COSTUME_1]       = {TRAINER_PIC_RS_BRENDAN, TRAINER_PIC_RS_MAY},
+};
+
 static const u8 sTrainerPicOffset[2][GENDER_COUNT][2] =
 {
     // Kanto
@@ -1885,7 +1891,7 @@ static void CreateTrainerCardTrainerPic(void)
     }
     else
     {
-        CreateTrainerCardTrainerPicSprite(FacilityClassToPicIndex(sTrainerPicFacilityClass[sData->cardType][sData->trainerCard.gender]),
+        CreateTrainerCardTrainerPicSprite(sCostumeFrontPics[gSaveBlock2Ptr->costumeId][sData->trainerCard.gender],
                     TRUE,
                     sTrainerPicOffset[sData->isHoenn][sData->trainerCard.gender][0],
                     sTrainerPicOffset[sData->isHoenn][sData->trainerCard.gender][1],
