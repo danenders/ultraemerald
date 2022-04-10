@@ -28,6 +28,7 @@
 #include "palette.h"
 #include "pokeball.h"
 #include "pokemon.h"
+#include "pokemon_debug.h"
 #include "pokemon_storage_system.h"
 #include "pokemon_summary_screen.h"
 #include "region_map.h"
@@ -46,22 +47,25 @@
 #include "constants/region_map_sections.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
+#include "constants/battle_config.h"
 #include "item_icon.h"
 #include "pokemon_icon.h"
 #include "constants/flags.h"
 #include "battle_interface.h"
 
+static const u8 sStatsLeftColumnLayoutIVEV[] = _("{DYNAMIC 0}\n{DYNAMIC 1}\n{DYNAMIC 2}");
+
 // Config options - Note that some config options need external modifications to fully work, such as CONFIG_CAN_FORGET_HM_MOVES, CONFIG_PHYSICAL_SPECIAL_SPLIT, and CONFIG_DECAPITALIZE_MET_LOCATION_STRINGS
 #define CONFIG_CAN_FORGET_HM_MOVES                      TRUE
 #define CONFIG_CAN_SWITCH_PAGES_WHILE_DETAILS_ARE_UP    TRUE
-#define CONFIG_PHYSICAL_SPECIAL_SPLIT                   FALSE   // Takes precendence over CONFIG_SHOW_ICONS_FOR_OLD_SPLIT
+#define CONFIG_PHYSICAL_SPECIAL_SPLIT                   TRUE   // Takes precendence over CONFIG_SHOW_ICONS_FOR_OLD_SPLIT
 #define CONFIG_SHOW_ICONS_FOR_OLD_SPLIT                 FALSE
 #define CONFIG_EXPANDED_MET_LOCATIONS                   TRUE
 #define CONFIG_TRUST_OUTSIDERS                          TRUE
 #define CONFIG_SHOW_HIDDEN_POWER_STATS                  TRUE
-#define CONFIG_DECAPITALIZE_TITLE_STRINGS               FALSE
+#define CONFIG_DECAPITALIZE_TITLE_STRINGS               TRUE
 #define CONFIG_DECAPITALIZE_MENU_STRINGS                TRUE
-#define CONFIG_DECAPITALIZE_MET_LOCATION_STRINGS        FALSE
+#define CONFIG_DECAPITALIZE_MET_LOCATION_STRINGS        TRUE
 #define CONFIG_FATEFUL_ENCOUNTER_MARK                   TRUE
 // Make sure gBallIconTable in src/data/item_icon_table.h is ordered correctly.  Default does not match RHH
 
@@ -185,6 +189,7 @@ static EWRAM_DATA struct PokemonSummaryScreenData
     u16 bgTilemapBufferPage[0x400];
     u16 bgTilemapBufferBG[0x400];
     u16 moveDetailTilemapBuffer[0x800];
+    //u16 contestMoveDetailTilemapBuffer[0x800];
     u8 mode;
     bool8 isBoxMon;
     u8 curMonIndex;
@@ -204,7 +209,10 @@ static EWRAM_DATA struct PokemonSummaryScreenData
     u8 spriteIds[SPRITE_ARR_ID_COUNT];
     bool8 unk40EF;
     s16 switchCounter; // Used for various switch statement cases that decompress/load graphics or pokemon data
+    u8 unk_filler4[6];
+    u8 splitIconSpriteId;
 } *sMonSummaryScreen = NULL;
+
 EWRAM_DATA u8 gLastViewedMonIndex = 0;
 static EWRAM_DATA u8 sMoveSlotToReplace = 0;
 ALIGNED(4) static EWRAM_DATA u8 sAnimDelayTaskId = 0;
@@ -609,6 +617,10 @@ static const union AnimCmd sSpriteAnim_TypeDark[] = {
     ANIMCMD_FRAME(TYPE_DARK * 8, 0, FALSE, FALSE),
     ANIMCMD_END
 };
+static const union AnimCmd sSpriteAnim_TypeFairy[] = {
+    ANIMCMD_FRAME(TYPE_FAIRY * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
 static const union AnimCmd sSpriteAnim_CategoryCool[] = {
     ANIMCMD_FRAME((CONTEST_CATEGORY_COOL + NUMBER_OF_MON_TYPES) * 8, 0, FALSE, FALSE),
     ANIMCMD_END
@@ -648,6 +660,7 @@ static const union AnimCmd *const sSpriteAnimTable_MoveTypes[NUMBER_OF_MON_TYPES
     sSpriteAnim_TypeIce,
     sSpriteAnim_TypeDragon,
     sSpriteAnim_TypeDark,
+    sSpriteAnim_TypeFairy,
     sSpriteAnim_CategoryCool,
     sSpriteAnim_CategoryBeauty,
     sSpriteAnim_CategoryCute,
@@ -655,13 +668,29 @@ static const union AnimCmd *const sSpriteAnimTable_MoveTypes[NUMBER_OF_MON_TYPES
     sSpriteAnim_CategoryTough,
 };
 
-static const struct CompressedSpriteSheet sSpriteSheet_MoveTypes =
+const struct CompressedSpriteSheet sSpriteSheet_MoveTypes =
 {
     .data = gMoveTypes_Gfx,
     .size = (NUMBER_OF_MON_TYPES + CONTEST_CATEGORIES_COUNT) * 0x100,
     .tag = TAG_MOVE_TYPES
 };
-static const struct SpriteTemplate sSpriteTemplate_MoveTypes =
+const struct SpriteTemplate sSpriteTemplate_MoveTypes =
+{
+    .tileTag = TAG_MOVE_TYPES,
+    .paletteTag = TAG_MOVE_TYPES,
+    .oam = &sOamData_MoveTypes,
+    .anims = sSpriteAnimTable_MoveTypes,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy
+};
+const struct CompressedSpriteSheet gSpriteSheet_MoveTypes =
+{
+    .data = gMoveTypes_Gfx,
+    .size = (NUMBER_OF_MON_TYPES + CONTEST_CATEGORIES_COUNT) * 0x100,
+    .tag = TAG_MOVE_TYPES
+};
+const struct SpriteTemplate gSpriteTemplate_MoveTypes =
 {
     .tileTag = TAG_MOVE_TYPES,
     .paletteTag = TAG_MOVE_TYPES,
@@ -691,6 +720,7 @@ static const u8 sMoveTypeToOamPaletteNum[NUMBER_OF_MON_TYPES + CONTEST_CATEGORIE
     [TYPE_ICE] = 14,
     [TYPE_DRAGON] = 15,
     [TYPE_DARK] = 13,
+    [TYPE_FAIRY] = 14,
     [NUMBER_OF_MON_TYPES + CONTEST_CATEGORY_COOL] = 13,
     [NUMBER_OF_MON_TYPES + CONTEST_CATEGORY_BEAUTY] = 14,
     [NUMBER_OF_MON_TYPES + CONTEST_CATEGORY_CUTE] = 14,
@@ -994,15 +1024,15 @@ const u8 sText_TitlePageIVs[] = _("{DPAD_LEFTRIGHT}Page {A_BUTTON}IVs");
 const u8 sText_TitlePageEVs[] = _("{DPAD_LEFTRIGHT}Page {A_BUTTON}EVs");
 const u8 sText_TitlePageStats[] = _("{DPAD_LEFTRIGHT}Page {A_BUTTON}Stats");
 #else
-const u8 sText_TitleInfo[] = _("POKéMON INFO");
+const u8 sText_TitleInfo[] = _("Pokémon INFO");
 const u8 sText_TitleMemo[] = _("TRAINER MEMO");
-const u8 sText_TitleSkills[] = _("POKéMON STATS");
+const u8 sText_TitleSkills[] = _("Pokémon STATS");
 const u8 sText_TitleBattleMoves[] = _("BATTLE MOVES");
 const u8 sText_TitleCondition[] = _("CONDITION");
 const u8 sText_TitleContestMoves[] = _("CONTEST MOVES");
 const u8 sText_TitleRibbons[] = _("RIBBONS");
-const u8 sText_TitleIVs[] = _("POKéMON IVS");
-const u8 sText_TitleEVs[] = _("POKéMON EVS");
+const u8 sText_TitleIVs[] = _("Pokémon IVS");
+const u8 sText_TitleEVs[] = _("Pokémon EVS");
 const u8 sText_TitlePage[] = _("{DPAD_LEFTRIGHT}PAGE");
 const u8 sText_TitlePageDetail[] = _("{DPAD_LEFTRIGHT}PAGE {A_BUTTON}DETAIL");
 const u8 sText_TitlePickSwitch[] = _("{DPAD_UPDOWN}PICK {A_BUTTON}SWITCH");
@@ -1141,6 +1171,23 @@ static void DestroySplitIcon(void)
 #endif
 
 // code
+/*static u8 ShowSplitIcon(u32 split)
+{
+    if (sMonSummaryScreen->splitIconSpriteId == 0xFF)
+        sMonSummaryScreen->splitIconSpriteId = CreateSprite(&sSpriteTemplate_SplitIcons, 48, 129, 0);
+
+    gSprites[sMonSummaryScreen->splitIconSpriteId].invisible = FALSE;
+    StartSpriteAnim(&gSprites[sMonSummaryScreen->splitIconSpriteId], split);
+    return sMonSummaryScreen->splitIconSpriteId;
+}
+
+static void DestroySplitIcon(void)
+{
+    if (sMonSummaryScreen->splitIconSpriteId != 0xFF)
+        DestroySprite(&gSprites[sMonSummaryScreen->splitIconSpriteId]);
+    sMonSummaryScreen->splitIconSpriteId = 0xFF;
+}*/
+
 void ShowPokemonSummaryScreen(u8 mode, void *mons, u8 monIndex, u8 maxMonIndex, void (*callback)(void))
 {
     sMonSummaryScreen = AllocZeroed(sizeof(*sMonSummaryScreen));
@@ -1312,7 +1359,11 @@ static bool8 LoadGraphics(void)
         break;
     case 18:
         LoadMonIconPalette(sMonSummaryScreen->summary.species2);
+#ifdef POKEMON_EXPANSION
+        sMonSummaryScreen->spriteIds[SPRITE_ARR_ID_MON_ICON] = CreateMonIcon(sMonSummaryScreen->summary.species2, SpriteCB_MonIcon, 20, 47, 1, sMonSummaryScreen->summary.pid);
+#else
         sMonSummaryScreen->spriteIds[SPRITE_ARR_ID_MON_ICON] = CreateMonIcon(sMonSummaryScreen->summary.species2, SpriteCB_MonIcon, 20, 47, 1, sMonSummaryScreen->summary.pid, TRUE);
+#endif
         gSprites[sMonSummaryScreen->spriteIds[SPRITE_ARR_ID_MON_ICON]].hFlip = !IsMonSpriteNotFlipped(sMonSummaryScreen->summary.species2);
         SetSpriteInvisibility(SPRITE_ARR_ID_MON_ICON, TRUE);
         gMain.state++;
@@ -1419,6 +1470,10 @@ static bool8 DecompressGraphics(void)
         }
         break;
     case 2:
+        //LZDecompressWram(gSummaryScreenPageContestMoveDetailsTilemap, sMonSummaryScreen->contestMoveDetailTilemapBuffer);
+        //sMonSummaryScreen->switchCounter++;
+        //break;
+    //case 3:
         LZDecompressWram(gSummaryScreenPageMoveDetailsTilemap, sMonSummaryScreen->moveDetailTilemapBuffer);
         sMonSummaryScreen->switchCounter++;
         break;
@@ -1778,7 +1833,11 @@ static void Task_ChangeSummaryMon(u8 taskId)
     case 10:
         FreeMonIconPalettes();
         LoadMonIconPalette(sMonSummaryScreen->summary.species2);
+#ifdef POKEMON_EXPANSION
+        sMonSummaryScreen->spriteIds[SPRITE_ARR_ID_MON_ICON] = CreateMonIcon(sMonSummaryScreen->summary.species2, SpriteCB_MonIcon, 20, 47, 1, sMonSummaryScreen->summary.pid);
+#else
         sMonSummaryScreen->spriteIds[SPRITE_ARR_ID_MON_ICON] = CreateMonIcon(sMonSummaryScreen->summary.species2, SpriteCB_MonIcon, 20, 47, 1, sMonSummaryScreen->summary.pid, TRUE);
+#endif
         gSprites[sMonSummaryScreen->spriteIds[SPRITE_ARR_ID_MON_ICON]].hFlip = !IsMonSpriteNotFlipped(sMonSummaryScreen->summary.species2);
         SetSpriteInvisibility(SPRITE_ARR_ID_MON_ICON, TRUE);
         break;
@@ -3697,7 +3756,7 @@ static void CreateMoveTypeIcons(void)
     for (i = SPRITE_ARR_ID_TYPE; i < SPRITE_ARR_ID_TYPE + 7; i++)
     {
         if (sMonSummaryScreen->spriteIds[i] == SPRITE_NONE)
-            sMonSummaryScreen->spriteIds[i] = CreateSprite(&sSpriteTemplate_MoveTypes, 0, 0, 2);
+            sMonSummaryScreen->spriteIds[i] = CreateSprite(&gSpriteTemplate_MoveTypes, 0, 0, 2);
 
         SetSpriteInvisibility(i, TRUE);
     }
