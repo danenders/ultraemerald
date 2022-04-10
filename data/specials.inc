@@ -537,4 +537,4 @@ gSpecials::
 	def_special TrySetBattleTowerLinkType
 	def_special SwapPlayersCostume
 	def_special GetPlayerCostumeId
-
+	def_special SetTotemBoost
