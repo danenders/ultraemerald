@@ -41,13 +41,13 @@
 #define FLAG_TEMP_1F     (TEMP_FLAGS_START + 0x1F)
 #define TEMP_FLAGS_END   FLAG_TEMP_1F
         
-#define FLAG_SYS_NO_COLLISION       0x20 // Unused Flag //DEBUG
-#define FLAG_SYS_NO_ENCOUNTER       0x21 // Unused Flag //DEBUG
-#define FLAG_SYS_NO_TRAINER_SEE     0x22 // Unused Flag //DEBUG
-#define FLAG_SYS_NO_BAG_USE         0x23 // Unused Flag //DEBUG
-#define FLAG_SYS_NO_CATCHING        0x24 // Unused Flag //DEBUG
-#define FLAG_SYS_PC_FROM_DEBUG_MENU 0x25 // Unused Flag //DEBUG
-#define FLAG_UNUSED_0x026    0x26 // Unused Flag
+#define FLAG_SYS_NO_COLLISION       0x20 //DEBUG
+#define FLAG_SYS_NO_ENCOUNTER       0x21 //DEBUG
+#define FLAG_SYS_NO_TRAINER_SEE     0x22 //DEBUG
+#define FLAG_SYS_NO_BAG_USE         0x23 //DEBUG
+#define FLAG_SYS_NO_CATCHING        0x24 //DEBUG
+#define FLAG_SYS_PC_FROM_DEBUG_MENU 0x25 //DEBUG
+#define FLAG_SET_FOLLOWER    0x26 // FOLLOWER
 #define FLAG_UNUSED_0x027    0x27 // Unused Flag
 #define FLAG_UNUSED_0x028    0x28 // Unused Flag
 #define FLAG_UNUSED_0x029    0x29 // Unused Flag

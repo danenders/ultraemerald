@@ -143,7 +143,7 @@ static u16 GetObjectEventFlagIdByObjectEventId(u8);
 static void UpdateObjectEventVisibility(struct ObjectEvent *, struct Sprite *);
 static void MakeSpriteTemplateFromObjectEventTemplate(struct ObjectEventTemplate *, struct SpriteTemplate *, const struct SubspriteTable **);
 static void GetObjectEventMovingCameraOffset(s16 *, s16 *);
-static struct ObjectEventTemplate *GetObjectEventTemplateByLocalIdAndMap(u8, u8, u8);
+struct ObjectEventTemplate *GetObjectEventTemplateByLocalIdAndMap(u8, u8, u8);
 static void RemoveObjectEventIfOutsideView(struct ObjectEvent *);
 static void SpawnObjectEventOnReturnToField(u8, s16, s16);
 static void SetPlayerAvatarObjectEventIdAndObjectId(u8, u8);
@@ -2104,7 +2104,7 @@ u8 CreateObjectGraphicsSprite(u16 graphicsId, void (*callback)(struct Sprite *),
 // A unique id is given as an argument and stored in the sprite data to allow referring back to the same virtual object.
 // They can be turned (and, in the case of the Union Room, animated teleporting in and out) but do not have movement types
 // or any of the other data normally associated with object events.
-u8 CreateVirtualObject(u16 graphicsId, u8 virtualObjId, s16 x, s16 y, u8 z, u8 direction)
+u8 CreateVirtualObject(u16 graphicsId, u8 virtualObjId, s16 x, s16 y, u8 elevation, u8 direction)
 {
     u8 spriteId;
     struct Sprite *sprite;
@@ -2138,8 +2138,8 @@ u8 CreateVirtualObject(u16 graphicsId, u8 virtualObjId, s16 x, s16 y, u8 z, u8 d
             SetSubspriteTables(sprite, subspriteTables);
             sprite->subspriteMode = SUBSPRITES_IGNORE_PRIORITY;
         }
-        InitObjectPriorityByElevation(sprite, z);
-        SetObjectSubpriorityByElevation(z, sprite, 1);
+        InitObjectPriorityByElevation(sprite, elevation);
+        SetObjectSubpriorityByElevation(elevation, sprite, 1);
         StartSpriteAnim(sprite, GetFaceDirectionAnimNum(direction));
     }
     return spriteId;
