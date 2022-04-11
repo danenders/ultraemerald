@@ -27,6 +27,7 @@
 #include "trainer_pokemon_sprites.h"
 #include "trig.h"
 #include "util.h"
+#include "follow_me.h"
 #include "constants/field_effects.h"
 #include "constants/event_object_movement.h"
 #include "constants/metatile_behaviors.h"
@@ -40,6 +41,7 @@ EWRAM_DATA u16 gReflectionPaletteBuffer[0x10] = {0};
 
 // Static type declarations
 
+extern void FollowMe_WarpSetEnd(void);
 static void Task_PokecenterHeal(u8 taskId);
 static void PokecenterHealEffect_Init(struct Task *);
 static void PokecenterHealEffect_WaitForBallPlacement(struct Task *);
@@ -1400,8 +1402,11 @@ static void Task_UseFly(u8 taskId)
             gFieldEffectArguments[0] = 0;
 
         FieldEffectStart(FLDEFF_USE_FLY);
+        FollowerIntoPokeball();
+        
         task->data[0]++;
     }
+    
     if (!FieldEffectActiveListContains(FLDEFF_USE_FLY))
     {
         Overworld_ResetStateAfterFly();
@@ -1580,6 +1585,7 @@ static bool8 FallWarpEffect_End(struct Task *task)
     UnfreezeObjectEvents();
     InstallCameraPanAheadCallback();
     DestroyTask(FindTaskIdByFunc(Task_FallWarpFieldEffect));
+    FollowMe_WarpSetEnd();
     return FALSE;
 }
 
@@ -1631,6 +1637,7 @@ static bool8 EscalatorWarpOut_WaitForPlayer(struct Task *task)
         task->tState++;
         task->data[2] = 0;
         task->data[3] = 0;
+        EscalatorMoveFollower(task->data[1]);
         if ((u8)task->tGoingUp == FALSE)
         {
             task->tState = 4; // jump to EscalatorWarpOut_Down_Ride
@@ -1928,6 +1935,7 @@ static bool8 WaterfallFieldEffect_ContinueRideOrEnd(struct Task *task, struct Ob
     gPlayerAvatar.preventStep = FALSE;
     DestroyTask(FindTaskIdByFunc(Task_UseWaterfall));
     FieldEffectActiveListRemove(FLDEFF_USE_WATERFALL);
+    FollowMe_WarpSetEnd();
     return FALSE;
 }
 
@@ -2314,6 +2322,31 @@ static void EscapeRopeWarpOutEffect_Spin(struct Task *task)
         else if (task->tSpinDelay == 0 || (--task->tSpinDelay) == 0)
         {
             ObjectEventSetHeldMovement(objectEvent, GetFaceDirectionMovementAction(spinDirections[objectEvent->facingDirection]));
+            
+            if (gSaveBlock2Ptr->follower.inProgress)
+            {
+                ObjectEventClearHeldMovement(&gObjectEvents[gSaveBlock2Ptr->follower.objId]);
+                switch(objectEvent->facingDirection)
+                {
+                    case DIR_SOUTH:
+                        gSprites[gObjectEvents[gSaveBlock2Ptr->follower.objId].spriteId].x2 = 0;
+                        ObjectEventSetHeldMovement(&gObjectEvents[gSaveBlock2Ptr->follower.objId], 25);
+                        break;
+                    case DIR_NORTH:
+                        gSprites[gObjectEvents[gSaveBlock2Ptr->follower.objId].spriteId].x2 = 0;
+                        ObjectEventSetHeldMovement(&gObjectEvents[gSaveBlock2Ptr->follower.objId], 26);
+                        break;
+                    case DIR_WEST:
+                        gSprites[gObjectEvents[gSaveBlock2Ptr->follower.objId].spriteId].x2 = 8;
+                        ObjectEventSetHeldMovement(&gObjectEvents[gSaveBlock2Ptr->follower.objId], 27);
+                        break;
+                    case DIR_EAST:
+                        gSprites[gObjectEvents[gSaveBlock2Ptr->follower.objId].spriteId].x2 = -8;
+                        ObjectEventSetHeldMovement(&gObjectEvents[gSaveBlock2Ptr->follower.objId], 28);
+                        break;
+                }
+            }
+            
             if (task->tNumTurns < 12)
                 task->tNumTurns++;
             task->tSpinDelay = 8 >> (task->tNumTurns >> 2);
@@ -3055,6 +3088,7 @@ static void SurfFieldEffect_FieldMovePose(struct Task *task)
         SetPlayerAvatarFieldMove();
         ObjectEventSetHeldMovement(objectEvent, MOVEMENT_ACTION_START_ANIM_IN_DIRECTION);
         task->tState++;
+        FollowerIntoPokeball();
     }
 }
 
