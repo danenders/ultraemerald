@@ -6864,6 +6864,35 @@ u16 PlayerGenderToFrontTrainerPicId(u8 playerGender)
         return FacilityClassToPicIndex(FACILITY_CLASS_BRENDAN);
 }
 
+u16 GetTrainerFrontSpriteBasedOnPlayerCostumeAndGender(u8 costumeId, u8 playerGender)
+{
+    u16 trainerPic;
+
+    switch (costumeId)
+    {
+        case DEFAULT_COSTUME:
+            if (playerGender != MALE)
+            {
+                trainerPic = TRAINER_PIC_MAY;
+                break;
+            }
+            else
+            {
+                trainerPic = TRAINER_PIC_BRENDAN;
+                break;
+            }
+        case COSTUME_1:
+            trainerPic = TRAINER_PIC_RS_BRENDAN;
+            break;
+        case COSTUME_2:
+            trainerPic = TRAINER_PIC_RS_MAY;
+            break;
+
+    }
+
+    return trainerPic;
+}
+
 void HandleSetPokedexFlag(u16 nationalNum, u8 caseId, u32 personality)
 {
     u8 getFlagCaseId = (caseId == FLAG_SET_SEEN) ? FLAG_GET_SEEN : FLAG_GET_CAUGHT;

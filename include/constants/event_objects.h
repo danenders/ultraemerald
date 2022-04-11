@@ -887,18 +887,40 @@
 #define OBJ_EVENT_GFX_SPORT_BALL                 677
 #define OBJ_EVENT_GFX_PARK_BALL                  678
 #define OBJ_EVENT_GFX_CHERISH_BALL               679
+
 #define OBJ_EVENT_GFX_EXPANDING_SPARKLE          680
 
 #endif
 
-#define NUM_OBJ_EVENT_GFX                        681
+//Costumes (Test)
+#define OBJ_EVENT_GFX_RS_BRENDAN_FIELD_MOVE      	681
+#define OBJ_EVENT_GFX_RS_BRENDAN_SURFING         	682
+#define OBJ_EVENT_GFX_RS_BRENDAN_MACH_BIKE       	683
+#define OBJ_EVENT_GFX_RS_BRENDAN_ACRO_BIKE       	684
+#define OBJ_EVENT_GFX_RS_BRENDAN_FISHING         	685
+#define OBJ_EVENT_GFX_RS_BRENDAN_WATERING        	686
+#define OBJ_EVENT_GFX_RS_BRENDAN_DECORATING      	687
+#define OBJ_EVENT_GFX_RS_BRENDAN_UNDERWATER      	688
+
+#define OBJ_EVENT_GFX_RS_MAY_FIELD_MOVE          	689
+#define OBJ_EVENT_GFX_RS_MAY_SURFING             	690
+#define OBJ_EVENT_GFX_RS_MAY_MACH_BIKE           	691
+#define OBJ_EVENT_GFX_RS_MAY_ACRO_BIKE           	692
+#define OBJ_EVENT_GFX_RS_MAY_FISHING             	693
+#define OBJ_EVENT_GFX_RS_MAY_WATERING            	694
+#define OBJ_EVENT_GFX_RS_MAY_DECORATING          	695
+#define OBJ_EVENT_GFX_RS_MAY_UNDERWATER          	696
+
+
+#define NUM_OBJ_EVENT_GFX                        697
+
 
 
 // These are dynamic object gfx ids.
 // They correspond with the values of the VAR_OBJ_GFX_ID_X vars.
 // More info about them in include/constants/vars.h
 #define OBJ_EVENT_GFX_VARS   (NUM_OBJ_EVENT_GFX + 1)
-#define OBJ_EVENT_GFX_VAR_0  (OBJ_EVENT_GFX_VARS + 0x0) // 240
+#define OBJ_EVENT_GFX_VAR_0  (OBJ_EVENT_GFX_VARS + 0x0) // Originally 240
 #define OBJ_EVENT_GFX_VAR_1  (OBJ_EVENT_GFX_VARS + 0x1)
 #define OBJ_EVENT_GFX_VAR_2  (OBJ_EVENT_GFX_VARS + 0x2)
 #define OBJ_EVENT_GFX_VAR_3  (OBJ_EVENT_GFX_VARS + 0x3)
@@ -913,7 +935,7 @@
 #define OBJ_EVENT_GFX_VAR_C  (OBJ_EVENT_GFX_VARS + 0xC)
 #define OBJ_EVENT_GFX_VAR_D  (OBJ_EVENT_GFX_VARS + 0xD)
 #define OBJ_EVENT_GFX_VAR_E  (OBJ_EVENT_GFX_VARS + 0xE)
-#define OBJ_EVENT_GFX_VAR_F  (OBJ_EVENT_GFX_VARS + 0xF) // 255
+#define OBJ_EVENT_GFX_VAR_F  (OBJ_EVENT_GFX_VARS + 0xF) // Originally 255
 
 #define SHADOW_SIZE_S   0
 #define SHADOW_SIZE_M   1
