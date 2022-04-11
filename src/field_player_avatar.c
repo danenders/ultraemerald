@@ -20,6 +20,7 @@
 #include "strings.h"
 #include "task.h"
 #include "tv.h"
+#include "follow_me.h"
 #include "wild_encounter.h"
 #include "constants/abilities.h"
 #include "constants/event_objects.h"
@@ -268,9 +269,20 @@ static const u16 sPlayerAvatarGfxIds[COSTUME_COUNT][PLAYER_AVATAR_STATE_COUNT][G
         {OBJ_EVENT_GFX_BRENDAN_FISHING,    OBJ_EVENT_GFX_BRENDAN_FISHING},
         {OBJ_EVENT_GFX_BRENDAN_WATERING,   OBJ_EVENT_GFX_BRENDAN_WATERING},
     },
-    [COSTUME_2] =
+    [COSTUME_2] = //DO NOT USE! Bugged in the battle tower.
     {
         {OBJ_EVENT_GFX_LINK_RS_MAY,    OBJ_EVENT_GFX_LINK_RS_MAY},
+        {OBJ_EVENT_GFX_MAY_MACH_BIKE,  OBJ_EVENT_GFX_MAY_MACH_BIKE},
+        {OBJ_EVENT_GFX_MAY_ACRO_BIKE,  OBJ_EVENT_GFX_MAY_ACRO_BIKE},
+        {OBJ_EVENT_GFX_MAY_SURFING,    OBJ_EVENT_GFX_MAY_SURFING},
+        {OBJ_EVENT_GFX_MAY_UNDERWATER, OBJ_EVENT_GFX_MAY_UNDERWATER},
+        {OBJ_EVENT_GFX_MAY_FIELD_MOVE, OBJ_EVENT_GFX_MAY_FIELD_MOVE},
+        {OBJ_EVENT_GFX_MAY_FISHING,    OBJ_EVENT_GFX_MAY_FISHING},
+        {OBJ_EVENT_GFX_MAY_WATERING,   OBJ_EVENT_GFX_MAY_WATERING},
+    },
+    [COSTUME_3] =
+    {
+        {OBJ_EVENT_GFX_MAY_NORMAL,     OBJ_EVENT_GFX_MAY_NORMAL},
         {OBJ_EVENT_GFX_MAY_MACH_BIKE,  OBJ_EVENT_GFX_MAY_MACH_BIKE},
         {OBJ_EVENT_GFX_MAY_ACRO_BIKE,  OBJ_EVENT_GFX_MAY_ACRO_BIKE},
         {OBJ_EVENT_GFX_MAY_SURFING,    OBJ_EVENT_GFX_MAY_SURFING},
@@ -346,6 +358,25 @@ static const u16 sPlayerAvatarGfxToStateFlag[COSTUME_COUNT][2][5][2] =
         [FEMALE] =
         {
             {OBJ_EVENT_GFX_LINK_RS_MAY,        PLAYER_AVATAR_FLAG_ON_FOOT},
+            {OBJ_EVENT_GFX_MAY_MACH_BIKE,      PLAYER_AVATAR_FLAG_MACH_BIKE},
+            {OBJ_EVENT_GFX_MAY_ACRO_BIKE,      PLAYER_AVATAR_FLAG_ACRO_BIKE},
+            {OBJ_EVENT_GFX_MAY_SURFING,        PLAYER_AVATAR_FLAG_SURFING},
+            {OBJ_EVENT_GFX_MAY_UNDERWATER,     PLAYER_AVATAR_FLAG_UNDERWATER},
+        },
+    },
+    [COSTUME_3] =
+    {
+        [MALE] =
+        {
+            {OBJ_EVENT_GFX_MAY_NORMAL,        PLAYER_AVATAR_FLAG_ON_FOOT},
+            {OBJ_EVENT_GFX_MAY_MACH_BIKE,      PLAYER_AVATAR_FLAG_MACH_BIKE},
+            {OBJ_EVENT_GFX_MAY_ACRO_BIKE,      PLAYER_AVATAR_FLAG_ACRO_BIKE},
+            {OBJ_EVENT_GFX_MAY_SURFING,        PLAYER_AVATAR_FLAG_SURFING},
+            {OBJ_EVENT_GFX_MAY_UNDERWATER,     PLAYER_AVATAR_FLAG_UNDERWATER},
+        },
+        [FEMALE] =
+        {
+            {OBJ_EVENT_GFX_MAY_NORMAL,        PLAYER_AVATAR_FLAG_ON_FOOT},
             {OBJ_EVENT_GFX_MAY_MACH_BIKE,      PLAYER_AVATAR_FLAG_MACH_BIKE},
             {OBJ_EVENT_GFX_MAY_ACRO_BIKE,      PLAYER_AVATAR_FLAG_ACRO_BIKE},
             {OBJ_EVENT_GFX_MAY_SURFING,        PLAYER_AVATAR_FLAG_SURFING},
@@ -676,6 +707,9 @@ static void PlayerNotOnBikeMoving(u8 direction, u16 heldKeys)
     {
         if (collision == COLLISION_LEDGE_JUMP)
         {
+            if (gSaveBlock2Ptr->follower.inProgress && gObjectEvents[gSaveBlock2Ptr->follower.objId].invisible == TRUE)
+                gSaveBlock2Ptr->follower.delayedState = MOVEMENT_ACTION_JUMP_2_DOWN;
+            FollowerPokeballSparkle();
             PlayerJumpLedge(direction);
             return;
         }
@@ -701,14 +735,16 @@ static void PlayerNotOnBikeMoving(u8 direction, u16 heldKeys)
     }
 
     if (!(gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_UNDERWATER) && (heldKeys & B_BUTTON) && FlagGet(FLAG_SYS_B_DASH)
-     && IsRunningDisallowed(gObjectEvents[gPlayerAvatar.objectEventId].currentMetatileBehavior) == 0)
+     && IsRunningDisallowed(gObjectEvents[gPlayerAvatar.objectEventId].currentMetatileBehavior) == 0 && !FollowerComingThroughDoor())
     {
+        FollowerPokeballSparkle();
         PlayerRun(direction);
         gPlayerAvatar.flags |= PLAYER_AVATAR_FLAG_DASH;
         return;
     }
     else
     {
+        FollowerPokeballSparkle();
         PlayerWalkNormal(direction);
     }
 }
@@ -1453,6 +1489,7 @@ void InitPlayerAvatar(s16 x, s16 y, u8 direction, u8 gender)
     gPlayerAvatar.spriteId = objectEvent->spriteId;
     gPlayerAvatar.gender = gender;
     SetPlayerAvatarStateMask(PLAYER_AVATAR_FLAG_CONTROLLABLE | PLAYER_AVATAR_FLAG_ON_FOOT);
+    CreateFollowerAvatar();
 }
 
 void SetPlayerInvisibility(bool8 invisible)

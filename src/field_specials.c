@@ -1498,6 +1498,21 @@ u8 GetLeadMonIndex(void)
     return 0;
 }
 
+u8 GetLeadMonNotFaintedIndex(void)
+{
+    u8 i;
+    u8 partyCount = CalculatePlayerPartyCount();
+    for(i = 0; i < partyCount; i++)
+    {
+        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES2, NULL) != SPECIES_EGG && GetMonData(&gPlayerParty[i], MON_DATA_SPECIES2, NULL) != 0
+            && GetMonData(&gPlayerParty[i], MON_DATA_HP, NULL) != 0)
+        {
+            return i;    
+        }
+    }
+    return 0;
+}
+
 u16 ScriptGetPartyMonSpecies(void)
 {
     return GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_SPECIES2, NULL);

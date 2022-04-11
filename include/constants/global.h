@@ -147,9 +147,15 @@
 #define CONNECTION_DIVE     5
 #define CONNECTION_EMERGE   6
 
+
+#define SIDEWAYS_STAIRS_IMPLEMENTED FALSE
+#define POST_BATTLE_FOLLOWER_FIX    FALSE
+
 #define DEFAULT_COSTUME 0
 #define COSTUME_1       1
 #define COSTUME_2       2
-#define COSTUME_COUNT   3
+#define	COSTUME_3		3
+#define COSTUME_COUNT   4
+
 
 #endif // GUARD_CONSTANTS_GLOBAL_H
