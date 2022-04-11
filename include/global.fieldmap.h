@@ -219,7 +219,7 @@ struct ObjectEvent
     /*0x20*/ u8 previousMovementDirection;
     /*0x21*/ u8 directionSequenceIndex;
     /*0x22*/ u8 playerCopyableMovement; // COPY_MOVE_*
-    /*0x23*/ u8 spriteId; //DUPLICATED?
+    /*0x23*/ //unused
     /*size = 0x24*/
 };
 
