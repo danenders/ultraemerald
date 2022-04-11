@@ -1478,6 +1478,10 @@ void CreateRegionMapPlayerIcon(u16 tileTag, u16 paletteTag)
         sheet.data = sRegionMapPlayerIcon_MayGfx;
         palette.data = sRegionMapPlayerIcon_MayPal;
         break;
+    case COSTUME_3:
+        sheet.data = sRegionMapPlayerIcon_MayGfx;
+        palette.data = sRegionMapPlayerIcon_MayPal;
+        break;
     }
 
     if (IsEventIslandMapSecId(gMapHeader.regionMapSectionId))
