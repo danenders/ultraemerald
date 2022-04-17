@@ -10787,4 +10787,40 @@ const struct PokedexEntry gPokedexEntries[] =
         .trainerScale = 256,
         .trainerOffset = 0,
     },
+
+    [NATIONAL_DEX_SPRIGATITO] =
+    {
+        .categoryName = _("Grass Cat"),
+        .height = 4,
+        .weight = 43,
+        .description = gSprigatitoPokedexText,
+        .pokemonScale = 356,
+        .pokemonOffset = 17,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_FUECOCO] =
+    {
+        .categoryName = _("Fire Croc"),
+        .height = 3,
+        .weight = 85,
+        .description = gFuecocoPokedexText,
+        .pokemonScale = 356,
+        .pokemonOffset = 17,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_QUAXLY] =
+    {
+        .categoryName = _("Duckling"),
+        .height = 8,
+        .weight = 150,
+        .description = gQuaxlyPokedexText,
+        .pokemonScale = 330,
+        .pokemonOffset = 2,
+        .trainerScale = 293,
+        .trainerOffset = 2,
+    },
 };

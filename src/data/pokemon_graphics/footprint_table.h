@@ -899,5 +899,8 @@ const u8 *const gMonFootprintTable[] =
     [SPECIES_GLASTRIER] = gMonFootprint_Glastrier,
     [SPECIES_SPECTRIER] = gMonFootprint_Spectrier,
     [SPECIES_CALYREX] = gMonFootprint_Calyrex,
+    [SPECIES_SPRIGATITO] = gMonFootprint_Sprigatito,
+    [SPECIES_QUAXLY] = gMonFootprint_Quaxly,
+    [SPECIES_FUECOCO] = gMonFootprint_Fuecoco,
     [SPECIES_EGG] = gMonFootprint_Bulbasaur,
 };

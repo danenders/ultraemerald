@@ -9316,6 +9316,24 @@ static const union AnimCmd sAnim_PICHU_SPIKY_EARED_1[] =
     ANIMCMD_END,
 };
 
+static const union AnimCmd sAnim_SPRIGATITO_1[] =
+{
+    ANIMCMD_FRAME(0, 1),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd sAnim_QUAXLY_1[] =
+{
+    ANIMCMD_FRAME(0, 1),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd sAnim_FUECOCO_1[] =
+{
+    ANIMCMD_FRAME(0, 1),
+    ANIMCMD_END,
+};
+
 static const union AnimCmd *const sAnims_NONE[] ={
     sAnim_GeneralFrame0,
     sAnim_NONE_1,
@@ -14669,6 +14687,21 @@ static const union AnimCmd *const sAnims_PICHU_SPIKY_EARED[] ={
     sAnim_PICHU_SPIKY_EARED_1,
 };
 
+static const union AnimCmd *const sAnims_SPRIGATITO[] ={
+    sAnim_GeneralFrame0,
+    sAnim_SPRIGATITO_1,
+};
+
+static const union AnimCmd *const sAnims_QUAXLY[] ={
+    sAnim_GeneralFrame0,
+    sAnim_QUAXLY_1,
+};
+
+static const union AnimCmd *const sAnims_FUECOCO[] ={
+    sAnim_GeneralFrame0,
+    sAnim_FUECOCO_1,
+};
+
 #define ANIM_CMD(name)             [SPECIES_##name] = sAnims_##name
 #define ANIM_CMD_FULL(name, anims) [SPECIES_##name] = anims
 
@@ -15881,6 +15914,9 @@ const union AnimCmd *const *const gMonFrontAnimsPtrTable[] =
     ANIM_CMD_FULL(ZARUDE_DADA, sAnims_ZARUDE),
     ANIM_CMD_FULL(CALYREX_ICE_RIDER, sAnims_CALYREX),
     ANIM_CMD_FULL(CALYREX_SHADOW_RIDER, sAnims_CALYREX),
+    ANIM_CMD(SPRIGATITO),
+    ANIM_CMD(QUAXLY),
+    ANIM_CMD(FUECOCO),
     ANIM_CMD(EGG),
 };
 

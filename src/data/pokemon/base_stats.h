@@ -33956,4 +33956,88 @@ const struct BaseStats gBaseStats[] =
         .bodyColor = BODY_COLOR_BLACK,
         .noFlip = FALSE,
     },
+
+    [SPECIES_SPRIGATITO] =
+    {
+        .baseHP        = 65,
+        .baseAttack    = 40,
+        .baseDefense   = 75,
+        .baseSpeed     = 85,
+        .baseSpAttack  = 80,
+        .baseSpDefense = 75,
+        .type1 = TYPE_GRASS,
+        .type2 = TYPE_GRASS,
+        .catchRate = 3,
+        .expYield = 340,
+        .evYield_SpAttack  = 3,
+        .genderRatio = PERCENT_FEMALE(75),
+        .eggCycles = 120,
+        .friendship = 100,
+        .growthRate = GROWTH_SLOW,
+        .eggGroup1 = EGG_GROUP_UNDISCOVERED,
+        .eggGroup2 = EGG_GROUP_UNDISCOVERED,
+        #ifdef BATTLE_ENGINE
+            .abilities = {ABILITY_OVERGROW, ABILITY_NONE, ABILITY_CONTRARY},
+        #else
+            .abilities = {ABILITY_OVERGROW, ABILITY_NONE},
+        #endif
+        .bodyColor = BODY_COLOR_GREEN,
+        .noFlip = FALSE,
+    },
+
+    [SPECIES_QUAXLY] =
+    {
+        .baseHP        = 70,
+        .baseAttack    = 80,
+        .baseDefense   = 65,
+        .baseSpeed     = 75,
+        .baseSpAttack  = 80,
+        .baseSpDefense = 60,
+        .type1 = TYPE_WATER,
+        .type2 = TYPE_WATER,
+        .catchRate = 3,
+        .expYield = 340,
+        .evYield_SpAttack  = 3,
+        .genderRatio = PERCENT_FEMALE(12.5),
+        .eggCycles = 120,
+        .friendship = 100,
+        .growthRate = GROWTH_SLOW,
+        .eggGroup1 = EGG_GROUP_UNDISCOVERED,
+        .eggGroup2 = EGG_GROUP_UNDISCOVERED,
+        #ifdef BATTLE_ENGINE
+            .abilities = {ABILITY_TORRENT, ABILITY_NONE, ABILITY_DEFIANT},
+        #else
+            .abilities = {ABILITY_NONE, ABILITY_NONE},
+        #endif
+        .bodyColor = BODY_COLOR_BLUE,
+        .noFlip = FALSE,
+    },
+
+    [SPECIES_FUECOCO] =
+    {
+        .baseHP        = 90,
+        .baseAttack    = 60,
+        .baseDefense   = 80,
+        .baseSpeed     = 60,
+        .baseSpAttack  = 80,
+        .baseSpDefense = 40,
+        .type1 = TYPE_FIRE,
+        .type2 = TYPE_FIRE,
+        .catchRate = 3,
+        .expYield = 340,
+        .evYield_SpAttack  = 3,
+        .genderRatio = PERCENT_FEMALE(50),
+        .eggCycles = 120,
+        .friendship = 100,
+        .growthRate = GROWTH_SLOW,
+        .eggGroup1 = EGG_GROUP_UNDISCOVERED,
+        .eggGroup2 = EGG_GROUP_UNDISCOVERED,
+        #ifdef BATTLE_ENGINE
+            .abilities = {ABILITY_BLAZE, ABILITY_NONE, ABILITY_FLAME_BODY},
+        #else
+            .abilities = {ABILITY_BLAZE, ABILITY_NONE},
+        #endif
+        .bodyColor = BODY_COLOR_RED,
+        .noFlip = FALSE,
+    },
 };

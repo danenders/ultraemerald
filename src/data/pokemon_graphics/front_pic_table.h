@@ -1272,6 +1272,10 @@ const struct CompressedSpriteSheet gMonFrontPicTable[] =
     SPECIES_SPRITE(CALYREX_ICE_RIDER, gMonFrontPic_CalyrexIceRider),
     SPECIES_SPRITE(CALYREX_SHADOW_RIDER, gMonFrontPic_CalyrexShadowRider),
 
+    SPECIES_SPRITE(SPRIGATITO, gMonFrontPic_Sprigatito),
+    SPECIES_SPRITE(QUAXLY, gMonFrontPic_Quaxly),
+    SPECIES_SPRITE(FUECOCO, gMonFrontPic_Fuecoco),
+
     SPECIES_SPRITE(EGG, gMonFrontPic_Egg),
 };
 

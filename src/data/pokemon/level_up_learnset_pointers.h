@@ -1272,4 +1272,10 @@ const struct LevelUpMove *const gLevelUpLearnsets[NUM_SPECIES] =
     // Calyrex
     [SPECIES_CALYREX_ICE_RIDER] = sCalyrexIceRiderLevelUpLearnset,
     [SPECIES_CALYREX_SHADOW_RIDER] = sCalyrexShadowRiderLevelUpLearnset,
+
+    //New Pokemon
+    [SPECIES_SPRIGATITO] = sSprigatitoLevelUpLearnset,
+    [SPECIES_QUAXLY] = sQuaxlyLevelUpLearnset,
+    [SPECIES_FUECOCO] = sFuecocoLevelUpLearnset,
+
 };

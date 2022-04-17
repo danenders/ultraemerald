@@ -1237,6 +1237,9 @@ const u8 *const gMonIconTable[] =
     [SPECIES_ZARUDE_DADA] = gMonIcon_ZarudeDada,
     [SPECIES_CALYREX_ICE_RIDER] = gMonIcon_QuestionMark,//gMonIcon_CalyrexIceRider,
     [SPECIES_CALYREX_SHADOW_RIDER] = gMonIcon_QuestionMark,//gMonIcon_CalyrexShadowRider,
+    [SPECIES_SPRIGATITO] = gMonIcon_Sprigatito,
+    [SPECIES_QUAXLY] = gMonIcon_Quaxly,
+    [SPECIES_FUECOCO] = gMonIcon_Fuecoco,
     [SPECIES_EGG] = gMonIcon_Egg,
 };
 
@@ -2432,6 +2435,9 @@ const u8 gMonIconPaletteIndices[] =
     [SPECIES_ZARUDE_DADA] = 1,
     [SPECIES_CALYREX_ICE_RIDER] = 0,
     [SPECIES_CALYREX_SHADOW_RIDER] = 0,
+    [SPECIES_SPRIGATITO] = 1,
+    [SPECIES_QUAXLY] = 3,
+    [SPECIES_FUECOCO] = 2,
     [SPECIES_EGG] = 1,
 };
 

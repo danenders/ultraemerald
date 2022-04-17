@@ -3882,6 +3882,7 @@ bool8 IsBigSprite(u16 graphicsId)
         case OBJ_EVENT_GFX_LUGIA_FOLLOWER:
         case OBJ_EVENT_GFX_HOOH_FOLLOWER:
         case OBJ_EVENT_GFX_WAILORD:
+        case OBJ_EVENT_GFX_REGIGIGAS:
             return TRUE;
         default:
             return FALSE;

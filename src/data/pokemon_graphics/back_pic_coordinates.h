@@ -6104,6 +6104,22 @@ const struct MonCoords gMonBackPicCoords[] =
         .size = MON_COORDS_SIZE(64, 56),
         .y_offset = 7,
     },
+
+    [SPECIES_SPRIGATITO] =
+    {
+        .size = MON_COORDS_SIZE(55, 59),
+        .y_offset = 2,
+    },
+    [SPECIES_QUAXLY] =
+    {
+        .size = MON_COORDS_SIZE(50, 59),
+        .y_offset = 3,
+    },
+    [SPECIES_FUECOCO] =
+    {
+        .size = MON_COORDS_SIZE(49, 53),
+        .y_offset = 4,
+    },
     // Egg
     [SPECIES_EGG] =
     {

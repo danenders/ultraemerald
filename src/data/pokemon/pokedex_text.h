@@ -5348,3 +5348,19 @@ const u8 gCalyrexPokedexText[] = _(
     "providing healing and blessings. It\n"
     "reigned over the Galar region in times\n"
     "of yore.");
+
+const u8 gSprigatitoPokedexText[] = _(
+    "A capricious and attention seeking\n"
+    "Pokémon. If it is feeling neglected,\n"
+    "it will summon a whirlwind of leaves.");
+
+const u8 gFuecocoPokedexText[] = _(
+    "A laid back Pokémon that does things\n"
+    "at its own pace. If it eats enough,\n"
+    "it can sleep for almost an entire\n"
+    "year.");
+
+const u8 gQuaxlyPokedexText[] = _(
+    "An earnest and tidy Pokémon. If it\n"
+    "encounters another Pokémon it will\n"
+    "challenge it to a duel of honor.");

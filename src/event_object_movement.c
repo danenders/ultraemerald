@@ -806,7 +806,44 @@ const u8 gInitialMovementTypeFacingDirections[] = {
 #define OBJ_EVENT_PAL_TAG_SPORT_BALL              0x1077
 #define OBJ_EVENT_PAL_TAG_PARK_BALL               0x1076
 #define OBJ_EVENT_PAL_TAG_CHERISH_BALL            0x1075
-#define OBJ_EVENT_PAL_TAG_NONE                    0x11FF
+
+#define OBJ_EVENT_PAL_TAG_BUDEW                   0x1200
+#define OBJ_EVENT_PAL_TAG_ROSERADE                0x1201
+#define OBJ_EVENT_PAL_TAG_AMBIPOM                 0x1202
+#define OBJ_EVENT_PAL_TAG_CHINGLING               0x1203
+#define OBJ_EVENT_PAL_TAG_MAGNEZONE               0x1204
+#define OBJ_EVENT_PAL_TAG_LICKILICKY              0x1205
+#define OBJ_EVENT_PAL_TAG_RHYPERIOR               0x1206
+#define OBJ_EVENT_PAL_TAG_TANGROWTH               0x1207
+#define OBJ_EVENT_PAL_TAG_YANMEGA                 0x1208
+#define OBJ_EVENT_PAL_TAG_MAMOSWINE               0x1209
+#define OBJ_EVENT_PAL_TAG_GALLADE                 0x120A
+#define OBJ_EVENT_PAL_TAG_PROBOPASS               0x120B
+#define OBJ_EVENT_PAL_TAG_DUSKNOIR                0x120C
+#define OBJ_EVENT_PAL_TAG_FROSLASS                0x120D
+#define OBJ_EVENT_PAL_TAG_HAPPINY                 0x120E
+#define OBJ_EVENT_PAL_TAG_MIME_JR                 0x120F
+#define OBJ_EVENT_PAL_TAG_ELECTIVIRE              0x1210
+#define OBJ_EVENT_PAL_TAG_MAGMORTAR               0x1211
+#define OBJ_EVENT_PAL_TAG_LEAFEON                 0x1212
+#define OBJ_EVENT_PAL_TAG_GLACEON                 0x1213
+#define OBJ_EVENT_PAL_TAG_PORYGON_Z               0x1214
+#define OBJ_EVENT_PAL_TAG_MUNCHLAX                0x1215
+#define OBJ_EVENT_PAL_TAG_MANTYKE                 0x1216
+#define OBJ_EVENT_PAL_TAG_TOGEKISS                0x1217
+#define OBJ_EVENT_PAL_TAG_BONSLY                  0x1218
+#define OBJ_EVENT_PAL_TAG_HONCHKROW               0x1219
+#define OBJ_EVENT_PAL_TAG_MISMAGIUS               0x121A
+#define OBJ_EVENT_PAL_TAG_GLISCOR                 0x121B
+#define OBJ_EVENT_PAL_TAG_WEAVILE                 0x121C
+#define OBJ_EVENT_PAL_TAG_SYLVEON                 0x121D
+#define OBJ_EVENT_PAL_TAG_REGIGIGAS               0x121E
+#define OBJ_EVENT_PAL_TAG_QUAXLY                  0x121F
+#define OBJ_EVENT_PAL_TAG_FUECOCO                 0x1220
+#define OBJ_EVENT_PAL_TAG_SPRIGATITO              0x1221
+
+
+#define OBJ_EVENT_PAL_TAG_NONE                    0x1222
 
 #include "data/field_effects/field_effect_object_template_pointers.h"
 #include "data/object_events/object_event_pic_tables.h"
@@ -1211,6 +1248,41 @@ static const struct SpritePalette sObjectEventSpritePalettes[] = {
     {gObjectEventPal_ParkBall,              OBJ_EVENT_PAL_TAG_PARK_BALL},
     {gObjectEventPal_CherishBall,           OBJ_EVENT_PAL_TAG_CHERISH_BALL},
     {gFieldEffectPal_SmallSparkle,          FLDEFF_PAL_TAG_SMALL_SPARKLE},
+
+    {gObjectEventPal_MimeJr,                OBJ_EVENT_PAL_TAG_MIME_JR},
+    {gObjectEventPal_Togekiss,              OBJ_EVENT_PAL_TAG_TOGEKISS},
+    {gObjectEventPal_PorygonZ,              OBJ_EVENT_PAL_TAG_PORYGON_Z},
+    {gObjectEventPal_Budew,                 OBJ_EVENT_PAL_TAG_BUDEW},
+    {gObjectEventPal_Roserade,              OBJ_EVENT_PAL_TAG_ROSERADE},
+    {gObjectEventPal_Rhyperior,             OBJ_EVENT_PAL_TAG_RHYPERIOR},
+    {gObjectEventPal_Yanmega,               OBJ_EVENT_PAL_TAG_YANMEGA},
+    {gObjectEventPal_Probopass,             OBJ_EVENT_PAL_TAG_PROBOPASS},
+    {gObjectEventPal_Dusknoir,              OBJ_EVENT_PAL_TAG_DUSKNOIR},
+    {gObjectEventPal_Froslass,              OBJ_EVENT_PAL_TAG_FROSLASS},
+    {gObjectEventPal_Ambipom,               OBJ_EVENT_PAL_TAG_AMBIPOM},
+    {gObjectEventPal_Gallade,               OBJ_EVENT_PAL_TAG_GALLADE},
+    {gObjectEventPal_Gliscor,               OBJ_EVENT_PAL_TAG_GLISCOR},
+    {gObjectEventPal_Lickilicky,            OBJ_EVENT_PAL_TAG_LICKILICKY},
+    {gObjectEventPal_Tangrowth,             OBJ_EVENT_PAL_TAG_TANGROWTH},
+    {gObjectEventPal_Electivire,            OBJ_EVENT_PAL_TAG_ELECTIVIRE},
+    {gObjectEventPal_Magmortar,             OBJ_EVENT_PAL_TAG_MAGMORTAR},
+    {gObjectEventPal_Mismagius,             OBJ_EVENT_PAL_TAG_MISMAGIUS},
+    {gObjectEventPal_Honchkrow,             OBJ_EVENT_PAL_TAG_HONCHKROW},
+    {gObjectEventPal_Magnezone,             OBJ_EVENT_PAL_TAG_MAGNEZONE},
+    {gObjectEventPal_Mamoswine,             OBJ_EVENT_PAL_TAG_MAMOSWINE},
+    {gObjectEventPal_Weavile,               OBJ_EVENT_PAL_TAG_WEAVILE},
+    {gObjectEventPal_Chingling,             OBJ_EVENT_PAL_TAG_CHINGLING},
+    {gObjectEventPal_Bonsly,                OBJ_EVENT_PAL_TAG_BONSLY},
+    {gObjectEventPal_Happiny,               OBJ_EVENT_PAL_TAG_HAPPINY},
+    {gObjectEventPal_Munchlax,              OBJ_EVENT_PAL_TAG_MUNCHLAX},
+    {gObjectEventPal_Mantyke,               OBJ_EVENT_PAL_TAG_MANTYKE},
+    {gObjectEventPal_Leafeon,               OBJ_EVENT_PAL_TAG_LEAFEON},
+    {gObjectEventPal_Glaceon,               OBJ_EVENT_PAL_TAG_GLACEON},
+    {gObjectEventPal_Sylveon,               OBJ_EVENT_PAL_TAG_SYLVEON},
+    {gObjectEventPal_Regigigas,             OBJ_EVENT_PAL_TAG_REGIGIGAS},
+    {gObjectEventPal_Quaxly,                OBJ_EVENT_PAL_TAG_QUAXLY},
+    {gObjectEventPal_Fuecoco,               OBJ_EVENT_PAL_TAG_FUECOCO},
+    {gObjectEventPal_Sprigatito,            OBJ_EVENT_PAL_TAG_SPRIGATITO},
     {},
 };
 

@@ -1271,6 +1271,10 @@ gCryTable::
 	@ Calyrex
 	cry Cry_CalyrexIceRider
 	cry Cry_CalyrexShadowRider
+	@NewPokemon
+	cry Cry_Sprigatito
+	cry Cry_Quaxly
+	cry Cry_Fuecoco
 
 	.align 2
 gCryTable_Reverse::
@@ -2545,3 +2549,7 @@ gCryTable_Reverse::
 	@ Calyrex
 	cry_reverse Cry_CalyrexIceRider
 	cry_reverse Cry_CalyrexShadowRider
+	@NewPokemon
+	cry_reverse Cry_Sprigatito
+	cry_reverse Cry_Quaxly
+	cry_reverse Cry_Fuecoco

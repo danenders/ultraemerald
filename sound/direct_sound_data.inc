@@ -4541,3 +4541,15 @@ DirectSoundWaveData_sd90_classical_whistle::
 	.align 2
 DirectSoundWaveData_sd90_enhanced_delay_shaku::
 	.incbin "sound/direct_sound_samples/sd90_enhanced_delay_shaku.bin"
+
+	.align 2
+Cry_Sprigatito::
+	.incbin "sound/direct_sound_samples/cries/litten.bin"
+
+	.align 2
+Cry_Fuecoco::
+	.incbin "sound/direct_sound_samples/cries/sandile.bin"
+
+	.align 2
+Cry_Quaxly::
+	.incbin "sound/direct_sound_samples/cries/ducklett.bin"

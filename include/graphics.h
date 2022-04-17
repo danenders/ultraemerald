@@ -10194,4 +10194,25 @@ extern const u32 gSummaryScreenPageContestMoveDetailsTilemap[];
 extern const u32 gSummaryScreenPageContestNewMoveTilemap[];
 extern const u32 gSummaryScreenPageConditionTilemap[];
 
+extern const u32 gMonFrontPic_Sprigatito[];
+extern const u32 gMonBackPic_Sprigatito[];
+extern const u32 gMonPalette_Sprigatito[];
+extern const u32 gMonShinyPalette_Sprigatito[];
+extern const u8 gMonIcon_Sprigatito[];
+extern const u8 gMonFootprint_Sprigatito[];
+
+extern const u32 gMonFrontPic_Quaxly[];
+extern const u32 gMonBackPic_Quaxly[];
+extern const u32 gMonPalette_Quaxly[];
+extern const u32 gMonShinyPalette_Quaxly[];
+extern const u8 gMonIcon_Quaxly[];
+extern const u8 gMonFootprint_Quaxly[];
+
+extern const u32 gMonFrontPic_Fuecoco[];
+extern const u32 gMonBackPic_Fuecoco[];
+extern const u32 gMonPalette_Fuecoco[];
+extern const u32 gMonShinyPalette_Fuecoco[];
+extern const u8 gMonIcon_Fuecoco[];
+extern const u8 gMonFootprint_Fuecoco[];
+
 #endif //GUARD_GRAPHICS_H

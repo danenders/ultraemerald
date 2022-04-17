@@ -1017,6 +1017,10 @@ bool8 IsFlyingPokemonGraphic(u16 graphicsId)
         case OBJ_EVENT_GFX_KYOGRE:
         case OBJ_EVENT_GFX_LATIAS_FOLLOWER:
         case OBJ_EVENT_GFX_LATIOS_FOLLOWER:
+        case OBJ_EVENT_GFX_YANMEGA:
+        case OBJ_EVENT_GFX_DUSKNOIR:
+        case OBJ_EVENT_GFX_FROSLASS:
+        case OBJ_EVENT_GFX_GLISCOR:
             return TRUE;
         default:
             return FALSE;

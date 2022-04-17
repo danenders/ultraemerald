@@ -681,6 +681,41 @@ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Deoxys_Attack;
 const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Deoxys_Defense;
 const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Deoxys_Speed;
 
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Ambipom;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Rhyperior;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Probopass;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_PorygonZ;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Gallade;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Gliscor;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Mantyke;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Chingling;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Yanmega;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_MimeJr;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Electivire;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Magmortar;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Magnezone;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Tangrowth;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Lickilicky;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Mismagius;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Togekiss;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Mamoswine;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Budew;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Roserade;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Munchlax;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Bonsly;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Happiny;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Weavile;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Honchkrow;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Regigigas;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Dusknoir;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Froslass;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Glaceon;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Leafeon;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Sylveon;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Quaxly;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Fuecoco;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Sprigatito;
+
 //Costumes
 const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RubySapphireBrendanFieldMove;
 const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RubySapphireBrendanSurfing;
@@ -1377,6 +1412,39 @@ const struct ObjectEventGraphicsInfo *const gObjectEventGraphicsInfoPointers[NUM
     [OBJ_EVENT_GFX_DEOXYS_ATTACK] =            &gObjectEventGraphicsInfo_Deoxys_Attack,
     [OBJ_EVENT_GFX_DEOXYS_DEFENSE] =           &gObjectEventGraphicsInfo_Deoxys_Defense,
     [OBJ_EVENT_GFX_DEOXYS_SPEED] =             &gObjectEventGraphicsInfo_Deoxys_Speed,
+
+    [OBJ_EVENT_GFX_BUDEW] =                    &gObjectEventGraphicsInfo_Budew,
+    [OBJ_EVENT_GFX_ROSERADE] =                 &gObjectEventGraphicsInfo_Roserade,
+    [OBJ_EVENT_GFX_AMBIPOM] =                  &gObjectEventGraphicsInfo_Ambipom,
+    [OBJ_EVENT_GFX_CHINGLING] =                &gObjectEventGraphicsInfo_Chingling,
+    [OBJ_EVENT_GFX_MAGNEZONE] =                &gObjectEventGraphicsInfo_Magnezone,
+    [OBJ_EVENT_GFX_RHYPERIOR] =                &gObjectEventGraphicsInfo_Rhyperior,
+    [OBJ_EVENT_GFX_BONSLY] =                   &gObjectEventGraphicsInfo_Bonsly,
+    [OBJ_EVENT_GFX_TOGEKISS] =                 &gObjectEventGraphicsInfo_Togekiss,
+    [OBJ_EVENT_GFX_MIME_JR] =                  &gObjectEventGraphicsInfo_MimeJr,
+    [OBJ_EVENT_GFX_PORYGON_Z] =                &gObjectEventGraphicsInfo_PorygonZ,
+    [OBJ_EVENT_GFX_TANGROWTH] =                &gObjectEventGraphicsInfo_Tangrowth,
+    [OBJ_EVENT_GFX_LICKILICKY] =               &gObjectEventGraphicsInfo_Lickilicky,
+    [OBJ_EVENT_GFX_ELECTIVIRE] =               &gObjectEventGraphicsInfo_Electivire,
+    [OBJ_EVENT_GFX_MAGMORTAR] =                &gObjectEventGraphicsInfo_Magmortar,
+    [OBJ_EVENT_GFX_YANMEGA] =                  &gObjectEventGraphicsInfo_Yanmega,
+    [OBJ_EVENT_GFX_PROBOPASS] =                &gObjectEventGraphicsInfo_Probopass,
+    [OBJ_EVENT_GFX_MUNCHLAX] =                 &gObjectEventGraphicsInfo_Munchlax,
+    [OBJ_EVENT_GFX_MANTYKE] =                  &gObjectEventGraphicsInfo_Mantyke,
+    [OBJ_EVENT_GFX_HAPPINY] =                  &gObjectEventGraphicsInfo_Happiny,
+    [OBJ_EVENT_GFX_GLISCOR] =                  &gObjectEventGraphicsInfo_Gliscor,
+    [OBJ_EVENT_GFX_GALLADE] =                  &gObjectEventGraphicsInfo_Gallade,
+    [OBJ_EVENT_GFX_MAMOSWINE] =                &gObjectEventGraphicsInfo_Mamoswine,
+    [OBJ_EVENT_GFX_MISMAGIUS] =                &gObjectEventGraphicsInfo_Mismagius,
+    [OBJ_EVENT_GFX_HONCHKROW] =                &gObjectEventGraphicsInfo_Honchkrow,
+    [OBJ_EVENT_GFX_REGIGIGAS] =                &gObjectEventGraphicsInfo_Regigigas,
+    [OBJ_EVENT_GFX_GLACEON] =                  &gObjectEventGraphicsInfo_Glaceon,
+    [OBJ_EVENT_GFX_LEAFEON] =                  &gObjectEventGraphicsInfo_Leafeon,
+    [OBJ_EVENT_GFX_SYLVEON] =                  &gObjectEventGraphicsInfo_Sylveon,
+    [OBJ_EVENT_GFX_QUAXLY] =                   &gObjectEventGraphicsInfo_Quaxly,
+    [OBJ_EVENT_GFX_FUECOCO] =                  &gObjectEventGraphicsInfo_Fuecoco,
+    [OBJ_EVENT_GFX_SPRIGATITO] =               &gObjectEventGraphicsInfo_Sprigatito,
+
     [OBJ_EVENT_GFX_RS_BRENDAN_FIELD_MOVE] =    &gObjectEventGraphicsInfo_RubySapphireBrendanFieldMove,
     [OBJ_EVENT_GFX_RS_BRENDAN_SURFING] =       &gObjectEventGraphicsInfo_RubySapphireBrendanSurfing,
     [OBJ_EVENT_GFX_RS_BRENDAN_MACH_BIKE] =     &gObjectEventGraphicsInfo_RubySapphireBrendanMachBike,
