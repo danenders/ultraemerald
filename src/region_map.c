@@ -123,10 +123,26 @@ static const u32 sRegionMapCursorLargeGfxLZ[] = INCBIN_U32("graphics/pokenav/reg
 static const u16 sRegionMapBg_Pal[] = INCBIN_U16("graphics/pokenav/region_map.gbapal");
 static const u32 sRegionMapBg_GfxLZ[] = INCBIN_U32("graphics/pokenav/region_map.8bpp.lz");
 static const u32 sRegionMapBg_TilemapLZ[] = INCBIN_U32("graphics/pokenav/region_map_map.bin.lz");
-static const u16 sRegionMapPlayerIcon_BrendanPal[] = INCBIN_U16("graphics/pokenav/region_map/brendan_icon.gbapal");
-static const u8 sRegionMapPlayerIcon_BrendanGfx[] = INCBIN_U8("graphics/pokenav/region_map/brendan_icon.4bpp");
-static const u16 sRegionMapPlayerIcon_MayPal[] = INCBIN_U16("graphics/pokenav/region_map/may_icon.gbapal");
-static const u8 sRegionMapPlayerIcon_MayGfx[] = INCBIN_U8("graphics/pokenav/region_map/may_icon.4bpp");
+
+static const u16 sRegionMapPlayerIcon_BrendanPal[] = INCBIN_U16("graphics/pokenav/region_map/icons/brendan_icon.gbapal");
+static const u8 sRegionMapPlayerIcon_BrendanGfx[] = INCBIN_U8("graphics/pokenav/region_map/icons/brendan_icon.4bpp");
+static const u16 sRegionMapPlayerIcon_MayPal[] = INCBIN_U16("graphics/pokenav/region_map/icons/may_icon.gbapal");
+static const u8 sRegionMapPlayerIcon_MayGfx[] = INCBIN_U8("graphics/pokenav/region_map/icons/may_icon.4bpp");
+static const u16 sRegionMapPlayerIcon_RedPal[] = INCBIN_U16("graphics/pokenav/region_map/icons/red_icon.gbapal");
+static const u8 sRegionMapPlayerIcon_RedGfx[] = INCBIN_U8("graphics/pokenav/region_map/icons/red_icon.4bpp");
+static const u16 sRegionMapPlayerIcon_LeafPal[] = INCBIN_U16("graphics/pokenav/region_map/icons/leaf_icon.gbapal");
+static const u8 sRegionMapPlayerIcon_LeafGfx[] = INCBIN_U8("graphics/pokenav/region_map/icons/leaf_icon.4bpp");
+static const u16 sRegionMapPlayerIcon_EthanPal[] = INCBIN_U16("graphics/pokenav/region_map/icons/ethan_icon.gbapal");
+static const u8 sRegionMapPlayerIcon_EthanGfx[] = INCBIN_U8("graphics/pokenav/region_map/icons/ethan_icon.4bpp");
+static const u16 sRegionMapPlayerIcon_LyraPal[] = INCBIN_U16("graphics/pokenav/region_map/icons/lyra_icon.gbapal");
+static const u8 sRegionMapPlayerIcon_LyraGfx[] = INCBIN_U8("graphics/pokenav/region_map/icons/lyra_icon.4bpp");
+static const u16 sRegionMapPlayerIcon_KrisPal[] = INCBIN_U16("graphics/pokenav/region_map/icons/kris_icon.gbapal");
+static const u8 sRegionMapPlayerIcon_KrisGfx[] = INCBIN_U8("graphics/pokenav/region_map/icons/kris_icon.4bpp");
+static const u16 sRegionMapPlayerIcon_LucasPal[] = INCBIN_U16("graphics/pokenav/region_map/icons/lucas_icon.gbapal");
+static const u8 sRegionMapPlayerIcon_LucasGfx[] = INCBIN_U8("graphics/pokenav/region_map/icons/lucas_icon.4bpp");
+static const u16 sRegionMapPlayerIcon_DawnPal[] = INCBIN_U16("graphics/pokenav/region_map/icons/dawn_icon.gbapal");
+static const u8 sRegionMapPlayerIcon_DawnGfx[] = INCBIN_U8("graphics/pokenav/region_map/icons/dawn_icon.4bpp");
+
 static const u8 sRegionMap_MapSectionLayout[] = INCBIN_U8("graphics/pokenav/region_map_section_layout.bin");
 
 #include "data/region_map/region_map_entries.h"
@@ -1458,7 +1474,7 @@ void CreateRegionMapPlayerIcon(u16 tileTag, u16 paletteTag)
 
     switch (gSaveBlock2Ptr->costumeId)
     {
-    case DEFAULT_COSTUME:
+    case ENBY_COSTUME:
         if (gSaveBlock2Ptr->playerGender == FEMALE)
         {
             sheet.data = sRegionMapPlayerIcon_MayGfx;
@@ -1470,17 +1486,43 @@ void CreateRegionMapPlayerIcon(u16 tileTag, u16 paletteTag)
             palette.data = sRegionMapPlayerIcon_BrendanPal;    
         }
         break;
-    case COSTUME_1:
+    case BRENDAN_COSTUME:
         sheet.data = sRegionMapPlayerIcon_BrendanGfx;
         palette.data = sRegionMapPlayerIcon_BrendanPal;
         break;
-    case COSTUME_2:
+    case MAY_COSTUME:
         sheet.data = sRegionMapPlayerIcon_MayGfx;
         palette.data = sRegionMapPlayerIcon_MayPal;
         break;
-    case COSTUME_3:
-        sheet.data = sRegionMapPlayerIcon_MayGfx;
-        palette.data = sRegionMapPlayerIcon_MayPal;
+    case RED_COSTUME:
+        sheet.data = sRegionMapPlayerIcon_RedGfx;
+        palette.data = sRegionMapPlayerIcon_RedPal;
+        break;
+    case LEAF_COSTUME:
+        sheet.data = sRegionMapPlayerIcon_LeafGfx;
+        palette.data = sRegionMapPlayerIcon_LeafPal;
+        break;
+    case ETHAN_COSTUME:
+        sheet.data = sRegionMapPlayerIcon_EthanGfx;
+        palette.data = sRegionMapPlayerIcon_EthanPal;
+        break;
+    case LYRA_COSTUME:
+        sheet.data = sRegionMapPlayerIcon_LyraGfx;
+        palette.data = sRegionMapPlayerIcon_LyraPal;
+        break;
+    case KRIS_COSTUME:
+        sheet.data = sRegionMapPlayerIcon_KrisGfx;
+        palette.data = sRegionMapPlayerIcon_KrisPal;
+        break;
+    case LUCAS_COSTUME:
+    case LUCAS_PLATINUM_COSTUME:
+        sheet.data = sRegionMapPlayerIcon_LucasGfx;
+        palette.data = sRegionMapPlayerIcon_LucasPal;
+        break;
+    case DAWN_COSTUME:
+    case DAWN_PLATINUM_COSTUME:
+        sheet.data = sRegionMapPlayerIcon_DawnGfx;
+        palette.data = sRegionMapPlayerIcon_DawnPal;
         break;
     }
 

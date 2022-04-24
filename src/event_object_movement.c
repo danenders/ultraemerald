@@ -841,9 +841,18 @@ const u8 gInitialMovementTypeFacingDirections[] = {
 #define OBJ_EVENT_PAL_TAG_QUAXLY                  0x121F
 #define OBJ_EVENT_PAL_TAG_FUECOCO                 0x1220
 #define OBJ_EVENT_PAL_TAG_SPRIGATITO              0x1221
+#define OBJ_EVENT_PAL_TAG_RED                     0x1222
+#define OBJ_EVENT_PAL_TAG_LEAF                    0x1223
+#define OBJ_EVENT_PAL_TAG_ETHAN                   0x1224
+#define OBJ_EVENT_PAL_TAG_LYRA                    0x1225
+#define OBJ_EVENT_PAL_TAG_KRIS                    0x1226
+#define OBJ_EVENT_PAL_TAG_LUCAS                   0x1227
+#define OBJ_EVENT_PAL_TAG_DAWN                    0x1228
+#define OBJ_EVENT_PAL_TAG_LUCAS_PLATINUM          0x1229
+#define OBJ_EVENT_PAL_TAG_DAWN_PLATINUM           0x122A
+#define OBJ_EVENT_PAL_TAG_ENBY                    0x122B
 
-
-#define OBJ_EVENT_PAL_TAG_NONE                    0x1222
+#define OBJ_EVENT_PAL_TAG_NONE                    0x122C
 
 #include "data/field_effects/field_effect_object_template_pointers.h"
 #include "data/object_events/object_event_pic_tables.h"
@@ -1248,7 +1257,6 @@ static const struct SpritePalette sObjectEventSpritePalettes[] = {
     {gObjectEventPal_ParkBall,              OBJ_EVENT_PAL_TAG_PARK_BALL},
     {gObjectEventPal_CherishBall,           OBJ_EVENT_PAL_TAG_CHERISH_BALL},
     {gFieldEffectPal_SmallSparkle,          FLDEFF_PAL_TAG_SMALL_SPARKLE},
-
     {gObjectEventPal_MimeJr,                OBJ_EVENT_PAL_TAG_MIME_JR},
     {gObjectEventPal_Togekiss,              OBJ_EVENT_PAL_TAG_TOGEKISS},
     {gObjectEventPal_PorygonZ,              OBJ_EVENT_PAL_TAG_PORYGON_Z},
@@ -1283,6 +1291,16 @@ static const struct SpritePalette sObjectEventSpritePalettes[] = {
     {gObjectEventPal_Quaxly,                OBJ_EVENT_PAL_TAG_QUAXLY},
     {gObjectEventPal_Fuecoco,               OBJ_EVENT_PAL_TAG_FUECOCO},
     {gObjectEventPal_Sprigatito,            OBJ_EVENT_PAL_TAG_SPRIGATITO},
+    {gObjectEventPal_Red,                   OBJ_EVENT_PAL_TAG_RED},
+    {gObjectEventPal_Leaf,                  OBJ_EVENT_PAL_TAG_LEAF},
+    {gObjectEventPal_Ethan,                 OBJ_EVENT_PAL_TAG_ETHAN},
+    {gObjectEventPal_Lyra,                  OBJ_EVENT_PAL_TAG_LYRA},
+    {gObjectEventPal_Kris,                  OBJ_EVENT_PAL_TAG_KRIS},
+    {gObjectEventPal_Lucas,                 OBJ_EVENT_PAL_TAG_LUCAS},
+    {gObjectEventPal_Dawn,                  OBJ_EVENT_PAL_TAG_DAWN},
+    {gObjectEventPal_LucasPlatinum,         OBJ_EVENT_PAL_TAG_LUCAS_PLATINUM},
+    {gObjectEventPal_DawnPlatinum,          OBJ_EVENT_PAL_TAG_DAWN_PLATINUM},
+    {gObjectEventPal_Enby,                  OBJ_EVENT_PAL_TAG_ENBY},
     {},
 };
 
