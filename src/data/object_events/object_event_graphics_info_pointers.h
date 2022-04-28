@@ -716,6 +716,19 @@ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Quaxly;
 const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Fuecoco;
 const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Sprigatito;
 
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ProfOak;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Lanette;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Blue;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Zinnia;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_PsychicF;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_TuberFSwimming;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_SchoolKidF;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Giovanni;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RocketMemberF;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RocketMemberM;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_CoolTrainerM;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_CoolTrainerF;
+
 //Costumes
 const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RubySapphireBrendanFieldMove;
 const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RubySapphireBrendanSurfing;
@@ -1635,6 +1648,19 @@ const struct ObjectEventGraphicsInfo *const gObjectEventGraphicsInfoPointers[NUM
     [OBJ_EVENT_GFX_DAWN_PLATINUM_WATERING] =         &gObjectEventGraphicsInfo_DawnPlatinumWatering,
     [OBJ_EVENT_GFX_DAWN_PLATINUM_DECORATING] =       &gObjectEventGraphicsInfo_DawnPlatinumDecorating,
     [OBJ_EVENT_GFX_ENBY] =           				 &gObjectEventGraphicsInfo_Enby,
+
+    [OBJ_EVENT_GFX_PROF_OAK] =           			 &gObjectEventGraphicsInfo_ProfOak,
+    [OBJ_EVENT_GFX_ZINNIA] =           				 &gObjectEventGraphicsInfo_Zinnia,
+    [OBJ_EVENT_GFX_BLUE] =           				 &gObjectEventGraphicsInfo_Blue,
+    [OBJ_EVENT_GFX_LANETTE] =           			 &gObjectEventGraphicsInfo_Lanette,
+    [OBJ_EVENT_GFX_GIOVANNI] =           			 &gObjectEventGraphicsInfo_Giovanni,
+    [OBJ_EVENT_GFX_ROCKET_MEMBER_M] =           	 &gObjectEventGraphicsInfo_RocketMemberM,
+    [OBJ_EVENT_GFX_ROCKET_MEMBER_F] =       		 &gObjectEventGraphicsInfo_RocketMemberF,
+    [OBJ_EVENT_GFX_PSYCHIC_F] =           			 &gObjectEventGraphicsInfo_PsychicF,
+    [OBJ_EVENT_GFX_TUBER_F_SWIMMING] =           	 &gObjectEventGraphicsInfo_TuberFSwimming,
+    [OBJ_EVENT_GFX_SCHOOL_KID_F] =           		 &gObjectEventGraphicsInfo_SchoolKidF,
+    [OBJ_EVENT_GFX_COOL_TRAINER_M] =           	 	 &gObjectEventGraphicsInfo_CoolTrainerM,
+    [OBJ_EVENT_GFX_COOL_TRAINER_F] =       		 	 &gObjectEventGraphicsInfo_CoolTrainerF,
 };
 
 const struct ObjectEventGraphicsInfo *const gMauvilleOldManGraphicsInfoPointers[] = {

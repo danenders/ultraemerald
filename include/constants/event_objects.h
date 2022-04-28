@@ -217,16 +217,16 @@
 #define OBJ_EVENT_GFX_MAGMA_MEMBER_M             	NPC_GFX + 28
 #define OBJ_EVENT_GFX_MAGMA_MEMBER_F             	NPC_GFX + 29
 #define OBJ_EVENT_GFX_GIOVANNI             			NPC_GFX + 30 	//Placeholder
-#define OBJ_EVENT_GFX_ROCKET_ADMIN             		NPC_GFX + 31 	//Placeholder
-#define OBJ_EVENT_GFX_ROCKET_M             			NPC_GFX + 32 	//Placeholder
-#define OBJ_EVENT_GFX_ROCKET_F             			NPC_GFX + 33 	//Placeholder
+#define OBJ_EVENT_GFX_ROCKET_ADMIN             		NPC_GFX + 31 	
+#define OBJ_EVENT_GFX_ROCKET_MEMBER_M             	NPC_GFX + 32 	
+#define OBJ_EVENT_GFX_ROCKET_MEMBER_F             	NPC_GFX + 33 	
 
 //Unique NPCs
 #define OBJ_EVENT_GFX_MOM                        	NPC_GFX + 34
 #define OBJ_EVENT_GFX_PROF_BIRCH                  	NPC_GFX + 35
-#define OBJ_EVENT_GFX_PROF_OAK                  	NPC_GFX + 36 //Placeholder
-#define OBJ_EVENT_GFX_PROF_LANETTE                  NPC_GFX + 37 //Placeholder
-#define OBJ_EVENT_GFX_PROF_ZINNIA                  	NPC_GFX + 38 //Placeholder
+#define OBJ_EVENT_GFX_PROF_OAK                  	NPC_GFX + 36 
+#define OBJ_EVENT_GFX_LANETTE                  		NPC_GFX + 37 
+#define OBJ_EVENT_GFX_ZINNIA                  		NPC_GFX + 38 
 #define OBJ_EVENT_GFX_SCOTT                      	NPC_GFX + 39
 #define OBJ_EVENT_GFX_STEVEN                     	NPC_GFX + 40
 #define OBJ_EVENT_GFX_WALLY                      	NPC_GFX + 41
@@ -243,11 +243,12 @@
 #define OBJ_EVENT_GFX_HOT_SPRINGS_OLD_WOMAN      	NPC_GFX + 52
 #define OBJ_EVENT_GFX_BARD                        	NPC_GFX + 53
 #define OBJ_EVENT_GFX_RED                        	NPC_GFX + 54
-#define OBJ_EVENT_GFX_LEAF                       	NPC_GFX + 55
+#define OBJ_EVENT_GFX_BLUE                       	NPC_GFX + 55
+#define OBJ_EVENT_GFX_LEAF                       	NPC_GFX + 56
 
 //MISC
-#define OBJ_EVENT_GFX_LITTLE_BOY_3               	NPC_GFX + 56 //UNUSED?
-#define OBJ_EVENT_GFX_QUINTY_PLUMP                 	NPC_GFX + 57
+#define OBJ_EVENT_GFX_LITTLE_BOY_3               	NPC_GFX + 57 //UNUSED?
+#define OBJ_EVENT_GFX_QUINTY_PLUMP                 	NPC_GFX + 58
 
 #define GENERIC_NPC_GFX								OBJ_EVENT_GFX_QUINTY_PLUMP
 
@@ -296,15 +297,15 @@
 #define OBJ_EVENT_GFX_REPORTER_M                  	GENDERED_NPC_GFX + 19
 #define OBJ_EVENT_GFX_REPORTER_F                  	GENDERED_NPC_GFX + 20
 #define OBJ_EVENT_GFX_PSYCHIC_M                   	GENDERED_NPC_GFX + 21
-#define OBJ_EVENT_GFX_PSYCHIC_F                   	GENDERED_NPC_GFX + 22 //Placeholder
+#define OBJ_EVENT_GFX_PSYCHIC_F                   	GENDERED_NPC_GFX + 22 
 #define OBJ_EVENT_GFX_SCHOOL_KID_M                	GENDERED_NPC_GFX + 23
-#define OBJ_EVENT_GFX_SCHOOL_KID_F                	GENDERED_NPC_GFX + 24 //Placeholder
+#define OBJ_EVENT_GFX_SCHOOL_KID_F                	GENDERED_NPC_GFX + 24 
 #define OBJ_EVENT_GFX_TUBER_M_SWIMMING           	GENDERED_NPC_GFX + 25
-#define OBJ_EVENT_GFX_TUBER_F_SWIMMING           	GENDERED_NPC_GFX + 26 //Placeholder
-#define OBJ_EVENT_GFX_ACE_TRAINER_M                 GENDERED_NPC_GFX + 27 //Placeholder
-#define OBJ_EVENT_GFX_ACE_TRAINER_F                 GENDERED_NPC_GFX + 28 //Placeholder
+#define OBJ_EVENT_GFX_TUBER_F_SWIMMING           	GENDERED_NPC_GFX + 26
+#define OBJ_EVENT_GFX_COOL_TRAINER_M                GENDERED_NPC_GFX + 27
+#define OBJ_EVENT_GFX_COOL_TRAINER_F                GENDERED_NPC_GFX + 28 
 
-#define TRAINER_NPC_GFX								OBJ_EVENT_GFX_ACE_TRAINER_F
+#define TRAINER_NPC_GFX								OBJ_EVENT_GFX_COOL_TRAINER_F
 
 //Trainer Classes
 #define OBJ_EVENT_GFX_HIKER                       	TRAINER_NPC_GFX + 1

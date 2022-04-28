@@ -383,8 +383,8 @@ static const u16 sPlayerAvatarGfxIds[COSTUME_COUNT][PLAYER_AVATAR_STATE_COUNT][G
 
 static const u16 sFRLGAvatarGfxIds[GENDER_COUNT] =
 {
-    [MALE]   = OBJ_EVENT_GFX_RED,
-    [FEMALE] = OBJ_EVENT_GFX_LEAF
+    [MALE]   = OBJ_EVENT_GFX_RED_NORMAL,
+    [FEMALE] = OBJ_EVENT_GFX_LEAF_NORMAL
 };
 
 static const u16 sRSAvatarGfxIds[GENDER_COUNT] =
