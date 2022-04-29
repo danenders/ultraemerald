@@ -273,11 +273,7 @@ static const union AnimCmd sAnim_ARBOK_1[] =
 
 static const union AnimCmd sAnim_PIKACHU_1[] =
 {
-    ANIMCMD_FRAME(0, 15),
-    ANIMCMD_FRAME(1, 20),
-    ANIMCMD_FRAME(0, 15),
-    ANIMCMD_FRAME(1, 20),
-    ANIMCMD_FRAME(0, 15),
+    ANIMCMD_FRAME(0, 1),
     ANIMCMD_END,
 };
 
@@ -9462,7 +9458,6 @@ static const union AnimCmd *const sAnims_ARBOK[] ={
 static const union AnimCmd *const sAnims_PIKACHU[] ={
     sAnim_GeneralFrame0,
     sAnim_PIKACHU_1,
-    sAnim_PIKACHU_2,
 };
 
 static const union AnimCmd *const sAnims_RAICHU[] ={

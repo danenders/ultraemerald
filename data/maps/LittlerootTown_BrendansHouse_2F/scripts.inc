@@ -272,6 +272,49 @@ PlayersHouse_2F_EventScript_GameCube::
 	msgbox PlayersHouse_2F_Text_ItsAGameCube, MSGBOX_SIGN
 	end
 
+PlayersHouse_2F_EventScript_ClothesBox::
+	lock
+	msgbox PlayersHouse_2F_Text_ChooseOutfit, MSGBOX_DEFAULT
+	multichoice 0, 0, MULTI_CLOTHES_BOX, FALSE
+	switch VAR_RESULT
+	case 0, PlayersHouse_2F_EventScript_CostumeSwap_Brendan
+	case 1, PlayersHouse_2F_EventScript_CostumeSwap_May
+	case MULTI_B_PRESSED, PlayersHouse_2F_EventScript_ClothesBox
+	end
+
+PlayersHouse_2F_EventScript_CostumeSwap_Brendan::
+	fadescreen FADE_TO_BLACK
+	setvar VAR_TEMP_1, BRENDAN_COSTUME
+	special SwapPlayersCostume
+	fadescreen FADE_FROM_BLACK
+	msgbox PlayersHouse_2F_Text_ConfirmOutfitBrendan, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, FALSE, PlayersHouse_2F_EventScript_ClothesBox
+	closemessage
+	setflag FLAG_SET_COSTUME
+	end
+
+PlayersHouse_2F_EventScript_CostumeSwap_May::
+	fadescreen FADE_TO_BLACK
+	setvar VAR_TEMP_1, MAY_COSTUME
+	special SwapPlayersCostume
+	fadescreen FADE_FROM_BLACK
+	msgbox PlayersHouse_2F_Text_ConfirmOutfitMay, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, FALSE, PlayersHouse_2F_EventScript_ClothesBox
+	closemessage
+	setflag FLAG_SET_COSTUME
+	end
+
+PlayersHouse_2F_Text_ChooseOutfit:
+	.string "There's two outfits in the box.\n"
+	.string "Which style do you want to wear?$"
+
+PlayersHouse_2F_Text_ConfirmOutfitBrendan:
+	.string "Wear the Sporty outfit?$"
+
+PlayersHouse_2F_Text_ConfirmOutfitMay:
+	.string "Wear the Stylish outfit?$"
+
+
 PlayersHouse_2F_Text_ClockIsStopped:
 	.string "The clock is stopped…\p"
 	.string "Better set it and start it!$"
@@ -282,9 +325,24 @@ PlayersHouse_2F_Text_HowDoYouLikeYourRoom:
 	.string "Good! Everything's put away neatly!\p"
 	.string "They finished moving everything in\n"
 	.string "downstairs, too.\p"
-	.string "POKéMON movers are so convenient!\p"
-	.string "Oh, you should make sure that\n"
-	.string "everything's all there on your desk.$"
+	.string "POKéMON movers are so convenient!$"
+
+PlayersHouse_2F_Text_ChangeYourClothes:
+	.string "Oh, you should change out of those\n"
+	.string "clothes you wore in the truck, too.\p"
+	.string "There should be a box of clothes by\n"
+	.string "bed.$"
+
+PlayersHouse_2F_Text_YouLookNice:
+	.string "How do you like your outfit?\p"
+	.string "I had your Dad pick them up from\n"
+	.string "the department store all the way\l"
+	.string "out in Lilycove City.\p"
+	.string "I heard that's a very popular style\n"
+	.string "here in Hoenn!\p"
+	.string "Now that you're all dressed, why\n"
+	.string "don't you check out your new room?\p"
+	.string "Come downstairs when you're ready.$"
 
 PlayersHouse_2F_Text_Notebook:
 	.string "{PLAYER} flipped open the notebook.\p"
@@ -302,3 +360,15 @@ PlayersHouse_2F_Text_ItsAGameCube:
 	.string "It's a Nintendo GameCube.\p"
 	.string "A Game Boy Advance is connected to\n"
 	.string "serve as the Controller.$"
+
+LittlerootTown_BrendansHouse_2F_EventScript_MomWaiting::
+	lock
+	faceplayer
+	goto_if_set FLAG_SET_COSTUME PlayersHouse_2F_EventScript_YouLookNice
+	msgbox LittlerootTown_BrendansHouse_2F_TextScript_NewOutfit
+	release
+	end
+
+LittlerootTown_BrendansHouse_2F_TextScript_NewOutfit:
+	.string "You should change out of those\n"
+	.string "moving clothes, {PLAYER}.$"

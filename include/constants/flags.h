@@ -48,7 +48,7 @@
 #define FLAG_SYS_NO_CATCHING        0x24 //DEBUG
 #define FLAG_SYS_PC_FROM_DEBUG_MENU 0x25 //DEBUG
 #define FLAG_SET_FOLLOWER    0x26 // FOLLOWER
-#define FLAG_UNUSED_0x027    0x27 // Unused Flag
+#define FLAG_SET_COSTUME     0x27 // Chose your starting costume
 #define FLAG_UNUSED_0x028    0x28 // Unused Flag
 #define FLAG_UNUSED_0x029    0x29 // Unused Flag
 #define FLAG_UNUSED_0x02A    0x2A // Unused Flag
