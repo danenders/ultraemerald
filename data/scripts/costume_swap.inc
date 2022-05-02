@@ -381,7 +381,7 @@ EventScript_ChangingRoom::
 EventScript_ChangingRoom_Exit::
 	closemessage
 	msgbox Text_ChangingRoom_Cancel, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, TRUE, EventScript_ChangingRoom_Loop
+	goto_if_eq VAR_RESULT, FALSE, EventScript_ChangingRoom_Loop
 	fadescreen FADE_FROM_BLACK
 	releaseall
 	end
@@ -423,7 +423,7 @@ Text_ChangingRoom_Error:
 
 Text_ChangingRoom_Cancel:
 	.string "Would you like to leave the\n"
-	.string "dressing room?"
+	.string "dressing room?$"
 
 
 EventScript_ChangingRoom_KantoCollection::
