@@ -206,6 +206,10 @@ RustboroCity_EventScript_GymSign::
 	msgbox RustboroCity_Text_GymSign, MSGBOX_SIGN
 	end
 
+RustboroCity_EventScript_TailorSign::
+	msgbox RustboroCity_Text_TailorSign, MSGBOX_SIGN
+	end
+
 @ Unused
 RustboroCity_EventScript_DevonCorpBranchOfficeSign::
 	msgbox RustboroCity_Text_DevonCorpBranchOfficeSign, MSGBOX_SIGN
@@ -1253,6 +1257,10 @@ RustboroCity_Text_CitySign:
 	.string "RUSTBORO CITY\p"
 	.string "“The city probing the integration of\n"
 	.string "nature and science.”$"
+
+RustboroCity_Text_TailorSign:
+	.string "Rustboro Tailor\p"
+	.string "“Classic Styles for Every Trainer!”$"
 
 RustboroCity_Text_TrainersSchoolSign:
 	.string "POKéMON TRAINER'S SCHOOL\p"

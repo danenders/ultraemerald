@@ -122,6 +122,11 @@
 #define MULTI_SLATEPORT_TENT_RULES         111
 #define MULTI_FALLARBOR_TENT_RULES         112
 #define MULTI_TAG_MATCH_TYPE               113
+#define MULTI_REGION               		   114
+#define MULTI_KANTO_OUTFIT                 115
+#define MULTI_JOHTO_OUTFIT                 116
+#define MULTI_HOENN_OUTFIT                 117
+#define MULTI_SINNOH_OUTFIT                118
 
 
 // Lilycove SS Tidal Multichoice Selections

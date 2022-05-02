@@ -41,23 +41,23 @@
 #define FLAG_TEMP_1F     (TEMP_FLAGS_START + 0x1F)
 #define TEMP_FLAGS_END   FLAG_TEMP_1F
         
-#define FLAG_SYS_NO_COLLISION       0x20 //DEBUG
-#define FLAG_SYS_NO_ENCOUNTER       0x21 //DEBUG
-#define FLAG_SYS_NO_TRAINER_SEE     0x22 //DEBUG
-#define FLAG_SYS_NO_BAG_USE         0x23 //DEBUG
-#define FLAG_SYS_NO_CATCHING        0x24 //DEBUG
-#define FLAG_SYS_PC_FROM_DEBUG_MENU 0x25 //DEBUG
-#define FLAG_SET_FOLLOWER    0x26 // FOLLOWER
-#define FLAG_SET_COSTUME     0x27 // Chose your starting costume
-#define FLAG_UNUSED_0x028    0x28 // Unused Flag
-#define FLAG_UNUSED_0x029    0x29 // Unused Flag
-#define FLAG_UNUSED_0x02A    0x2A // Unused Flag
-#define FLAG_UNUSED_0x02B    0x2B // Unused Flag
-#define FLAG_UNUSED_0x02C    0x2C // Unused Flag
-#define FLAG_UNUSED_0x02D    0x2D // Unused Flag
-#define FLAG_UNUSED_0x02E    0x2E // Unused Flag
-#define FLAG_UNUSED_0x02F    0x2F // Unused Flag
-#define FLAG_UNUSED_0x030    0x30 // Unused Flag
+#define FLAG_SYS_NO_COLLISION       	0x20 //DEBUG
+#define FLAG_SYS_NO_ENCOUNTER       	0x21 //DEBUG
+#define FLAG_SYS_NO_TRAINER_SEE     	0x22 //DEBUG
+#define FLAG_SYS_NO_BAG_USE         	0x23 //DEBUG
+#define FLAG_SYS_NO_CATCHING        	0x24 //DEBUG
+#define FLAG_SYS_PC_FROM_DEBUG_MENU 	0x25 //DEBUG
+#define FLAG_SET_FOLLOWER    			0x26 // FOLLOWER
+#define FLAG_SET_COSTUME     			0x27 // Chose your starting costume
+#define FLAG_COSTUME_RED    			0x28 // Purchased Red Costume
+#define FLAG_COSTUME_LEAF    			0x29 // Purchased Leaf Costume
+#define FLAG_COSTUME_ETHAN    			0x2A // Purchased Ethan Costume
+#define FLAG_COSTUME_LYRA    			0x2B // Purchased Lyra Costume
+#define FLAG_COSTUME_KRIS    			0x2C // Purchased Kris Costume
+#define FLAG_COSTUME_LUCAS    			0x2D // Purchased Lucas Costume
+#define FLAG_COSTUME_DAWN    			0x2E // Purchased Dawn Costume
+#define FLAG_COSTUME_LUCAS_PLATINUM    	0x2F // Purchased Lucas Platinum Costume
+#define FLAG_COSTUME_DAWN_PLATINUM   	0x30 // Purchased Dawn Platinum Costume
 #define FLAG_UNUSED_0x031    0x31 // Unused Flag
 #define FLAG_UNUSED_0x032    0x32 // Unused Flag
 #define FLAG_UNUSED_0x033    0x33 // Unused Flag

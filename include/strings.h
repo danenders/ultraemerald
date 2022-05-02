@@ -157,6 +157,9 @@ extern const u8 gText_Decorate[];
 extern const u8 gText_PutAway[];
 extern const u8 gText_Toss2[];
 extern const u8 gText_Hoenn[];
+extern const u8 gText_Kanto[];
+extern const u8 gText_Johto[];
+extern const u8 gText_Sinnoh[];
 extern const u8 gText_Ferry[];
 extern const u8 gText_SecretBase[];
 extern const u8 gText_Hideout[];
@@ -1305,6 +1308,18 @@ extern const u8 gText_DeepSeaScale[];
 
 extern const u8 gText_StylishOutfit[];
 extern const u8 gText_SportyOutfit[];
+
+extern const u8 gText_ClassicOutfit[];
+extern const u8 gText_SummerOutfit[];
+
+extern const u8 gText_CoolOutfit[];
+extern const u8 gText_CuteOutfit[];
+extern const u8 gText_ChicOutfit[];
+
+extern const u8 gText_ModernOutfit[];
+extern const u8 gText_TrendyOutfit[];
+extern const u8 gText_WinterOutfit[];
+extern const u8 gText_AutumnOutfit[];
 
 extern const u8 gText_TreeckoDollAndPrice[];
 extern const u8 gText_TorchicDollAndPrice[];

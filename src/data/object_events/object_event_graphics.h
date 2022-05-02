@@ -31,8 +31,6 @@ const u32 gObjectEventPic_RubySapphireMayRunning[] = INCBIN_U32("graphics/object
 const u16 gObjectEventPal_RubySapphireMay[] = INCBIN_U16("graphics/object_events/palettes/ruby_sapphire_may.gbapal");
 const u16 gObjectEventPal_PlayerUnderwater[] = INCBIN_U16("graphics/object_events/palettes/player_underwater.gbapal");
 
-//const u16 gObjectEventPal_?[] = INCBIN_U16("graphics/object_events/palettes/?.gbapal");
-
 //NPCs
 const u32 gObjectEventPic_Anabel[] = INCBIN_U32("graphics/object_events/pics/people/frontier_brains/anabel.4bpp");
 const u16 gObjectEventPal_Anabel[] = INCBIN_U16("graphics/object_events/palettes/anabel.gbapal");
@@ -1574,6 +1572,18 @@ const u16 gObjectEventPal_DawnPlatinum[] = INCBIN_U16("graphics/object_events/pa
 const u32 gObjectEventPic_Enby[] = INCBIN_U32("graphics/object_events/pics/people/enby.4bpp");
 const u16 gObjectEventPal_Enby[] = INCBIN_U16("graphics/object_events/palettes/enby.gbapal");
 
+//Hats
+const u32 gObjectEventPic_BrendanHat[] = INCBIN_U32("graphics/object_events/pics/people/brendan/hat.4bpp");
+const u32 gObjectEventPic_MayHat[] = INCBIN_U32("graphics/object_events/pics/people/may/hat.4bpp");
+const u32 gObjectEventPic_RedHat[] = INCBIN_U32("graphics/object_events/pics/people/red/hat.4bpp");
+const u32 gObjectEventPic_LeafHat[] = INCBIN_U32("graphics/object_events/pics/people/leaf/hat.4bpp");
+const u32 gObjectEventPic_EthanHat[] = INCBIN_U32("graphics/object_events/pics/people/ethan/hat.4bpp");
+const u32 gObjectEventPic_LyraHat[] = INCBIN_U32("graphics/object_events/pics/people/lyra/hat.4bpp");
+const u32 gObjectEventPic_KrisHat[] = INCBIN_U32("graphics/object_events/pics/people/kris/hat.4bpp");
+const u32 gObjectEventPic_LucasHat[] = INCBIN_U32("graphics/object_events/pics/people/lucas/hat.4bpp");
+const u32 gObjectEventPic_DawnHat[] = INCBIN_U32("graphics/object_events/pics/people/dawn/hat.4bpp");
+const u32 gObjectEventPic_LucasPlatinumHat[] = INCBIN_U32("graphics/object_events/pics/people/lucas_platinum/hat.4bpp");
+const u32 gObjectEventPic_DawnPlatinumHat[] = INCBIN_U32("graphics/object_events/pics/people/dawn_platinum/hat.4bpp");
 
 //MISC & Palletes
 const u32 gUnusedGrass3[] = INCBIN_U32("graphics/field_effects/pics/unused_grass_3.4bpp");

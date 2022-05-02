@@ -54,6 +54,10 @@ MauvilleCity_EventScript_GameCornerSign::
 	msgbox MauvilleCity_Text_GameCornerSign, MSGBOX_SIGN
 	end
 
+MauvilleCity_EventScript_TailorSign::
+	msgbox MauvilleCity_Text_TailorSign, MSGBOX_SIGN
+	end
+
 MauvilleCity_EventScript_SchoolKidM::
 	lock
 	faceplayer
@@ -636,6 +640,10 @@ MauvilleCity_Text_PokemonCanJumpYouOnBike:
 MauvilleCity_Text_CitySign:
 	.string "MAUVILLE CITY\n"
 	.string "“The bright and shiny city of fun!”$"
+
+MauvilleCity_Text_TailorSign:
+	.string "Mauville Tailor\n"
+	.string "“New Styles from Johto in stock!”$"
 
 MauvilleCity_Text_GymSign:
 	.string "MAUVILLE CITY POKéMON GYM\n"

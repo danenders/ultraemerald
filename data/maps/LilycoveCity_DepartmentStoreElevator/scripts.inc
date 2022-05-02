@@ -13,47 +13,68 @@ LilycoveCity_DepartmentStoreElevator_EventScript_Attendant::
 	setvar VAR_0x8004, 0
 	specialvar VAR_RESULT, GetDeptStoreDefaultFloorChoice
 	switch VAR_RESULT
-	case 0, LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloorFrom5th
-	case 1, LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloorFrom4th
-	case 2, LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloorFrom3rd
-	case 3, LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloorFrom2nd
-	case 4, LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloorFrom1st
+	case 0, LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloorFrom8th
+	case 1, LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloorFrom7th
+	case 2, LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloorFrom6th
+	case 3, LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloorFrom5th
+	case 4, LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloorFrom4th
+	case 5, LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloorFrom3rd
+	case 6, LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloorFrom2nd
+	case 7, LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloorFrom1st
 	end
 
 @ Below scripts ensure the cursor for floor select always starts on the current floor
-LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloorFrom5th::
+LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloorFrom8th::
 	multichoicedefault 0, 0, MULTI_FLOORS, 0, FALSE
 	goto LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloor
 	end
 
-LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloorFrom4th::
+LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloorFrom7th::
 	multichoicedefault 0, 0, MULTI_FLOORS, 1, FALSE
 	goto LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloor
 	end
 
-LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloorFrom3rd::
+LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloorFrom6th::
 	multichoicedefault 0, 0, MULTI_FLOORS, 2, FALSE
 	goto LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloor
 	end
 
-LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloorFrom2nd::
+LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloorFrom5th::
 	multichoicedefault 0, 0, MULTI_FLOORS, 3, FALSE
 	goto LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloor
 	end
 
-LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloorFrom1st::
+LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloorFrom4th::
 	multichoicedefault 0, 0, MULTI_FLOORS, 4, FALSE
+	goto LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloor
+	end
+
+LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloorFrom3rd::
+	multichoicedefault 0, 0, MULTI_FLOORS, 5, FALSE
+	goto LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloor
+	end
+
+LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloorFrom2nd::
+	multichoicedefault 0, 0, MULTI_FLOORS, 6, FALSE
+	goto LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloor
+	end
+
+LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloorFrom1st::
+	multichoicedefault 0, 0, MULTI_FLOORS, 7, FALSE
 	goto LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloor
 	end
 
 LilycoveCity_DepartmentStoreElevator_EventScript_ChooseFloor::
 	switch VAR_RESULT
-	case 0, LilycoveCity_DepartmentStoreElevator_EventScript_5thFloor
-	case 1, LilycoveCity_DepartmentStoreElevator_EventScript_4thFloor
-	case 2, LilycoveCity_DepartmentStoreElevator_EventScript_3rdFloor
-	case 3, LilycoveCity_DepartmentStoreElevator_EventScript_2ndFloor
-	case 4, LilycoveCity_DepartmentStoreElevator_EventScript_1stFloor
-	case 5, LilycoveCity_DepartmentStoreElevator_EventScript_ExitFloorSelect
+	case 0, LilycoveCity_DepartmentStoreElevator_EventScript_8thFloor
+	case 1, LilycoveCity_DepartmentStoreElevator_EventScript_7thFloor
+	case 2, LilycoveCity_DepartmentStoreElevator_EventScript_6thFloor
+	case 3, LilycoveCity_DepartmentStoreElevator_EventScript_5thFloor
+	case 4, LilycoveCity_DepartmentStoreElevator_EventScript_4thFloor
+	case 5, LilycoveCity_DepartmentStoreElevator_EventScript_3rdFloor
+	case 6, LilycoveCity_DepartmentStoreElevator_EventScript_2ndFloor
+	case 7, LilycoveCity_DepartmentStoreElevator_EventScript_1stFloor
+	case 8, LilycoveCity_DepartmentStoreElevator_EventScript_ExitFloorSelect
 	case MULTI_B_PRESSED, LilycoveCity_DepartmentStoreElevator_EventScript_ExitFloorSelect
 	end
 
@@ -99,6 +120,33 @@ LilycoveCity_DepartmentStoreElevator_EventScript_5thFloor::
 	goto_if_eq VAR_DEPT_STORE_FLOOR, DEPT_STORE_FLOORNUM_5F, LilycoveCity_DepartmentStoreElevator_EventScript_ExitFloorSelect
 	call LilycoveCity_DepartmentStoreElevator_EventScript_MoveElevator
 	setvar VAR_DEPT_STORE_FLOOR, DEPT_STORE_FLOORNUM_5F
+	goto LilycoveCity_DepartmentStoreElevator_EventScript_ExitFloorSelect
+	end
+
+LilycoveCity_DepartmentStoreElevator_EventScript_6thFloor::
+	setvar VAR_0x8006, DEPT_STORE_FLOORNUM_6F
+	setdynamicwarp MAP_LILYCOVE_CITY_DEPARTMENT_STORE_6F, 2, 1
+	goto_if_eq VAR_DEPT_STORE_FLOOR, DEPT_STORE_FLOORNUM_6F, LilycoveCity_DepartmentStoreElevator_EventScript_ExitFloorSelect
+	call LilycoveCity_DepartmentStoreElevator_EventScript_MoveElevator
+	setvar VAR_DEPT_STORE_FLOOR, DEPT_STORE_FLOORNUM_6F
+	goto LilycoveCity_DepartmentStoreElevator_EventScript_ExitFloorSelect
+	end
+
+LilycoveCity_DepartmentStoreElevator_EventScript_7thFloor::
+	setvar VAR_0x8006, DEPT_STORE_FLOORNUM_7F
+	setdynamicwarp MAP_LILYCOVE_CITY_DEPARTMENT_STORE_7F, 2, 1
+	goto_if_eq VAR_DEPT_STORE_FLOOR, DEPT_STORE_FLOORNUM_7F, LilycoveCity_DepartmentStoreElevator_EventScript_ExitFloorSelect
+	call LilycoveCity_DepartmentStoreElevator_EventScript_MoveElevator
+	setvar VAR_DEPT_STORE_FLOOR, DEPT_STORE_FLOORNUM_7F
+	goto LilycoveCity_DepartmentStoreElevator_EventScript_ExitFloorSelect
+	end
+
+LilycoveCity_DepartmentStoreElevator_EventScript_8thFloor::
+	setvar VAR_0x8006, DEPT_STORE_FLOORNUM_8F
+	setdynamicwarp MAP_LILYCOVE_CITY_DEPARTMENT_STORE_8F, 2, 1
+	goto_if_eq VAR_DEPT_STORE_FLOOR, DEPT_STORE_FLOORNUM_8F, LilycoveCity_DepartmentStoreElevator_EventScript_ExitFloorSelect
+	call LilycoveCity_DepartmentStoreElevator_EventScript_MoveElevator
+	setvar VAR_DEPT_STORE_FLOOR, DEPT_STORE_FLOORNUM_8F
 	goto LilycoveCity_DepartmentStoreElevator_EventScript_ExitFloorSelect
 	end
 

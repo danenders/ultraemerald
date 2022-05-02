@@ -7908,3 +7908,47 @@ static const struct SpriteFrameImage sPicTable_Lanette[] = {
     overworld_frame(gObjectEventPic_Lanette, 4, 4, 7),
     overworld_frame(gObjectEventPic_Lanette, 4, 4, 8),
 };
+
+static const struct SpriteFrameImage sPicTable_BrendanHat[] = {
+    obj_frame_tiles(gObjectEventPic_BrendanHat),
+};
+
+static const struct SpriteFrameImage sPicTable_MayHat[] = {
+    obj_frame_tiles(gObjectEventPic_MayHat),
+};
+
+static const struct SpriteFrameImage sPicTable_RedHat[] = {
+    obj_frame_tiles(gObjectEventPic_RedHat),
+};
+
+static const struct SpriteFrameImage sPicTable_LeafHat[] = {
+    obj_frame_tiles(gObjectEventPic_LeafHat),
+};
+
+static const struct SpriteFrameImage sPicTable_EthanHat[] = {
+    obj_frame_tiles(gObjectEventPic_EthanHat),
+};
+
+static const struct SpriteFrameImage sPicTable_LyraHat[] = {
+    obj_frame_tiles(gObjectEventPic_LyraHat),
+};
+
+static const struct SpriteFrameImage sPicTable_KrisHat[] = {
+    obj_frame_tiles(gObjectEventPic_KrisHat),
+};
+
+static const struct SpriteFrameImage sPicTable_LucasHat[] = {
+    obj_frame_tiles(gObjectEventPic_LucasHat),
+};
+
+static const struct SpriteFrameImage sPicTable_DawnHat[] = {
+    obj_frame_tiles(gObjectEventPic_DawnHat),
+};
+
+static const struct SpriteFrameImage sPicTable_LucasPlatinumHat[] = {
+    obj_frame_tiles(gObjectEventPic_LucasPlatinumHat),
+};
+
+static const struct SpriteFrameImage sPicTable_DawnPlatinumHat[] = {
+    obj_frame_tiles(gObjectEventPic_DawnPlatinumHat),
+};

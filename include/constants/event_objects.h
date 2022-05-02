@@ -853,7 +853,21 @@
 
 #define OBJ_EVENT_GFX_EXPANDING_SPARKLE         BALL_GFX + 26
 
-#define DECORATION_GFX							OBJ_EVENT_GFX_EXPANDING_SPARKLE
+#define HAT_GFX									OBJ_EVENT_GFX_EXPANDING_SPARKLE
+
+#define OBJ_EVENT_GFX_HAT_BRENDAN               HAT_GFX + 1
+#define OBJ_EVENT_GFX_HAT_MAY              		HAT_GFX + 2
+#define OBJ_EVENT_GFX_HAT_RED              		HAT_GFX + 3
+#define OBJ_EVENT_GFX_HAT_LEAF           		HAT_GFX + 4
+#define OBJ_EVENT_GFX_HAT_ETHAN         		HAT_GFX + 5
+#define OBJ_EVENT_GFX_HAT_LYRA            		HAT_GFX + 6
+#define OBJ_EVENT_GFX_HAT_KRIS             		HAT_GFX + 7
+#define OBJ_EVENT_GFX_HAT_LUCAS           		HAT_GFX + 8
+#define OBJ_EVENT_GFX_HAT_DAWN            		HAT_GFX + 9
+#define OBJ_EVENT_GFX_HAT_LUCAS_PLATINUM        HAT_GFX + 10
+#define OBJ_EVENT_GFX_HAT_DAWN_PLATINUM         HAT_GFX + 11
+
+#define DECORATION_GFX							OBJ_EVENT_GFX_HAT_DAWN_PLATINUM
 
 #define OBJ_EVENT_GFX_PICHU_DOLL                DECORATION_GFX + 1
 #define OBJ_EVENT_GFX_PIKACHU_DOLL              DECORATION_GFX + 2

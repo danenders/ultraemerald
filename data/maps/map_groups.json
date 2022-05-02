@@ -189,7 +189,8 @@
     "MauvilleCity_House2",
     "MauvilleCity_PokemonCenter_1F",
     "MauvilleCity_PokemonCenter_2F",
-    "MauvilleCity_Mart"
+    "MauvilleCity_Mart",
+    "Mauville_Tailor"
   ],
   "gMapGroup_IndoorRustboro": [
     "RustboroCity_DevonCorp_1F",
@@ -208,7 +209,8 @@
     "RustboroCity_Flat2_1F",
     "RustboroCity_Flat2_2F",
     "RustboroCity_Flat2_3F",
-    "RustboroCity_House3"
+    "RustboroCity_House3",
+    "RustboroCity_Tailor"
   ],
   "gMapGroup_IndoorFortree": [
     "FortreeCity_House1",
@@ -245,7 +247,10 @@
     "LilycoveCity_DepartmentStore_4F",
     "LilycoveCity_DepartmentStore_5F",
     "LilycoveCity_DepartmentStoreRooftop",
-    "LilycoveCity_DepartmentStoreElevator"
+    "LilycoveCity_DepartmentStoreElevator",
+    "LilycoveCity_DepartmentStore_6F",
+    "LilycoveCity_DepartmentStore_7F",
+    "LilycoveCity_DepartmentStore_8F"
   ],
   "gMapGroup_IndoorMossdeep": [
     "MossdeepCity_Gym",
