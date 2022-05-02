@@ -1,21 +1,3 @@
-EventScript_CostumeSwap_BrendanIntro::
-	lockall
-	fadescreen FADE_TO_BLACK
-	setvar VAR_TEMP_1, BRENDAN_COSTUME
-	special SwapPlayersCostume
-	fadescreen FADE_FROM_BLACK
-	releaseall
-	end
-
-EventScript_CostumeSwap_MayIntro::
-	lockall
-	fadescreen FADE_TO_BLACK
-	setvar VAR_TEMP_1, MAY_COSTUME
-	special SwapPlayersCostume
-	fadescreen FADE_FROM_BLACK
-	releaseall
-	end
-
 EventScript_CostumeSwap_Brendan::
 	setvar VAR_TEMP_1, BRENDAN_COSTUME
 	special SwapPlayersCostume
