@@ -15,6 +15,7 @@
 #define TRAINER_LINK_OPPONENT               2048
 #define TRAINER_UNION_ROOM                  3072
 #define TRAINER_STEVEN_PARTNER              3075
+#define TRAINER_CUSTOM_PARTNER              3076
 
 #define TRAINER_PIC_HIKER                  0
 #define TRAINER_PIC_AQUA_GRUNT_M           1
@@ -110,6 +111,14 @@
 #define TRAINER_PIC_RS_BRENDAN            91
 #define TRAINER_PIC_RS_MAY                92
 
+#define TRAINER_PIC_ETHAN                 93
+#define TRAINER_PIC_LYRA                  94
+#define TRAINER_PIC_KRIS                  95
+#define TRAINER_PIC_LUCAS                 96
+#define TRAINER_PIC_DAWN                  97
+#define TRAINER_PIC_LUCAS_PLATINUM        98
+#define TRAINER_PIC_DAWN_PLATINUM         99
+
 // The player back pics are assumed to alternate according to the gender values (MALE/FEMALE)
 #define TRAINER_BACK_PIC_BRENDAN                0
 #define TRAINER_BACK_PIC_MAY                    1
@@ -119,6 +128,13 @@
 #define TRAINER_BACK_PIC_RUBY_SAPPHIRE_MAY      5
 #define TRAINER_BACK_PIC_WALLY                  6
 #define TRAINER_BACK_PIC_STEVEN                 7
+#define TRAINER_BACK_PIC_ETHAN                  8
+#define TRAINER_BACK_PIC_LYRA                   9
+#define TRAINER_BACK_PIC_KRIS                   10
+#define TRAINER_BACK_PIC_LUCAS                  11
+#define TRAINER_BACK_PIC_DAWN                   12
+#define TRAINER_BACK_PIC_LUCAS_PLATINUM         13
+#define TRAINER_BACK_PIC_DAWN_PLATINUM          14
 
 #define FACILITY_CLASS_HIKER                 0x0
 #define FACILITY_CLASS_AQUA_GRUNT_M          0x1
@@ -203,7 +219,16 @@
 #define FACILITY_CLASS_RS_BRENDAN            0x50
 #define FACILITY_CLASS_RS_MAY                0x51
 
-#define FACILITY_CLASSES_COUNT               0x52
+#define FACILITY_CLASS_ETHAN              	 0x52
+#define FACILITY_CLASS_LYRA                  0x53
+#define FACILITY_CLASS_KRIS                  0x54
+
+#define FACILITY_CLASS_LUCAS                 0x55
+#define FACILITY_CLASS_DAWN                  0x56
+#define FACILITY_CLASS_LUCAS_PLATINUM        0x57
+#define FACILITY_CLASS_DAWN_PLATINUM         0x58
+
+#define FACILITY_CLASSES_COUNT               0x59
 
 #define RS_FACILITY_CLASS_AQUA_LEADER_ARCHIE    0x0
 #define RS_FACILITY_CLASS_AQUA_GRUNT_M          0x1

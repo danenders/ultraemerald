@@ -55,7 +55,7 @@
 #define MULTI_ACRO_BIKE_INFO               44
 #define MULTI_SATISFACTION                 45
 #define MULTI_STERN_DEEPSEA                46
-#define MULTI_UNUSED_ASH_VENDOR            47 // Replaced by scrollable multichoice
+#define MULTI_CLOTHES_BOX		           47
 #define MULTI_GAME_CORNER_DOLLS            48
 #define MULTI_GAME_CORNER_COINS            49
 #define MULTI_HOWS_FISHING                 50
@@ -122,6 +122,12 @@
 #define MULTI_SLATEPORT_TENT_RULES         111
 #define MULTI_FALLARBOR_TENT_RULES         112
 #define MULTI_TAG_MATCH_TYPE               113
+#define MULTI_REGION               		   114
+#define MULTI_KANTO_OUTFIT                 115
+#define MULTI_JOHTO_OUTFIT                 116
+#define MULTI_HOENN_OUTFIT                 117
+#define MULTI_SINNOH_OUTFIT                118
+
 
 // Lilycove SS Tidal Multichoice Selections
 #define SSTIDAL_SELECTION_SLATEPORT        0

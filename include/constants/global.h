@@ -147,4 +147,23 @@
 #define CONNECTION_DIVE     5
 #define CONNECTION_EMERGE   6
 
+
+#define SIDEWAYS_STAIRS_IMPLEMENTED FALSE
+#define POST_BATTLE_FOLLOWER_FIX    FALSE
+
+#define ENBY_COSTUME 				0
+#define BRENDAN_COSTUME       		1
+#define MAY_COSTUME       			2
+#define	RED_COSTUME					3
+#define	LEAF_COSTUME				4
+#define	ETHAN_COSTUME				5
+#define	LYRA_COSTUME				6
+#define	KRIS_COSTUME				7
+#define	LUCAS_COSTUME				8
+#define	DAWN_COSTUME				9
+#define	LUCAS_PLATINUM_COSTUME		10
+#define	DAWN_PLATINUM_COSTUME		11
+#define COSTUME_COUNT   			12
+
+
 #endif // GUARD_CONSTANTS_GLOBAL_H

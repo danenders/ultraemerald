@@ -2,6 +2,7 @@
 #include "constants/apprentice.h"
 #include "constants/battle.h"
 #include "constants/battle_arena.h"
+#include "constants/battle_config.h"
 #include "constants/battle_dome.h"
 #include "constants/battle_factory.h"
 #include "constants/battle_frontier.h"
@@ -16,6 +17,7 @@
 #include "constants/coins.h"
 #include "constants/contest.h"
 #include "constants/daycare.h"
+#include "constants/day_night.h"
 #include "constants/decorations.h"
 #include "constants/easy_chat.h"
 #include "constants/event_objects.h"
@@ -53,6 +55,7 @@
 #include "constants/union_room.h"
 #include "constants/vars.h"
 #include "constants/weather.h"
+#include "constants/follow_me.h"
 	.include "asm/macros.inc"
 	.include "asm/macros/event.inc"
 	.include "constants/constants.inc"
@@ -1057,3 +1060,15 @@ Common_EventScript_LegendaryFlewAway::
 	.include "data/text/frontier_brain.inc"
 	.include "data/text/save.inc"
 	.include "data/text/birch_speech.inc"
+	.include "data/scripts/costume_swap.inc"
+
+
+	.include "data/maps/RustboroCity_Tailor/scripts.inc"
+
+	.include "data/maps/Mauville_Tailor/scripts.inc"
+
+	.include "data/maps/LilycoveCity_DepartmentStore_6F/scripts.inc"
+
+	.include "data/maps/LilycoveCity_DepartmentStore_7F/scripts.inc"
+
+	.include "data/maps/LilycoveCity_DepartmentStore_8F/scripts.inc"

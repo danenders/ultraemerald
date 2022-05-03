@@ -1,3 +1,4 @@
+
 #ifndef GUARD_OVERWORLD_H
 #define GUARD_OVERWORLD_H
 
@@ -54,6 +55,7 @@ extern u8 gFieldLinkPlayerCount;
 
 extern const struct UCoords32 gDirectionToVectors[];
 
+void UpdateAmbientCry(s16 *state, u16 *delayCounter);
 void DoWhiteOut(void);
 void Overworld_ResetStateAfterFly(void);
 void Overworld_ResetStateAfterTeleport(void);
@@ -154,5 +156,9 @@ bool32 Overworld_RecvKeysFromLinkIsRunning(void);
 bool32 Overworld_SendKeysToLinkIsRunning(void);
 bool32 IsSendingKeysOverCable(void);
 void ClearLinkPlayerObjectEvents(void);
+void UpdateFollowerPokemonGraphic(void);
+void FollowerPokeballSparkle(void);
+void FollowerIntoPokeball(void);
+bool8 IsBigSprite(u16);
 
 #endif // GUARD_OVERWORLD_H

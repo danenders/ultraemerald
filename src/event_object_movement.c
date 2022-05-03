@@ -2,6 +2,7 @@
 #include "malloc.h"
 #include "battle_pyramid.h"
 #include "berry.h"
+#include "day_night.h"
 #include "debug.h"
 #include "decoration.h"
 #include "event_data.h"
@@ -12,17 +13,21 @@
 #include "field_effect.h"
 #include "field_effect_helpers.h"
 #include "field_player_avatar.h"
+#include "field_weather.h"
+#include "field_specials.h"
 #include "fieldmap.h"
 #include "mauville_old_man.h"
 #include "metatile_behavior.h"
 #include "overworld.h"
 #include "palette.h"
+#include "pokemon.h"
 #include "random.h"
 #include "sprite.h"
 #include "task.h"
 #include "trainer_see.h"
 #include "trainer_hill.h"
 #include "util.h"
+#include "follow_me.h"
 #include "constants/event_object_movement.h"
 #include "constants/event_objects.h"
 #include "constants/field_effects.h"
@@ -30,6 +35,7 @@
 #include "constants/mauville_old_man.h"
 #include "constants/trainer_types.h"
 #include "constants/union_room.h"
+#include "constants/metatile_behaviors.h"
 
 // this file was known as evobjmv.c in Game Freak's original source
 
@@ -76,10 +82,10 @@ static u8 setup##_callback(struct ObjectEvent *objectEvent, struct Sprite *sprit
     return 0;\
 }
 
-static EWRAM_DATA u8 sCurrentReflectionType = 0;
-static EWRAM_DATA u16 sCurrentSpecialObjectPaletteTag = 0;
 static EWRAM_DATA struct LockedAnimObjectEvents *sLockedAnimObjectEvents = {0};
 
+extern void PlaySE(u16);
+extern void PlaySE12WithPanning(u16, s8);
 static void MoveCoordsInDirection(u32, s16 *, s16 *, s16, s16);
 static bool8 ObjectEventExecSingleMovementAction(struct ObjectEvent *, struct Sprite *);
 static void SetMovementDelay(struct Sprite *, s16);
@@ -115,6 +121,9 @@ static void InitObjectPriorityByElevation(struct Sprite *, u8);
 static void ObjectEventUpdateSubpriority(struct ObjectEvent*, struct Sprite*);
 static void DoTracksGroundEffect_None(struct ObjectEvent*, struct Sprite*, u8);
 static void DoTracksGroundEffect_Footprints(struct ObjectEvent*, struct Sprite*, u8);
+static void DoTracksGroundEffect_FootprintsBug(struct ObjectEvent*, struct Sprite*, u8);
+static void DoTracksGroundEffect_FootprintsSpot(struct ObjectEvent*, struct Sprite*, u8);
+static void DoTracksGroundEffect_SlitherTracks(struct ObjectEvent*, struct Sprite*, u8);
 static void DoTracksGroundEffect_BikeTireTracks(struct ObjectEvent*, struct Sprite*, u8);
 static void DoRippleFieldEffect(struct ObjectEvent*, struct Sprite*);
 static void DoGroundEffects_OnSpawn(struct ObjectEvent*, struct Sprite*);
@@ -134,14 +143,13 @@ static u16 GetObjectEventFlagIdByObjectEventId(u8);
 static void UpdateObjectEventVisibility(struct ObjectEvent *, struct Sprite *);
 static void MakeSpriteTemplateFromObjectEventTemplate(struct ObjectEventTemplate *, struct SpriteTemplate *, const struct SubspriteTable **);
 static void GetObjectEventMovingCameraOffset(s16 *, s16 *);
-static struct ObjectEventTemplate *GetObjectEventTemplateByLocalIdAndMap(u8, u8, u8);
-static void LoadObjectEventPalette(u16);
+struct ObjectEventTemplate *GetObjectEventTemplateByLocalIdAndMap(u8, u8, u8);
 static void RemoveObjectEventIfOutsideView(struct ObjectEvent *);
 static void SpawnObjectEventOnReturnToField(u8, s16, s16);
 static void SetPlayerAvatarObjectEventIdAndObjectId(u8, u8);
 static void ResetObjectEventFldEffData(struct ObjectEvent *);
 static u8 LoadSpritePaletteIfTagExists(const struct SpritePalette *);
-static u8 FindObjectEventPaletteIndexByTag(u16);
+static u16 FindObjectEventPaletteIndexByTag(u16);
 static void _PatchObjectPalette(u16, u8);
 static bool8 ObjectEventDoesElevationMatch(struct ObjectEvent *, u8);
 static void SpriteCB_CameraObject(struct Sprite *);
@@ -168,8 +176,6 @@ static bool8 IsElevationMismatchAt(u8, s16, s16);
 static bool8 AreElevationsCompatible(u8 a, u8 b);
 
 static const struct SpriteFrameImage sPicTable_PechaBerryTree[];
-
-const u8 gReflectionEffectPaletteMap[] = {1, 1, 6, 7, 8, 9, 6, 7, 8, 9, 11, 11, 0, 0, 0, 0};
 
 static const struct SpriteTemplate sCameraSpriteTemplate = {
     .tileTag = 0,
@@ -273,6 +279,7 @@ static void (*const sMovementTypeCallbacks[])(struct Sprite *) =
     [MOVEMENT_TYPE_WALK_SLOWLY_IN_PLACE_UP] = MovementType_WalkSlowlyInPlace,
     [MOVEMENT_TYPE_WALK_SLOWLY_IN_PLACE_LEFT] = MovementType_WalkSlowlyInPlace,
     [MOVEMENT_TYPE_WALK_SLOWLY_IN_PLACE_RIGHT] = MovementType_WalkSlowlyInPlace,
+    [MOVEMENT_TYPE_FOLLOWING_POKEMON] = MovementType_FollowingPokemon,
 };
 
 static const bool8 sMovementTypeHasRange[NUM_MOVEMENT_TYPES] = {
@@ -317,6 +324,7 @@ static const bool8 sMovementTypeHasRange[NUM_MOVEMENT_TYPES] = {
     [MOVEMENT_TYPE_COPY_PLAYER_OPPOSITE_IN_GRASS] = TRUE,
     [MOVEMENT_TYPE_COPY_PLAYER_COUNTERCLOCKWISE_IN_GRASS] = TRUE,
     [MOVEMENT_TYPE_COPY_PLAYER_CLOCKWISE_IN_GRASS] = TRUE,
+    [MOVEMENT_TYPE_FOLLOWING_POKEMON] = FALSE,
 };
 
 const u8 gInitialMovementTypeFacingDirections[] = {
@@ -401,6 +409,7 @@ const u8 gInitialMovementTypeFacingDirections[] = {
     [MOVEMENT_TYPE_WALK_SLOWLY_IN_PLACE_UP] = DIR_NORTH,
     [MOVEMENT_TYPE_WALK_SLOWLY_IN_PLACE_LEFT] = DIR_WEST,
     [MOVEMENT_TYPE_WALK_SLOWLY_IN_PLACE_RIGHT] = DIR_EAST,
+    [MOVEMENT_TYPE_FOLLOWING_POKEMON] = DIR_SOUTH,
 };
 
 #define OBJ_EVENT_PAL_TAG_BRENDAN                 0x1100
@@ -430,24 +439,525 @@ const u8 gInitialMovementTypeFacingDirections[] = {
 #define OBJ_EVENT_PAL_TAG_GROUDON                 0x1118
 #define OBJ_EVENT_PAL_TAG_GROUDON_REFLECTION      0x1119
 #define OBJ_EVENT_PAL_TAG_UNUSED                  0x111A
-#define OBJ_EVENT_PAL_TAG_SUBMARINE_SHADOW        0x111B
-#define OBJ_EVENT_PAL_TAG_POOCHYENA               0x111C
-#define OBJ_EVENT_PAL_TAG_RED_LEAF                0x111D
-#define OBJ_EVENT_PAL_TAG_DEOXYS                  0x111E
-#define OBJ_EVENT_PAL_TAG_BIRTH_ISLAND_STONE      0x111F
-#define OBJ_EVENT_PAL_TAG_HO_OH                   0x1120
-#define OBJ_EVENT_PAL_TAG_LUGIA                   0x1121
-#define OBJ_EVENT_PAL_TAG_RS_BRENDAN              0x1122
-#define OBJ_EVENT_PAL_TAG_RS_MAY                  0x1123
-#define OBJ_EVENT_PAL_TAG_NONE                    0x11FF
+#define OBJ_EVENT_PAL_TAG_POOCHYENA               0x111B
+#define OBJ_EVENT_PAL_TAG_RED_LEAF                0x111C
+#define OBJ_EVENT_PAL_TAG_DEOXYS                  0x111D
+#define OBJ_EVENT_PAL_TAG_BIRTH_ISLAND_STONE      0x111E
+#define OBJ_EVENT_PAL_TAG_HO_OH                   0x111F
+#define OBJ_EVENT_PAL_TAG_LUGIA                   0x1120
+#define OBJ_EVENT_PAL_TAG_RS_BRENDAN              0x1121
+#define OBJ_EVENT_PAL_TAG_RS_MAY                  0x1122
+#define OBJ_EVENT_PAL_TAG_BULBASAUR               0x1123
+#define OBJ_EVENT_PAL_TAG_IVYSAUR                 0x1124
+#define OBJ_EVENT_PAL_TAG_VENUSAUR                0x1125
+#define OBJ_EVENT_PAL_TAG_CHARMANDER              0x1126
+#define OBJ_EVENT_PAL_TAG_CHARMELEON              0x1127
+#define OBJ_EVENT_PAL_TAG_CHARIZARD               0x1128
+#define OBJ_EVENT_PAL_TAG_SQUIRTLE                0x1129
+#define OBJ_EVENT_PAL_TAG_WARTORTLE               0x112A
+#define OBJ_EVENT_PAL_TAG_BLASTOISE               0x112B
+#define OBJ_EVENT_PAL_TAG_CATERPIE                0x112C
+#define OBJ_EVENT_PAL_TAG_BUTTERFREE              0x112D
+#define OBJ_EVENT_PAL_TAG_WEEDLE                  0x112E
+#define OBJ_EVENT_PAL_TAG_BEEDRILL                0x112F
+#define OBJ_EVENT_PAL_TAG_PIDGEY                  0x1130
+#define OBJ_EVENT_PAL_TAG_PIDGEOTTO               0x1131
+#define OBJ_EVENT_PAL_TAG_PIDGEOT                 0x1132
+#define OBJ_EVENT_PAL_TAG_RATTATA                 0x1133
+#define OBJ_EVENT_PAL_TAG_RATICATE                0x1134
+#define OBJ_EVENT_PAL_TAG_SPEAROW                 0x1135
+#define OBJ_EVENT_PAL_TAG_FEAROW                  0x1136
+#define OBJ_EVENT_PAL_TAG_EKANS                   0x1137
+#define OBJ_EVENT_PAL_TAG_ARBOK                   0x1138
+#define OBJ_EVENT_PAL_TAG_PIKACHU                 0x1139
+#define OBJ_EVENT_PAL_TAG_RAICHU                  0x113A
+#define OBJ_EVENT_PAL_TAG_SANDSHREW               0x113B
+#define OBJ_EVENT_PAL_TAG_SANDSLASH               0x113C
+#define OBJ_EVENT_PAL_TAG_NIDORAN_F               0x113D
+#define OBJ_EVENT_PAL_TAG_NIDORINA                0x113E
+#define OBJ_EVENT_PAL_TAG_NIDOQUEEN               0x113F
+#define OBJ_EVENT_PAL_TAG_NIDORAN_M               0x1140
+#define OBJ_EVENT_PAL_TAG_NIDOKING                0x1141
+#define OBJ_EVENT_PAL_TAG_CLEFABLE                0x1142
+#define OBJ_EVENT_PAL_TAG_VULPIX                  0x1143
+#define OBJ_EVENT_PAL_TAG_NINETALES               0x1144
+#define OBJ_EVENT_PAL_TAG_JIGGLYPUFF              0x1145
+#define OBJ_EVENT_PAL_TAG_WIGGLYTUFF              0x1146
+#define OBJ_EVENT_PAL_TAG_GOLBAT                  0x1147
+#define OBJ_EVENT_PAL_TAG_GLOOM                   0x1148
+#define OBJ_EVENT_PAL_TAG_PARAS                   0x1149
+#define OBJ_EVENT_PAL_TAG_VENONAT                 0x114A
+#define OBJ_EVENT_PAL_TAG_VENOMOTH                0x114B
+#define OBJ_EVENT_PAL_TAG_DIGLETT                 0x114C
+#define OBJ_EVENT_PAL_TAG_DUGTRIO                 0x114D
+#define OBJ_EVENT_PAL_TAG_MEOWTH                  0x114E
+#define OBJ_EVENT_PAL_TAG_PERSIAN                 0x114F
+#define OBJ_EVENT_PAL_TAG_GOLDUCK                 0x1150
+#define OBJ_EVENT_PAL_TAG_MANKEY                  0x1151
+#define OBJ_EVENT_PAL_TAG_PRIMEAPE                0x1152
+#define OBJ_EVENT_PAL_TAG_ARCANINE                0x1153
+#define OBJ_EVENT_PAL_TAG_POLIWAG                 0x1154
+#define OBJ_EVENT_PAL_TAG_POLIWHIRL               0x1155
+#define OBJ_EVENT_PAL_TAG_KADABRA                 0x1156
+#define OBJ_EVENT_PAL_TAG_MACHOP                  0x1157
+#define OBJ_EVENT_PAL_TAG_MACHOKE                 0x1158
+#define OBJ_EVENT_PAL_TAG_MACHAMP                 0x1159
+#define OBJ_EVENT_PAL_TAG_WEEPINBELL              0x115A
+#define OBJ_EVENT_PAL_TAG_VICTREEBEL              0x115B
+#define OBJ_EVENT_PAL_TAG_TENTACOOL               0x115C
+#define OBJ_EVENT_PAL_TAG_TENTACRUEL              0x115D
+#define OBJ_EVENT_PAL_TAG_GRAVELER                0x115E
+#define OBJ_EVENT_PAL_TAG_GOLEM                   0x115F
+#define OBJ_EVENT_PAL_TAG_PONYTA                  0x1160
+#define OBJ_EVENT_PAL_TAG_SLOWPOKE                0x1161
+#define OBJ_EVENT_PAL_TAG_SLOWBRO                 0x1162
+#define OBJ_EVENT_PAL_TAG_MAGNEMITE               0x1163
+#define OBJ_EVENT_PAL_TAG_FARFETCHD               0x1164
+#define OBJ_EVENT_PAL_TAG_DODUO                   0x1165
+#define OBJ_EVENT_PAL_TAG_DODRIO                  0x1166
+#define OBJ_EVENT_PAL_TAG_SEEL                    0x1167
+#define OBJ_EVENT_PAL_TAG_MUK                     0x1168
+#define OBJ_EVENT_PAL_TAG_SHELLDER                0x1169
+#define OBJ_EVENT_PAL_TAG_CLOYSTER                0x116A
+#define OBJ_EVENT_PAL_TAG_GASTLY                  0x116B
+#define OBJ_EVENT_PAL_TAG_HAUNTER                 0x116C
+#define OBJ_EVENT_PAL_TAG_GENGAR                  0x116D
+#define OBJ_EVENT_PAL_TAG_HYPNO                   0x116E
+#define OBJ_EVENT_PAL_TAG_KINGLER                 0x116F
+#define OBJ_EVENT_PAL_TAG_VOLTORB                 0x1170
+#define OBJ_EVENT_PAL_TAG_EXEGGCUTE               0x1171
+#define OBJ_EVENT_PAL_TAG_EXEGGUTOR               0x1172
+#define OBJ_EVENT_PAL_TAG_CUBONE                  0x1173
+#define OBJ_EVENT_PAL_TAG_HITMONLEE               0x1174
+#define OBJ_EVENT_PAL_TAG_HITMONCHAN              0x1175
+#define OBJ_EVENT_PAL_TAG_LICKITUNG               0x1176
+#define OBJ_EVENT_PAL_TAG_KOFFING                 0x1177
+#define OBJ_EVENT_PAL_TAG_RHYDON                  0x1178
+#define OBJ_EVENT_PAL_TAG_CHANSEY                 0x1179
+#define OBJ_EVENT_PAL_TAG_TANGELA                 0x117A
+#define OBJ_EVENT_PAL_TAG_KANGASKHAN              0x117B
+#define OBJ_EVENT_PAL_TAG_HORSEA                  0x117C
+#define OBJ_EVENT_PAL_TAG_SEADRA                  0x117D
+#define OBJ_EVENT_PAL_TAG_GOLDEEN                 0x117E
+#define OBJ_EVENT_PAL_TAG_SEAKING                 0x117F
+#define OBJ_EVENT_PAL_TAG_STARMIE                 0x1180
+#define OBJ_EVENT_PAL_TAG_MR_MIME                 0x1181
+#define OBJ_EVENT_PAL_TAG_SCYTHER                 0x1182
+#define OBJ_EVENT_PAL_TAG_JYNX                    0x1183
+#define OBJ_EVENT_PAL_TAG_MAGMAR                  0x1184
+#define OBJ_EVENT_PAL_TAG_PINSIR                  0x1185
+#define OBJ_EVENT_PAL_TAG_TAUROS                  0x1186
+#define OBJ_EVENT_PAL_TAG_MAGIKARP                0x1187
+#define OBJ_EVENT_PAL_TAG_GYARADOS                0x1188
+#define OBJ_EVENT_PAL_TAG_LAPRAS                  0x1189
+#define OBJ_EVENT_PAL_TAG_EEVEE                   0x118A
+#define OBJ_EVENT_PAL_TAG_VAPOREON                0x118B
+#define OBJ_EVENT_PAL_TAG_JOLTEON                 0x118C
+#define OBJ_EVENT_PAL_TAG_FLAREON                 0x118D
+#define OBJ_EVENT_PAL_TAG_PORYGON                 0x118E
+#define OBJ_EVENT_PAL_TAG_OMANYTE                 0x118F
+#define OBJ_EVENT_PAL_TAG_OMASTAR                 0x1190
+#define OBJ_EVENT_PAL_TAG_KABUTO                  0x1191
+#define OBJ_EVENT_PAL_TAG_KABUTOPS                0x1192
+#define OBJ_EVENT_PAL_TAG_AERODACTYL              0x1193
+#define OBJ_EVENT_PAL_TAG_SNORLAX                 0x1194
+#define OBJ_EVENT_PAL_TAG_ARTICUNO                0x1195
+#define OBJ_EVENT_PAL_TAG_ZAPDOS                  0x1196
+#define OBJ_EVENT_PAL_TAG_MOLTRES                 0x1197
+#define OBJ_EVENT_PAL_TAG_DRATINI                 0x1198
+#define OBJ_EVENT_PAL_TAG_DRAGONAIR               0x1199
+#define OBJ_EVENT_PAL_TAG_DRAGONITE               0x119A
+#define OBJ_EVENT_PAL_TAG_MEWTWO                  0x119B
+#define OBJ_EVENT_PAL_TAG_MEW                     0x119C
+#define OBJ_EVENT_PAL_TAG_BAYLEEF                 0x119D
+#define OBJ_EVENT_PAL_TAG_MEGANIUM                0x119E
+#define OBJ_EVENT_PAL_TAG_CYNDAQUIL               0x119F
+#define OBJ_EVENT_PAL_TAG_QUILAVA                 0x11A0
+#define OBJ_EVENT_PAL_TAG_TYPHLOSION              0x11A1
+#define OBJ_EVENT_PAL_TAG_TOTODILE                0x11A2
+#define OBJ_EVENT_PAL_TAG_CROCONAW                0x11A3
+#define OBJ_EVENT_PAL_TAG_FERALIGATR              0x11A4
+#define OBJ_EVENT_PAL_TAG_SENTRET                 0x11A5
+#define OBJ_EVENT_PAL_TAG_FURRET                  0x11A6
+#define OBJ_EVENT_PAL_TAG_HOOTHOOT                0x11A7
+#define OBJ_EVENT_PAL_TAG_NOCTOWL                 0x11A8
+#define OBJ_EVENT_PAL_TAG_LEDYBA                  0x11A9
+#define OBJ_EVENT_PAL_TAG_LEDIAN                  0x11AA
+#define OBJ_EVENT_PAL_TAG_SPINARAK                0x11AB
+#define OBJ_EVENT_PAL_TAG_ARIADOS                 0x11AC
+#define OBJ_EVENT_PAL_TAG_CROBAT                  0x11AD
+#define OBJ_EVENT_PAL_TAG_CHINCHOU                0x11AE
+#define OBJ_EVENT_PAL_TAG_LANTURN                 0x11AF
+#define OBJ_EVENT_PAL_TAG_PICHU                   0x11B0
+#define OBJ_EVENT_PAL_TAG_CLEFFA                  0x11B1
+#define OBJ_EVENT_PAL_TAG_IGGLYBUFF               0x11B2
+#define OBJ_EVENT_PAL_TAG_TOGEPI                  0x11B3
+#define OBJ_EVENT_PAL_TAG_NATU                    0x11B4
+#define OBJ_EVENT_PAL_TAG_XATU                    0x11B5
+#define OBJ_EVENT_PAL_TAG_MAREEP                  0x11B6
+#define OBJ_EVENT_PAL_TAG_FLAAFFY                 0x11B7
+#define OBJ_EVENT_PAL_TAG_AMPHAROS                0x11B8
+#define OBJ_EVENT_PAL_TAG_BELLOSSOM               0x11B9
+#define OBJ_EVENT_PAL_TAG_AZUMARILL               0x11BA
+#define OBJ_EVENT_PAL_TAG_SUDOWOODO               0x11BB
+#define OBJ_EVENT_PAL_TAG_POLITOED                0x11BC
+#define OBJ_EVENT_PAL_TAG_HOPPIP                  0x11BD
+#define OBJ_EVENT_PAL_TAG_SKIPLOOM                0x11BE
+#define OBJ_EVENT_PAL_TAG_JUMPLUFF                0x11BF
+#define OBJ_EVENT_PAL_TAG_AIPOM                   0x11C0
+#define OBJ_EVENT_PAL_TAG_SUNKERN                 0x11C1
+#define OBJ_EVENT_PAL_TAG_SUNFLORA                0x11C2
+#define OBJ_EVENT_PAL_TAG_YANMA                   0x11C3
+#define OBJ_EVENT_PAL_TAG_QUAGSIRE                0x11C4
+#define OBJ_EVENT_PAL_TAG_ESPEON                  0x11C5
+#define OBJ_EVENT_PAL_TAG_UMBREON                 0x11C6
+#define OBJ_EVENT_PAL_TAG_MURKROW                 0x11C7
+#define OBJ_EVENT_PAL_TAG_SLOWKING                0x11C8
+#define OBJ_EVENT_PAL_TAG_MISDREAVUS              0x11C9
+#define OBJ_EVENT_PAL_TAG_WOBBUFFET               0x11CA
+#define OBJ_EVENT_PAL_TAG_GIRAFARIG               0x11CB
+#define OBJ_EVENT_PAL_TAG_PINECO                  0x11CC
+#define OBJ_EVENT_PAL_TAG_FORRETRESS              0x11CD
+#define OBJ_EVENT_PAL_TAG_DUNSPARCE               0x11CE
+#define OBJ_EVENT_PAL_TAG_GLIGAR                  0x11CF
+#define OBJ_EVENT_PAL_TAG_SNUBBULL                0x11D0
+#define OBJ_EVENT_PAL_TAG_GRANBULL                0x11D1
+#define OBJ_EVENT_PAL_TAG_QWILFISH                0x11D2
+#define OBJ_EVENT_PAL_TAG_SCIZOR                  0x11D3
+#define OBJ_EVENT_PAL_TAG_SHUCKLE                 0x11D4
+#define OBJ_EVENT_PAL_TAG_HERACROSS               0x11D5
+#define OBJ_EVENT_PAL_TAG_SNEASEL                 0x11D6
+#define OBJ_EVENT_PAL_TAG_TEDDIURSA               0x11D7
+#define OBJ_EVENT_PAL_TAG_URSARING                0x11D8
+#define OBJ_EVENT_PAL_TAG_MAGCARGO                0x11D9
+#define OBJ_EVENT_PAL_TAG_SWINUB                  0x11DA
+#define OBJ_EVENT_PAL_TAG_PILOSWINE               0x11DB
+#define OBJ_EVENT_PAL_TAG_CORSOLA                 0x11DC
+#define OBJ_EVENT_PAL_TAG_REMORAID                0x11DD
+#define OBJ_EVENT_PAL_TAG_OCTILLERY               0x11DE
+#define OBJ_EVENT_PAL_TAG_DELIBIRD                0x11DF
+#define OBJ_EVENT_PAL_TAG_MANTINE                 0x11E0
+#define OBJ_EVENT_PAL_TAG_SKARMORY                0x11E1
+#define OBJ_EVENT_PAL_TAG_HOUNDOOM                0x11E2
+#define OBJ_EVENT_PAL_TAG_KINGDRA                 0x11E3
+#define OBJ_EVENT_PAL_TAG_PHANPY                  0x11E4
+#define OBJ_EVENT_PAL_TAG_DONPHAN                 0x11E5
+#define OBJ_EVENT_PAL_TAG_PORYGON2                0x11E6
+#define OBJ_EVENT_PAL_TAG_STANTLER                0x11E7
+#define OBJ_EVENT_PAL_TAG_SMEARGLE                0x11E8
+#define OBJ_EVENT_PAL_TAG_TYROGUE                 0x11E9
+#define OBJ_EVENT_PAL_TAG_HITMONTOP               0x11EA
+#define OBJ_EVENT_PAL_TAG_SMOOCHUM                0x11EB
+#define OBJ_EVENT_PAL_TAG_ELEKID                  0x11EC
+#define OBJ_EVENT_PAL_TAG_MAGBY                   0x11ED
+#define OBJ_EVENT_PAL_TAG_MILTANK                 0x11EE
+#define OBJ_EVENT_PAL_TAG_BLISSEY                 0x11EF
+#define OBJ_EVENT_PAL_TAG_RAIKOU                  0x11F0
+#define OBJ_EVENT_PAL_TAG_ENTEI                   0x11F1
+#define OBJ_EVENT_PAL_TAG_SUICUNE                 0x11F2
+#define OBJ_EVENT_PAL_TAG_LARVITAR                0x11F3
+#define OBJ_EVENT_PAL_TAG_TYRANITAR               0x11F4
+#define OBJ_EVENT_PAL_TAG_LUGIA_FOLLOWER          0x11F5
+#define OBJ_EVENT_PAL_TAG_HO_OH_FOLLOWER          0x11F6
+#define OBJ_EVENT_PAL_TAG_CELEBI                  0x11F7
+#define OBJ_EVENT_PAL_TAG_TREECKO                 0x11F8
+#define OBJ_EVENT_PAL_TAG_GROVYLE                 0x11F9
+#define OBJ_EVENT_PAL_TAG_SCEPTILE                0x11FA
+#define OBJ_EVENT_PAL_TAG_COMBUSKEN               0x11FB
+#define OBJ_EVENT_PAL_TAG_BLAZIKEN                0x11FC
+#define OBJ_EVENT_PAL_TAG_MUDKIP                  0x11FD
+#define OBJ_EVENT_PAL_TAG_MARSHTOMP               0x11FE
+#define OBJ_EVENT_PAL_TAG_SWAMPERT                0x10FF
+#define OBJ_EVENT_PAL_TAG_POOCHYENA_FOLLOWER      0x10FE
+#define OBJ_EVENT_PAL_TAG_MIGHTYENA               0x10FD
+#define OBJ_EVENT_PAL_TAG_ZIGZAGOON_FOLLOWER      0x10FC
+#define OBJ_EVENT_PAL_TAG_LINOONE                 0x10FB
+#define OBJ_EVENT_PAL_TAG_WURMPLE                 0x10FA
+#define OBJ_EVENT_PAL_TAG_BEAUTIFLY               0x10F9
+#define OBJ_EVENT_PAL_TAG_CASCOON                 0x10F8
+#define OBJ_EVENT_PAL_TAG_DUSTOX                  0x10F7
+#define OBJ_EVENT_PAL_TAG_LOTAD                   0x10F6
+#define OBJ_EVENT_PAL_TAG_LOMBRE                  0x10F5
+#define OBJ_EVENT_PAL_TAG_LUDICOLO                0x10F4
+#define OBJ_EVENT_PAL_TAG_SEEDOT                  0x10F3
+#define OBJ_EVENT_PAL_TAG_NUZLEAF                 0x10F2
+#define OBJ_EVENT_PAL_TAG_SHIFTRY                 0x10F1
+#define OBJ_EVENT_PAL_TAG_TAILLOW                 0x10F0
+#define OBJ_EVENT_PAL_TAG_SWELLOW                 0x10EF
+#define OBJ_EVENT_PAL_TAG_WINGULL                 0x10EE
+#define OBJ_EVENT_PAL_TAG_PELIPPER                0x10ED
+#define OBJ_EVENT_PAL_TAG_GARDEVOIR               0x10EC
+#define OBJ_EVENT_PAL_TAG_SURSKIT                 0x10EB
+#define OBJ_EVENT_PAL_TAG_MASQUERAIN              0x10EA
+#define OBJ_EVENT_PAL_TAG_SHROOMISH               0x10E9
+#define OBJ_EVENT_PAL_TAG_BRELOOM                 0x10E8
+#define OBJ_EVENT_PAL_TAG_SLAKOTH                 0x10E7
+#define OBJ_EVENT_PAL_TAG_VIGOROTH_FOLLOWER       0x10E6
+#define OBJ_EVENT_PAL_TAG_SLAKING                 0x10E5
+#define OBJ_EVENT_PAL_TAG_NINCADA                 0x10E4
+#define OBJ_EVENT_PAL_TAG_NINJASK                 0x10E3
+#define OBJ_EVENT_PAL_TAG_SHEDINJA                0x10E2
+#define OBJ_EVENT_PAL_TAG_WHISMUR                 0x10E1
+#define OBJ_EVENT_PAL_TAG_EXPLOUD                 0x10E0
+#define OBJ_EVENT_PAL_TAG_MAKUHITA                0x10DF
+#define OBJ_EVENT_PAL_TAG_HARIYAMA                0x10DE
+#define OBJ_EVENT_PAL_TAG_AZURILL_FOLLOWER        0x10DD
+#define OBJ_EVENT_PAL_TAG_NOSEPASS                0x10DC
+#define OBJ_EVENT_PAL_TAG_DELCATTY                0x10DB
+#define OBJ_EVENT_PAL_TAG_SABLEYE                 0x10DA
+#define OBJ_EVENT_PAL_TAG_MAWILE                  0x10D9
+#define OBJ_EVENT_PAL_TAG_LAIRON                  0x10D8
+#define OBJ_EVENT_PAL_TAG_AGGRON                  0x10D7
+#define OBJ_EVENT_PAL_TAG_MEDITITE                0x10D6
+#define OBJ_EVENT_PAL_TAG_MEDICHAM                0x10D5
+#define OBJ_EVENT_PAL_TAG_ELECTRIKE               0x10D4
+#define OBJ_EVENT_PAL_TAG_MANECTRIC               0x10D3
+#define OBJ_EVENT_PAL_TAG_MINUN                   0x10D2
+#define OBJ_EVENT_PAL_TAG_VOLBEAT                 0x10D1
+#define OBJ_EVENT_PAL_TAG_ILLUMISE                0x10D0
+#define OBJ_EVENT_PAL_TAG_ROSELIA                 0x10CF
+#define OBJ_EVENT_PAL_TAG_GULPIN                  0x10CE
+#define OBJ_EVENT_PAL_TAG_SWALOT                  0x10CD
+#define OBJ_EVENT_PAL_TAG_CARVANHA                0x10CC
+#define OBJ_EVENT_PAL_TAG_SHARPEDO                0x10CB
+#define OBJ_EVENT_PAL_TAG_WAILMER                 0x10CA
+#define OBJ_EVENT_PAL_TAG_WAILORD                 0x10C9
+#define OBJ_EVENT_PAL_TAG_NUMEL                   0x10C8
+#define OBJ_EVENT_PAL_TAG_CAMERUPT                0x10C7
+#define OBJ_EVENT_PAL_TAG_TORKOAL                 0x10C6
+#define OBJ_EVENT_PAL_TAG_SPOINK                  0x10C5
+#define OBJ_EVENT_PAL_TAG_GRUMPIG                 0x10C4
+#define OBJ_EVENT_PAL_TAG_SPINDA                  0x10C3
+#define OBJ_EVENT_PAL_TAG_TRAPINCH                0x10C2
+#define OBJ_EVENT_PAL_TAG_VIBRAVA                 0x10C1
+#define OBJ_EVENT_PAL_TAG_FLYGON                  0x10C0
+#define OBJ_EVENT_PAL_TAG_CACNEA                  0x10BF
+#define OBJ_EVENT_PAL_TAG_ALTARIA                 0x10BE
+#define OBJ_EVENT_PAL_TAG_ZANGOOSE                0x10BD
+#define OBJ_EVENT_PAL_TAG_SEVIPER                 0x10BC
+#define OBJ_EVENT_PAL_TAG_SOLROCK                 0x10BB
+#define OBJ_EVENT_PAL_TAG_BARBOACH                0x10BA
+#define OBJ_EVENT_PAL_TAG_WHISCASH                0x10B9
+#define OBJ_EVENT_PAL_TAG_CORPHISH                0x10B8
+#define OBJ_EVENT_PAL_TAG_CRAWDAUNT               0x10B7
+#define OBJ_EVENT_PAL_TAG_BALTOY                  0x10B6
+#define OBJ_EVENT_PAL_TAG_CLAYDOL                 0x10B5
+#define OBJ_EVENT_PAL_TAG_LILEEP                  0x10B4
+#define OBJ_EVENT_PAL_TAG_CRADILY                 0x10B3
+#define OBJ_EVENT_PAL_TAG_ANORITH                 0x10B2
+#define OBJ_EVENT_PAL_TAG_ARMALDO                 0x10B1
+#define OBJ_EVENT_PAL_TAG_FEEBAS                  0x10B0
+#define OBJ_EVENT_PAL_TAG_MILOTIC                 0x10AF
+#define OBJ_EVENT_PAL_TAG_KECLEON                 0x10AE
+#define OBJ_EVENT_PAL_TAG_BANETTE                 0x10AD
+#define OBJ_EVENT_PAL_TAG_DUSKULL                 0x10AC
+#define OBJ_EVENT_PAL_TAG_DUSCLOPS                0x10AB
+#define OBJ_EVENT_PAL_TAG_TROPIUS                 0x10AA
+#define OBJ_EVENT_PAL_TAG_CHIMECHO                0x10A9
+#define OBJ_EVENT_PAL_TAG_ABSOL                   0x10A8
+#define OBJ_EVENT_PAL_TAG_WYNAUT                  0x10A7
+#define OBJ_EVENT_PAL_TAG_SNORUNT                 0x10A6
+#define OBJ_EVENT_PAL_TAG_GLALIE                  0x10A5
+#define OBJ_EVENT_PAL_TAG_SPHEAL                  0x10A4
+#define OBJ_EVENT_PAL_TAG_SEALEO                  0x10A3
+#define OBJ_EVENT_PAL_TAG_WALREIN                 0x10A2
+#define OBJ_EVENT_PAL_TAG_CLAMPERL                0x10A1
+#define OBJ_EVENT_PAL_TAG_HUNTAIL                 0x10A0
+#define OBJ_EVENT_PAL_TAG_GOREBYSS                0x109F
+#define OBJ_EVENT_PAL_TAG_RELICANTH               0x109E
+#define OBJ_EVENT_PAL_TAG_LUVDISC                 0x109D
+#define OBJ_EVENT_PAL_TAG_BAGON                   0x109C
+#define OBJ_EVENT_PAL_TAG_SHELGON                 0x109B
+#define OBJ_EVENT_PAL_TAG_SALAMENCE               0x109A
+#define OBJ_EVENT_PAL_TAG_BELDUM                  0x1099
+#define OBJ_EVENT_PAL_TAG_METANG                  0x1098
+#define OBJ_EVENT_PAL_TAG_REGIROCK                0x1097
+#define OBJ_EVENT_PAL_TAG_REGICE                  0x1096
+#define OBJ_EVENT_PAL_TAG_REGISTEEL               0x1095
+#define OBJ_EVENT_PAL_TAG_LATIAS                  0x1094
+#define OBJ_EVENT_PAL_TAG_LATIOS                  0x1093
+#define OBJ_EVENT_PAL_TAG_KYOGRE_FOLLOWER         0x1092
+#define OBJ_EVENT_PAL_TAG_GROUDON_FOLLOWER        0x1091
+#define OBJ_EVENT_PAL_TAG_RAYQUAZA                0x1090
+#define OBJ_EVENT_PAL_TAG_JIRACHI                 0x108F
+#define OBJ_EVENT_PAL_TAG_DEOXYS_FOLLOWER         0x108E
+#define OBJ_EVENT_PAL_TAG_GREAT_BALL              0x108D
+#define OBJ_EVENT_PAL_TAG_ULTRA_BALL              0x108C
+#define OBJ_EVENT_PAL_TAG_MASTER_BALL             0x108B
+#define OBJ_EVENT_PAL_TAG_SAFARI_BALL             0x108A
+#define OBJ_EVENT_PAL_TAG_NET_BALL                0x1089
+#define OBJ_EVENT_PAL_TAG_DIVE_BALL               0x1088
+#define OBJ_EVENT_PAL_TAG_NEST_BALL               0x1087
+#define OBJ_EVENT_PAL_TAG_REPEAT_BALL             0x1086
+#define OBJ_EVENT_PAL_TAG_TIMER_BALL              0x1085
+#define OBJ_EVENT_PAL_TAG_LUXURY_BALL             0x1084
+#define OBJ_EVENT_PAL_TAG_PREMIER_BALL            0x1083
+#define OBJ_EVENT_PAL_TAG_HEAL_BALL               0x1082
+#define OBJ_EVENT_PAL_TAG_DUSK_BALL               0x1081
+#define OBJ_EVENT_PAL_TAG_QUICK_BALL              0x1080
+#define OBJ_EVENT_PAL_TAG_LEVEL_BALL              0x107F
+#define OBJ_EVENT_PAL_TAG_LURE_BALL               0x107E
+#define OBJ_EVENT_PAL_TAG_MOON_BALL               0x107D
+#define OBJ_EVENT_PAL_TAG_FRIEND_BALL             0x107C
+#define OBJ_EVENT_PAL_TAG_LOVE_BALL               0x107B
+#define OBJ_EVENT_PAL_TAG_FAST_BALL               0x107A
+#define OBJ_EVENT_PAL_TAG_HEAVY_BALL              0x1079
+#define OBJ_EVENT_PAL_TAG_DREAM_BALL              0x1078
+#define OBJ_EVENT_PAL_TAG_SPORT_BALL              0x1077
+#define OBJ_EVENT_PAL_TAG_PARK_BALL               0x1076
+#define OBJ_EVENT_PAL_TAG_CHERISH_BALL            0x1075
 
-#include "data/object_events/object_event_graphics_info_pointers.h"
+#define OBJ_EVENT_PAL_TAG_BUDEW                   0x1200
+#define OBJ_EVENT_PAL_TAG_ROSERADE                0x1201
+#define OBJ_EVENT_PAL_TAG_AMBIPOM                 0x1202
+#define OBJ_EVENT_PAL_TAG_CHINGLING               0x1203
+#define OBJ_EVENT_PAL_TAG_MAGNEZONE               0x1204
+#define OBJ_EVENT_PAL_TAG_LICKILICKY              0x1205
+#define OBJ_EVENT_PAL_TAG_RHYPERIOR               0x1206
+#define OBJ_EVENT_PAL_TAG_TANGROWTH               0x1207
+#define OBJ_EVENT_PAL_TAG_YANMEGA                 0x1208
+#define OBJ_EVENT_PAL_TAG_MAMOSWINE               0x1209
+#define OBJ_EVENT_PAL_TAG_GALLADE                 0x120A
+#define OBJ_EVENT_PAL_TAG_PROBOPASS               0x120B
+#define OBJ_EVENT_PAL_TAG_DUSKNOIR                0x120C
+#define OBJ_EVENT_PAL_TAG_FROSLASS                0x120D
+#define OBJ_EVENT_PAL_TAG_HAPPINY                 0x120E
+#define OBJ_EVENT_PAL_TAG_MIME_JR                 0x120F
+#define OBJ_EVENT_PAL_TAG_ELECTIVIRE              0x1210
+#define OBJ_EVENT_PAL_TAG_MAGMORTAR               0x1211
+#define OBJ_EVENT_PAL_TAG_LEAFEON                 0x1212
+#define OBJ_EVENT_PAL_TAG_GLACEON                 0x1213
+#define OBJ_EVENT_PAL_TAG_PORYGON_Z               0x1214
+#define OBJ_EVENT_PAL_TAG_MUNCHLAX                0x1215
+#define OBJ_EVENT_PAL_TAG_MANTYKE                 0x1216
+#define OBJ_EVENT_PAL_TAG_TOGEKISS                0x1217
+#define OBJ_EVENT_PAL_TAG_BONSLY                  0x1218
+#define OBJ_EVENT_PAL_TAG_HONCHKROW               0x1219
+#define OBJ_EVENT_PAL_TAG_MISMAGIUS               0x121A
+#define OBJ_EVENT_PAL_TAG_GLISCOR                 0x121B
+#define OBJ_EVENT_PAL_TAG_WEAVILE                 0x121C
+#define OBJ_EVENT_PAL_TAG_SYLVEON                 0x121D
+#define OBJ_EVENT_PAL_TAG_REGIGIGAS               0x121E
+#define OBJ_EVENT_PAL_TAG_QUAXLY                  0x121F
+#define OBJ_EVENT_PAL_TAG_FUECOCO                 0x1220
+#define OBJ_EVENT_PAL_TAG_SPRIGATITO              0x1221
+#define OBJ_EVENT_PAL_TAG_RED                     0x1222
+#define OBJ_EVENT_PAL_TAG_LEAF                    0x1223
+#define OBJ_EVENT_PAL_TAG_ETHAN                   0x1224
+#define OBJ_EVENT_PAL_TAG_LYRA                    0x1225
+#define OBJ_EVENT_PAL_TAG_KRIS                    0x1226
+#define OBJ_EVENT_PAL_TAG_LUCAS                   0x1227
+#define OBJ_EVENT_PAL_TAG_DAWN                    0x1228
+#define OBJ_EVENT_PAL_TAG_LUCAS_PLATINUM          0x1229
+#define OBJ_EVENT_PAL_TAG_DAWN_PLATINUM           0x122A
+#define OBJ_EVENT_PAL_TAG_ENBY                    0x122B
+
+#define OBJ_EVENT_PAL_TAG_ANABEL                0x122C
+#define OBJ_EVENT_PAL_TAG_TUCKER                0x122D
+#define OBJ_EVENT_PAL_TAG_SPENSER               0x122E
+#define OBJ_EVENT_PAL_TAG_GRETA                 0x122F
+#define OBJ_EVENT_PAL_TAG_NOLAND                0x1230
+#define OBJ_EVENT_PAL_TAG_LUCY                  0x1231
+#define OBJ_EVENT_PAL_TAG_BRANDON               0x1232
+#define OBJ_EVENT_PAL_TAG_ROXANNE               0x1233
+#define OBJ_EVENT_PAL_TAG_BRAWLY                0x1234
+#define OBJ_EVENT_PAL_TAG_NORMAN                0x1235
+#define OBJ_EVENT_PAL_TAG_WATTSON               0x1236
+#define OBJ_EVENT_PAL_TAG_FLANNERY              0x1237
+#define OBJ_EVENT_PAL_TAG_WINONA                0x1238
+#define OBJ_EVENT_PAL_TAG_TATE_LIZA             0x1239
+#define OBJ_EVENT_PAL_TAG_JUAN                  0x123A
+#define OBJ_EVENT_PAL_TAG_MAGMA                 0x123B
+#define OBJ_EVENT_PAL_TAG_AQUA                  0x123C
+#define OBJ_EVENT_PAL_TAG_ROCKET                0x123D
+#define OBJ_EVENT_PAL_TAG_SIDNEY                0x123E
+#define OBJ_EVENT_PAL_TAG_PHOEBE                0x123F
+#define OBJ_EVENT_PAL_TAG_GLACIA                0x1240
+#define OBJ_EVENT_PAL_TAG_DRAKE                 0x1241
+#define OBJ_EVENT_PAL_TAG_SCIENTIST             0x1242
+#define OBJ_EVENT_PAL_TAG_TUBER_F               0x1243
+#define OBJ_EVENT_PAL_TAG_TUBER_M               0x1244
+#define OBJ_EVENT_PAL_TAG_FATMAN                0x1245
+#define OBJ_EVENT_PAL_TAG_ZINNIA                0x1246
+#define OBJ_EVENT_PAL_TAG_WALLY                 0x1247
+#define OBJ_EVENT_PAL_TAG_YOUNGSTER             0x1248
+#define OBJ_EVENT_PAL_TAG_WOMAN_2               0x1249
+#define OBJ_EVENT_PAL_TAG_WOMAN_3               0x124A
+#define OBJ_EVENT_PAL_TAG_WOMAN_4               0x124B
+#define OBJ_EVENT_PAL_TAG_WOMAN_5               0x124C
+#define OBJ_EVENT_PAL_TAG_MAN_2                 0x124D
+#define OBJ_EVENT_PAL_TAG_MAN_3                 0x124E
+#define OBJ_EVENT_PAL_TAG_MAN_4                 0x124F
+#define OBJ_EVENT_PAL_TAG_MAN_5                 0x1250
+#define OBJ_EVENT_PAL_TAG_SOCIALITE             0x1251
+#define OBJ_EVENT_PAL_TAG_CHAMP_RED             0x1252
+#define OBJ_EVENT_PAL_TAG_NURSE                 0x1253
+#define OBJ_EVENT_PAL_TAG_REPORTER_M            0x1254
+#define OBJ_EVENT_PAL_TAG_REPORTER_F            0x1255
+#define OBJ_EVENT_PAL_TAG_PSYCHIC               0x1256
+#define OBJ_EVENT_PAL_TAG_LITTLE_KID            0x1257
+#define OBJ_EVENT_PAL_TAG_MOM                   0x1258
+#define OBJ_EVENT_PAL_TAG_WALLACE               0x1259
+#define OBJ_EVENT_PAL_TAG_ATTENDANT             0x125A
+#define OBJ_EVENT_PAL_TAG_TWIN                  0x125B
+#define OBJ_EVENT_PAL_TAG_SWIMMER_M             0x125C
+#define OBJ_EVENT_PAL_TAG_SWIMMER_F             0x125D
+#define OBJ_EVENT_PAL_TAG_DELIVERY              0x125E
+#define OBJ_EVENT_PAL_TAG_TEALA                 0x125F
+#define OBJ_EVENT_PAL_TAG_SCOTT                 0x1260
+#define OBJ_EVENT_PAL_TAG_MART                  0x1261
+#define OBJ_EVENT_PAL_TAG_EXPERT_F              0x1262
+#define OBJ_EVENT_PAL_TAG_SCHOOL_KID_M          0x1263
+#define OBJ_EVENT_PAL_TAG_SCHOOL_KID_F          0x1264
+#define OBJ_EVENT_PAL_TAG_LANETTE               0x1265
+#define OBJ_EVENT_PAL_TAG_ATHLETE_M             0x1266
+#define OBJ_EVENT_PAL_TAG_ATHLETE_F             0x1267
+#define OBJ_EVENT_PAL_TAG_SAILOR                0x1268
+#define OBJ_EVENT_PAL_TAG_BOY_1                 0x1269
+#define OBJ_EVENT_PAL_TAG_BOY_2                 0x126A
+#define OBJ_EVENT_PAL_TAG_BOY_3                 0x126B
+#define OBJ_EVENT_PAL_TAG_BIRCH                 0x126C
+#define OBJ_EVENT_PAL_TAG_OAK                   0x126D
+#define OBJ_EVENT_PAL_TAG_EMPLOYEE              0x126E
+#define OBJ_EVENT_PAL_TAG_HIKER                 0x126F
+#define OBJ_EVENT_PAL_TAG_BUG_CATCHER           0x1270
+#define OBJ_EVENT_PAL_TAG_CYCLER_F              0x1271
+#define OBJ_EVENT_PAL_TAG_CYCLER_M              0x1272
+#define OBJ_EVENT_PAL_TAG_GIRL_1                0x1273
+#define OBJ_EVENT_PAL_TAG_GIRL_2                0x1274
+#define OBJ_EVENT_PAL_TAG_GIRL_3                0x1275
+#define OBJ_EVENT_PAL_TAG_COOL_TRAINER          0x1276
+#define OBJ_EVENT_PAL_TAG_BLACKBELT             0x1277
+#define OBJ_EVENT_PAL_TAG_BEAUTY                0x1278
+#define OBJ_EVENT_PAL_TAG_BLUE                  0x1279
+#define OBJ_EVENT_PAL_TAG_SCOUT                 0x127A
+#define OBJ_EVENT_PAL_TAG_OLDMAN                0x127B
+#define OBJ_EVENT_PAL_TAG_OLDWOMAN              0x127C
+#define OBJ_EVENT_PAL_TAG_EXPERT_M              0x127D
+#define OBJ_EVENT_PAL_TAG_NINJABOY              0x127E
+#define OBJ_EVENT_PAL_TAG_RICHBOY               0x127F
+#define OBJ_EVENT_PAL_TAG_POKEFAN_M             0x1280
+#define OBJ_EVENT_PAL_TAG_POKEFAN_F             0x1281
+#define OBJ_EVENT_PAL_TAG_COOK                  0x1282
+#define OBJ_EVENT_PAL_TAG_RECEPTIONIST          0x1283
+#define OBJ_EVENT_PAL_TAG_GENTLEMAN             0x1284
+#define OBJ_EVENT_PAL_TAG_FISHERMAN             0x1285
+#define OBJ_EVENT_PAL_TAG_ARTIST                0x1286
+#define OBJ_EVENT_PAL_TAG_CAMERAMAN             0x1287
+#define OBJ_EVENT_PAL_TAG_GAMEBOY               0x1288
+#define OBJ_EVENT_PAL_TAG_JUDGE                 0x1289
+#define OBJ_EVENT_PAL_TAG_LASS                  0x128A
+#define OBJ_EVENT_PAL_TAG_STEVEN                0x128B
+
+#define OBJ_EVENT_PAL_TAG_NONE                  0x128C
+
 #include "data/field_effects/field_effect_object_template_pointers.h"
 #include "data/object_events/object_event_pic_tables.h"
 #include "data/object_events/object_event_anims.h"
 #include "data/object_events/base_oam.h"
 #include "data/object_events/object_event_subsprites.h"
 #include "data/object_events/object_event_graphics_info.h"
+#include "data/object_events/object_event_graphics_info_pointers.h"
 
 static const struct SpritePalette sObjectEventSpritePalettes[] = {
     {gObjectEventPal_Npc1,                  OBJ_EVENT_PAL_TAG_NPC_1},
@@ -476,7 +986,6 @@ static const struct SpritePalette sObjectEventSpritePalettes[] = {
     {gObjectEventPal_KyogreReflection,      OBJ_EVENT_PAL_TAG_KYOGRE_REFLECTION},
     {gObjectEventPal_Groudon,               OBJ_EVENT_PAL_TAG_GROUDON},
     {gObjectEventPal_GroudonReflection,     OBJ_EVENT_PAL_TAG_GROUDON_REFLECTION},
-    {gObjectEventPal_SubmarineShadow,       OBJ_EVENT_PAL_TAG_SUBMARINE_SHADOW},
     {gObjectEventPal_Poochyena,             OBJ_EVENT_PAL_TAG_POOCHYENA},
     {gObjectEventPal_RedLeaf,               OBJ_EVENT_PAL_TAG_RED_LEAF},
     {gObjectEventPal_Deoxys,                OBJ_EVENT_PAL_TAG_DEOXYS},
@@ -485,188 +994,507 @@ static const struct SpritePalette sObjectEventSpritePalettes[] = {
     {gObjectEventPal_Lugia,                 OBJ_EVENT_PAL_TAG_LUGIA},
     {gObjectEventPal_RubySapphireBrendan,   OBJ_EVENT_PAL_TAG_RS_BRENDAN},
     {gObjectEventPal_RubySapphireMay,       OBJ_EVENT_PAL_TAG_RS_MAY},
+    {gObjectEventPal_Bulbasaur,             OBJ_EVENT_PAL_TAG_BULBASAUR},
+    {gObjectEventPal_Ivysaur,               OBJ_EVENT_PAL_TAG_IVYSAUR},
+    {gObjectEventPal_Venusaur,              OBJ_EVENT_PAL_TAG_VENUSAUR},
+    {gObjectEventPal_Charmander,            OBJ_EVENT_PAL_TAG_CHARMANDER},
+    {gObjectEventPal_Charmeleon,            OBJ_EVENT_PAL_TAG_CHARMELEON},
+    {gObjectEventPal_Charizard,             OBJ_EVENT_PAL_TAG_CHARIZARD},
+    {gObjectEventPal_Squirtle,              OBJ_EVENT_PAL_TAG_SQUIRTLE},
+    {gObjectEventPal_Wartortle,             OBJ_EVENT_PAL_TAG_WARTORTLE},
+    {gObjectEventPal_Blastoise,             OBJ_EVENT_PAL_TAG_BLASTOISE},
+    {gObjectEventPal_Caterpie,              OBJ_EVENT_PAL_TAG_CATERPIE},
+    {gObjectEventPal_Butterfree,            OBJ_EVENT_PAL_TAG_BUTTERFREE},
+    {gObjectEventPal_Weedle,                OBJ_EVENT_PAL_TAG_WEEDLE},
+    {gObjectEventPal_Beedrill,              OBJ_EVENT_PAL_TAG_BEEDRILL},
+    {gObjectEventPal_Pidgey,                OBJ_EVENT_PAL_TAG_PIDGEY},
+    {gObjectEventPal_Pidgeotto,             OBJ_EVENT_PAL_TAG_PIDGEOTTO},
+    {gObjectEventPal_Pidgeot,               OBJ_EVENT_PAL_TAG_PIDGEOT},
+    {gObjectEventPal_Rattata,               OBJ_EVENT_PAL_TAG_RATTATA},
+    {gObjectEventPal_Raticate,              OBJ_EVENT_PAL_TAG_RATICATE},
+    {gObjectEventPal_Spearow,               OBJ_EVENT_PAL_TAG_SPEAROW},
+    {gObjectEventPal_Fearow,                OBJ_EVENT_PAL_TAG_FEAROW},
+    {gObjectEventPal_Ekans,                 OBJ_EVENT_PAL_TAG_EKANS},
+    {gObjectEventPal_Arbok,                 OBJ_EVENT_PAL_TAG_ARBOK},
+    {gObjectEventPal_Pikachu,               OBJ_EVENT_PAL_TAG_PIKACHU},
+    {gObjectEventPal_Raichu,                OBJ_EVENT_PAL_TAG_RAICHU},
+    {gObjectEventPal_Sandshrew,             OBJ_EVENT_PAL_TAG_SANDSHREW},
+    {gObjectEventPal_Sandslash,             OBJ_EVENT_PAL_TAG_SANDSLASH},
+    {gObjectEventPal_Nidoran_F,             OBJ_EVENT_PAL_TAG_NIDORAN_F},
+    {gObjectEventPal_Nidorina,              OBJ_EVENT_PAL_TAG_NIDORINA},
+    {gObjectEventPal_Nidoqueen,             OBJ_EVENT_PAL_TAG_NIDOQUEEN},
+    {gObjectEventPal_Nidoran_M,             OBJ_EVENT_PAL_TAG_NIDORAN_M},
+    {gObjectEventPal_Nidoking,              OBJ_EVENT_PAL_TAG_NIDOKING},
+    {gObjectEventPal_Clefable,              OBJ_EVENT_PAL_TAG_CLEFABLE},
+    {gObjectEventPal_Vulpix,                OBJ_EVENT_PAL_TAG_VULPIX},
+    {gObjectEventPal_Ninetales,             OBJ_EVENT_PAL_TAG_NINETALES},
+    {gObjectEventPal_Jigglypuff,            OBJ_EVENT_PAL_TAG_JIGGLYPUFF},
+    {gObjectEventPal_Wigglytuff,            OBJ_EVENT_PAL_TAG_WIGGLYTUFF},
+    {gObjectEventPal_Golbat,                OBJ_EVENT_PAL_TAG_GOLBAT},
+    {gObjectEventPal_Gloom,                 OBJ_EVENT_PAL_TAG_GLOOM},
+    {gObjectEventPal_Paras,                 OBJ_EVENT_PAL_TAG_PARAS},
+    {gObjectEventPal_Venonat,               OBJ_EVENT_PAL_TAG_VENONAT},
+    {gObjectEventPal_Venomoth,              OBJ_EVENT_PAL_TAG_VENOMOTH},
+    {gObjectEventPal_Diglett,               OBJ_EVENT_PAL_TAG_DIGLETT},
+    {gObjectEventPal_Dugtrio,               OBJ_EVENT_PAL_TAG_DUGTRIO},
+    {gObjectEventPal_Meowth,                OBJ_EVENT_PAL_TAG_MEOWTH},
+    {gObjectEventPal_Persian,               OBJ_EVENT_PAL_TAG_PERSIAN},
+    {gObjectEventPal_Golduck,               OBJ_EVENT_PAL_TAG_GOLDUCK},
+    {gObjectEventPal_Mankey,                OBJ_EVENT_PAL_TAG_MANKEY},
+    {gObjectEventPal_Primeape,              OBJ_EVENT_PAL_TAG_PRIMEAPE},
+    {gObjectEventPal_Arcanine,              OBJ_EVENT_PAL_TAG_ARCANINE},
+    {gObjectEventPal_Poliwag,               OBJ_EVENT_PAL_TAG_POLIWAG},
+    {gObjectEventPal_Poliwhirl,             OBJ_EVENT_PAL_TAG_POLIWHIRL},
+    {gObjectEventPal_Kadabra,               OBJ_EVENT_PAL_TAG_KADABRA},
+    {gObjectEventPal_Machop,                OBJ_EVENT_PAL_TAG_MACHOP},
+    {gObjectEventPal_Machoke,               OBJ_EVENT_PAL_TAG_MACHOKE},
+    {gObjectEventPal_Machamp,               OBJ_EVENT_PAL_TAG_MACHAMP},
+    {gObjectEventPal_Weepinbell,            OBJ_EVENT_PAL_TAG_WEEPINBELL},
+    {gObjectEventPal_Victreebel,            OBJ_EVENT_PAL_TAG_VICTREEBEL},
+    {gObjectEventPal_Tentacool,             OBJ_EVENT_PAL_TAG_TENTACOOL},
+    {gObjectEventPal_Tentacruel,            OBJ_EVENT_PAL_TAG_TENTACRUEL},
+    {gObjectEventPal_Graveler,              OBJ_EVENT_PAL_TAG_GRAVELER},
+    {gObjectEventPal_Golem,                 OBJ_EVENT_PAL_TAG_GOLEM},
+    {gObjectEventPal_Ponyta,                OBJ_EVENT_PAL_TAG_PONYTA},
+    {gObjectEventPal_Slowpoke,              OBJ_EVENT_PAL_TAG_SLOWPOKE},
+    {gObjectEventPal_Slowbro,               OBJ_EVENT_PAL_TAG_SLOWBRO},
+    {gObjectEventPal_Magnemite,             OBJ_EVENT_PAL_TAG_MAGNEMITE},
+    {gObjectEventPal_Farfetchd,             OBJ_EVENT_PAL_TAG_FARFETCHD},
+    {gObjectEventPal_Doduo,                 OBJ_EVENT_PAL_TAG_DODUO},
+    {gObjectEventPal_Dodrio,                OBJ_EVENT_PAL_TAG_DODRIO},
+    {gObjectEventPal_Seel,                  OBJ_EVENT_PAL_TAG_SEEL},
+    {gObjectEventPal_Muk,                   OBJ_EVENT_PAL_TAG_MUK},
+    {gObjectEventPal_Shellder,              OBJ_EVENT_PAL_TAG_SHELLDER},
+    {gObjectEventPal_Cloyster,              OBJ_EVENT_PAL_TAG_CLOYSTER},
+    {gObjectEventPal_Gastly,                OBJ_EVENT_PAL_TAG_GASTLY},
+    {gObjectEventPal_Haunter,               OBJ_EVENT_PAL_TAG_HAUNTER},
+    {gObjectEventPal_Gengar,                OBJ_EVENT_PAL_TAG_GENGAR},
+    {gObjectEventPal_Hypno,                 OBJ_EVENT_PAL_TAG_HYPNO},
+    {gObjectEventPal_Kingler,               OBJ_EVENT_PAL_TAG_KINGLER},
+    {gObjectEventPal_Voltorb,               OBJ_EVENT_PAL_TAG_VOLTORB},
+    {gObjectEventPal_Exeggcute,             OBJ_EVENT_PAL_TAG_EXEGGCUTE},
+    {gObjectEventPal_Exeggutor,             OBJ_EVENT_PAL_TAG_EXEGGUTOR},
+    {gObjectEventPal_Cubone,                OBJ_EVENT_PAL_TAG_CUBONE},
+    {gObjectEventPal_Hitmonlee,             OBJ_EVENT_PAL_TAG_HITMONLEE},
+    {gObjectEventPal_Hitmonchan,            OBJ_EVENT_PAL_TAG_HITMONCHAN},
+    {gObjectEventPal_Lickitung,             OBJ_EVENT_PAL_TAG_LICKITUNG},
+    {gObjectEventPal_Koffing,               OBJ_EVENT_PAL_TAG_KOFFING},
+    {gObjectEventPal_Rhydon,                OBJ_EVENT_PAL_TAG_RHYDON},
+    {gObjectEventPal_Chansey,               OBJ_EVENT_PAL_TAG_CHANSEY},
+    {gObjectEventPal_Tangela,               OBJ_EVENT_PAL_TAG_TANGELA},
+    {gObjectEventPal_Kangaskhan,            OBJ_EVENT_PAL_TAG_KANGASKHAN},
+    {gObjectEventPal_Horsea,                OBJ_EVENT_PAL_TAG_HORSEA},
+    {gObjectEventPal_Seadra,                OBJ_EVENT_PAL_TAG_SEADRA},
+    {gObjectEventPal_Goldeen,               OBJ_EVENT_PAL_TAG_GOLDEEN},
+    {gObjectEventPal_Seaking,               OBJ_EVENT_PAL_TAG_SEAKING},
+    {gObjectEventPal_Starmie,               OBJ_EVENT_PAL_TAG_STARMIE},
+    {gObjectEventPal_Mr_Mime,               OBJ_EVENT_PAL_TAG_MR_MIME},
+    {gObjectEventPal_Scyther,               OBJ_EVENT_PAL_TAG_SCYTHER},
+    {gObjectEventPal_Jynx,                  OBJ_EVENT_PAL_TAG_JYNX},
+    {gObjectEventPal_Magmar,                OBJ_EVENT_PAL_TAG_MAGMAR},
+    {gObjectEventPal_Pinsir,                OBJ_EVENT_PAL_TAG_PINSIR},
+    {gObjectEventPal_Tauros,                OBJ_EVENT_PAL_TAG_TAUROS},
+    {gObjectEventPal_Magikarp,              OBJ_EVENT_PAL_TAG_MAGIKARP},
+    {gObjectEventPal_Gyarados,              OBJ_EVENT_PAL_TAG_GYARADOS},
+    {gObjectEventPal_Lapras,                OBJ_EVENT_PAL_TAG_LAPRAS},
+    {gObjectEventPal_Eevee,                 OBJ_EVENT_PAL_TAG_EEVEE},
+    {gObjectEventPal_Vaporeon,              OBJ_EVENT_PAL_TAG_VAPOREON},
+    {gObjectEventPal_Jolteon,               OBJ_EVENT_PAL_TAG_JOLTEON},
+    {gObjectEventPal_Flareon,               OBJ_EVENT_PAL_TAG_FLAREON},
+    {gObjectEventPal_Porygon,               OBJ_EVENT_PAL_TAG_PORYGON},
+    {gObjectEventPal_Omanyte,               OBJ_EVENT_PAL_TAG_OMANYTE},
+    {gObjectEventPal_Omastar,               OBJ_EVENT_PAL_TAG_OMASTAR},
+    {gObjectEventPal_Kabuto,                OBJ_EVENT_PAL_TAG_KABUTO},
+    {gObjectEventPal_Kabutops,              OBJ_EVENT_PAL_TAG_KABUTOPS},
+    {gObjectEventPal_Aerodactyl,            OBJ_EVENT_PAL_TAG_AERODACTYL},
+    {gObjectEventPal_Snorlax,               OBJ_EVENT_PAL_TAG_SNORLAX},
+    {gObjectEventPal_Articuno,              OBJ_EVENT_PAL_TAG_ARTICUNO},
+    {gObjectEventPal_Zapdos,                OBJ_EVENT_PAL_TAG_ZAPDOS},
+    {gObjectEventPal_Moltres,               OBJ_EVENT_PAL_TAG_MOLTRES},
+    {gObjectEventPal_Dratini,               OBJ_EVENT_PAL_TAG_DRATINI},
+    {gObjectEventPal_Dragonair,             OBJ_EVENT_PAL_TAG_DRAGONAIR},
+    {gObjectEventPal_Dragonite,             OBJ_EVENT_PAL_TAG_DRAGONITE},
+    {gObjectEventPal_Mewtwo,                OBJ_EVENT_PAL_TAG_MEWTWO},
+    {gObjectEventPal_Mew,                   OBJ_EVENT_PAL_TAG_MEW},
+    {gObjectEventPal_Bayleef,               OBJ_EVENT_PAL_TAG_BAYLEEF},
+    {gObjectEventPal_Meganium,              OBJ_EVENT_PAL_TAG_MEGANIUM},
+    {gObjectEventPal_Cyndaquil,             OBJ_EVENT_PAL_TAG_CYNDAQUIL},
+    {gObjectEventPal_Quilava,               OBJ_EVENT_PAL_TAG_QUILAVA},
+    {gObjectEventPal_Typhlosion,            OBJ_EVENT_PAL_TAG_TYPHLOSION},
+    {gObjectEventPal_Totodile,              OBJ_EVENT_PAL_TAG_TOTODILE},
+    {gObjectEventPal_Croconaw,              OBJ_EVENT_PAL_TAG_CROCONAW},
+    {gObjectEventPal_Feraligatr,            OBJ_EVENT_PAL_TAG_FERALIGATR},
+    {gObjectEventPal_Sentret,               OBJ_EVENT_PAL_TAG_SENTRET},
+    {gObjectEventPal_Furret,                OBJ_EVENT_PAL_TAG_FURRET},
+    {gObjectEventPal_Hoothoot,              OBJ_EVENT_PAL_TAG_HOOTHOOT},
+    {gObjectEventPal_Noctowl,               OBJ_EVENT_PAL_TAG_NOCTOWL},
+    {gObjectEventPal_Ledyba,                OBJ_EVENT_PAL_TAG_LEDYBA},
+    {gObjectEventPal_Ledian,                OBJ_EVENT_PAL_TAG_LEDIAN},
+    {gObjectEventPal_Spinarak,              OBJ_EVENT_PAL_TAG_SPINARAK},
+    {gObjectEventPal_Ariados,               OBJ_EVENT_PAL_TAG_ARIADOS},
+    {gObjectEventPal_Crobat,                OBJ_EVENT_PAL_TAG_CROBAT},
+    {gObjectEventPal_Chinchou,              OBJ_EVENT_PAL_TAG_CHINCHOU},
+    {gObjectEventPal_Lanturn,               OBJ_EVENT_PAL_TAG_LANTURN},
+    {gObjectEventPal_Pichu,                 OBJ_EVENT_PAL_TAG_PICHU},
+    {gObjectEventPal_Cleffa,                OBJ_EVENT_PAL_TAG_CLEFFA},
+    {gObjectEventPal_Igglybuff,             OBJ_EVENT_PAL_TAG_IGGLYBUFF},
+    {gObjectEventPal_Togepi,                OBJ_EVENT_PAL_TAG_TOGEPI},
+    {gObjectEventPal_Natu,                  OBJ_EVENT_PAL_TAG_NATU},
+    {gObjectEventPal_Xatu,                  OBJ_EVENT_PAL_TAG_XATU},
+    {gObjectEventPal_Mareep,                OBJ_EVENT_PAL_TAG_MAREEP},
+    {gObjectEventPal_Flaaffy,               OBJ_EVENT_PAL_TAG_FLAAFFY},
+    {gObjectEventPal_Ampharos,              OBJ_EVENT_PAL_TAG_AMPHAROS},
+    {gObjectEventPal_Bellossom,             OBJ_EVENT_PAL_TAG_BELLOSSOM},
+    {gObjectEventPal_Azumarill,             OBJ_EVENT_PAL_TAG_AZUMARILL},
+    {gObjectEventPal_Sudowoodo,             OBJ_EVENT_PAL_TAG_SUDOWOODO},
+    {gObjectEventPal_Politoed,              OBJ_EVENT_PAL_TAG_POLITOED},
+    {gObjectEventPal_Hoppip,                OBJ_EVENT_PAL_TAG_HOPPIP},
+    {gObjectEventPal_Skiploom,              OBJ_EVENT_PAL_TAG_SKIPLOOM},
+    {gObjectEventPal_Jumpluff,              OBJ_EVENT_PAL_TAG_JUMPLUFF},
+    {gObjectEventPal_Aipom,                 OBJ_EVENT_PAL_TAG_AIPOM},
+    {gObjectEventPal_Sunkern,               OBJ_EVENT_PAL_TAG_SUNKERN},
+    {gObjectEventPal_Sunflora,              OBJ_EVENT_PAL_TAG_SUNFLORA},
+    {gObjectEventPal_Yanma,                 OBJ_EVENT_PAL_TAG_YANMA},
+    {gObjectEventPal_Quagsire,              OBJ_EVENT_PAL_TAG_QUAGSIRE},
+    {gObjectEventPal_Espeon,                OBJ_EVENT_PAL_TAG_ESPEON},
+    {gObjectEventPal_Umbreon,               OBJ_EVENT_PAL_TAG_UMBREON},
+    {gObjectEventPal_Murkrow,               OBJ_EVENT_PAL_TAG_MURKROW},
+    {gObjectEventPal_Slowking,              OBJ_EVENT_PAL_TAG_SLOWKING},
+    {gObjectEventPal_Misdreavus,            OBJ_EVENT_PAL_TAG_MISDREAVUS},
+    {gObjectEventPal_Wobbuffet,             OBJ_EVENT_PAL_TAG_WOBBUFFET},
+    {gObjectEventPal_Girafarig,             OBJ_EVENT_PAL_TAG_GIRAFARIG},
+    {gObjectEventPal_Pineco,                OBJ_EVENT_PAL_TAG_PINECO},
+    {gObjectEventPal_Forretress,            OBJ_EVENT_PAL_TAG_FORRETRESS},
+    {gObjectEventPal_Dunsparce,             OBJ_EVENT_PAL_TAG_DUNSPARCE},
+    {gObjectEventPal_Gligar,                OBJ_EVENT_PAL_TAG_GLIGAR},
+    {gObjectEventPal_Snubbull,              OBJ_EVENT_PAL_TAG_SNUBBULL},
+    {gObjectEventPal_Granbull,              OBJ_EVENT_PAL_TAG_GRANBULL},
+    {gObjectEventPal_Qwilfish,              OBJ_EVENT_PAL_TAG_QWILFISH},
+    {gObjectEventPal_Scizor,                OBJ_EVENT_PAL_TAG_SCIZOR},
+    {gObjectEventPal_Shuckle,               OBJ_EVENT_PAL_TAG_SHUCKLE},
+    {gObjectEventPal_Heracross,             OBJ_EVENT_PAL_TAG_HERACROSS},
+    {gObjectEventPal_Sneasel,               OBJ_EVENT_PAL_TAG_SNEASEL},
+    {gObjectEventPal_Teddiursa,             OBJ_EVENT_PAL_TAG_TEDDIURSA},
+    {gObjectEventPal_Ursaring,              OBJ_EVENT_PAL_TAG_URSARING},
+    {gObjectEventPal_Magcargo,              OBJ_EVENT_PAL_TAG_MAGCARGO},
+    {gObjectEventPal_Swinub,                OBJ_EVENT_PAL_TAG_SWINUB},
+    {gObjectEventPal_Piloswine,             OBJ_EVENT_PAL_TAG_PILOSWINE},
+    {gObjectEventPal_Corsola,               OBJ_EVENT_PAL_TAG_CORSOLA},
+    {gObjectEventPal_Remoraid,              OBJ_EVENT_PAL_TAG_REMORAID},
+    {gObjectEventPal_Octillery,             OBJ_EVENT_PAL_TAG_OCTILLERY},
+    {gObjectEventPal_Delibird,              OBJ_EVENT_PAL_TAG_DELIBIRD},
+    {gObjectEventPal_Mantine,               OBJ_EVENT_PAL_TAG_MANTINE},
+    {gObjectEventPal_Skarmory,              OBJ_EVENT_PAL_TAG_SKARMORY},
+    {gObjectEventPal_Houndoom,              OBJ_EVENT_PAL_TAG_HOUNDOOM},
+    {gObjectEventPal_Kingdra,               OBJ_EVENT_PAL_TAG_KINGDRA},
+    {gObjectEventPal_Phanpy,                OBJ_EVENT_PAL_TAG_PHANPY},
+    {gObjectEventPal_Donphan,               OBJ_EVENT_PAL_TAG_DONPHAN},
+    {gObjectEventPal_Porygon2,              OBJ_EVENT_PAL_TAG_PORYGON2},
+    {gObjectEventPal_Stantler,              OBJ_EVENT_PAL_TAG_STANTLER},
+    {gObjectEventPal_Smeargle,              OBJ_EVENT_PAL_TAG_SMEARGLE},
+    {gObjectEventPal_Tyrogue,               OBJ_EVENT_PAL_TAG_TYROGUE},
+    {gObjectEventPal_Hitmontop,             OBJ_EVENT_PAL_TAG_HITMONTOP},
+    {gObjectEventPal_Smoochum,              OBJ_EVENT_PAL_TAG_SMOOCHUM},
+    {gObjectEventPal_Elekid,                OBJ_EVENT_PAL_TAG_ELEKID},
+    {gObjectEventPal_Magby,                 OBJ_EVENT_PAL_TAG_MAGBY},
+    {gObjectEventPal_Miltank,               OBJ_EVENT_PAL_TAG_MILTANK},
+    {gObjectEventPal_Blissey,               OBJ_EVENT_PAL_TAG_BLISSEY},
+    {gObjectEventPal_Raikou,                OBJ_EVENT_PAL_TAG_RAIKOU},
+    {gObjectEventPal_Entei,                 OBJ_EVENT_PAL_TAG_ENTEI},
+    {gObjectEventPal_Suicune,               OBJ_EVENT_PAL_TAG_SUICUNE},
+    {gObjectEventPal_Larvitar,              OBJ_EVENT_PAL_TAG_LARVITAR},
+    {gObjectEventPal_Tyranitar,             OBJ_EVENT_PAL_TAG_TYRANITAR},
+    {gObjectEventPal_Lugia_Follower,        OBJ_EVENT_PAL_TAG_LUGIA_FOLLOWER},
+    {gObjectEventPal_HoOh_Follower,         OBJ_EVENT_PAL_TAG_HO_OH_FOLLOWER},
+    {gObjectEventPal_Celebi,                OBJ_EVENT_PAL_TAG_CELEBI},
+    {gObjectEventPal_Treecko,               OBJ_EVENT_PAL_TAG_TREECKO},
+    {gObjectEventPal_Grovyle,               OBJ_EVENT_PAL_TAG_GROVYLE},
+    {gObjectEventPal_Sceptile,              OBJ_EVENT_PAL_TAG_SCEPTILE},
+    {gObjectEventPal_Combusken,             OBJ_EVENT_PAL_TAG_COMBUSKEN},
+    {gObjectEventPal_Blaziken,              OBJ_EVENT_PAL_TAG_BLAZIKEN},
+    {gObjectEventPal_Mudkip,                OBJ_EVENT_PAL_TAG_MUDKIP},
+    {gObjectEventPal_Marshtomp,             OBJ_EVENT_PAL_TAG_MARSHTOMP},
+    {gObjectEventPal_Swampert,              OBJ_EVENT_PAL_TAG_SWAMPERT},
+    {gObjectEventPal_Poochyena_Follower,    OBJ_EVENT_PAL_TAG_POOCHYENA_FOLLOWER},
+    {gObjectEventPal_Mightyena,             OBJ_EVENT_PAL_TAG_MIGHTYENA},
+    {gObjectEventPal_Zigzagoon_Follower,    OBJ_EVENT_PAL_TAG_ZIGZAGOON_FOLLOWER},
+    {gObjectEventPal_Linoone,               OBJ_EVENT_PAL_TAG_LINOONE},
+    {gObjectEventPal_Wurmple,               OBJ_EVENT_PAL_TAG_WURMPLE},
+    {gObjectEventPal_Beautifly,             OBJ_EVENT_PAL_TAG_BEAUTIFLY},
+    {gObjectEventPal_Cascoon,               OBJ_EVENT_PAL_TAG_CASCOON},
+    {gObjectEventPal_Dustox,                OBJ_EVENT_PAL_TAG_DUSTOX},
+    {gObjectEventPal_Lotad,                 OBJ_EVENT_PAL_TAG_LOTAD},
+    {gObjectEventPal_Lombre,                OBJ_EVENT_PAL_TAG_LOMBRE},
+    {gObjectEventPal_Ludicolo,              OBJ_EVENT_PAL_TAG_LUDICOLO},
+    {gObjectEventPal_Seedot,                OBJ_EVENT_PAL_TAG_SEEDOT},
+    {gObjectEventPal_Nuzleaf,               OBJ_EVENT_PAL_TAG_NUZLEAF},
+    {gObjectEventPal_Shiftry,               OBJ_EVENT_PAL_TAG_SHIFTRY},
+    {gObjectEventPal_Taillow,               OBJ_EVENT_PAL_TAG_TAILLOW},
+    {gObjectEventPal_Swellow,               OBJ_EVENT_PAL_TAG_SWELLOW},
+    {gObjectEventPal_Wingull,               OBJ_EVENT_PAL_TAG_WINGULL},
+    {gObjectEventPal_Pelipper,              OBJ_EVENT_PAL_TAG_PELIPPER},
+    {gObjectEventPal_Gardevoir,             OBJ_EVENT_PAL_TAG_GARDEVOIR},
+    {gObjectEventPal_Surskit,               OBJ_EVENT_PAL_TAG_SURSKIT},
+    {gObjectEventPal_Masquerain,            OBJ_EVENT_PAL_TAG_MASQUERAIN},
+    {gObjectEventPal_Shroomish,             OBJ_EVENT_PAL_TAG_SHROOMISH},
+    {gObjectEventPal_Breloom,               OBJ_EVENT_PAL_TAG_BRELOOM},
+    {gObjectEventPal_Slakoth,               OBJ_EVENT_PAL_TAG_SLAKOTH},
+    {gObjectEventPal_Vigoroth_Follower,     OBJ_EVENT_PAL_TAG_VIGOROTH_FOLLOWER},
+    {gObjectEventPal_Slaking,               OBJ_EVENT_PAL_TAG_SLAKING},
+    {gObjectEventPal_Nincada,               OBJ_EVENT_PAL_TAG_NINCADA},
+    {gObjectEventPal_Ninjask,               OBJ_EVENT_PAL_TAG_NINJASK},
+    {gObjectEventPal_Shedinja,              OBJ_EVENT_PAL_TAG_SHEDINJA},
+    {gObjectEventPal_Whismur,               OBJ_EVENT_PAL_TAG_WHISMUR},
+    {gObjectEventPal_Exploud,               OBJ_EVENT_PAL_TAG_EXPLOUD},
+    {gObjectEventPal_Makuhita,              OBJ_EVENT_PAL_TAG_MAKUHITA},
+    {gObjectEventPal_Hariyama,              OBJ_EVENT_PAL_TAG_HARIYAMA},
+    {gObjectEventPal_Azurill_Follower,      OBJ_EVENT_PAL_TAG_AZURILL_FOLLOWER},
+    {gObjectEventPal_Nosepass,              OBJ_EVENT_PAL_TAG_NOSEPASS},
+    {gObjectEventPal_Delcatty,              OBJ_EVENT_PAL_TAG_DELCATTY},
+    {gObjectEventPal_Sableye,               OBJ_EVENT_PAL_TAG_SABLEYE},
+    {gObjectEventPal_Mawile,                OBJ_EVENT_PAL_TAG_MAWILE},
+    {gObjectEventPal_Lairon,                OBJ_EVENT_PAL_TAG_LAIRON},
+    {gObjectEventPal_Aggron,                OBJ_EVENT_PAL_TAG_AGGRON},
+    {gObjectEventPal_Meditite,              OBJ_EVENT_PAL_TAG_MEDITITE},
+    {gObjectEventPal_Medicham,              OBJ_EVENT_PAL_TAG_MEDICHAM},
+    {gObjectEventPal_Electrike,             OBJ_EVENT_PAL_TAG_ELECTRIKE},
+    {gObjectEventPal_Manectric,             OBJ_EVENT_PAL_TAG_MANECTRIC},
+    {gObjectEventPal_Minun,                 OBJ_EVENT_PAL_TAG_MINUN},
+    {gObjectEventPal_Volbeat,               OBJ_EVENT_PAL_TAG_VOLBEAT},
+    {gObjectEventPal_Illumise,              OBJ_EVENT_PAL_TAG_ILLUMISE},
+    {gObjectEventPal_Roselia,               OBJ_EVENT_PAL_TAG_ROSELIA},
+    {gObjectEventPal_Gulpin,                OBJ_EVENT_PAL_TAG_GULPIN},
+    {gObjectEventPal_Swalot,                OBJ_EVENT_PAL_TAG_SWALOT},
+    {gObjectEventPal_Carvanha,              OBJ_EVENT_PAL_TAG_CARVANHA},
+    {gObjectEventPal_Sharpedo,              OBJ_EVENT_PAL_TAG_SHARPEDO},
+    {gObjectEventPal_Wailmer,               OBJ_EVENT_PAL_TAG_WAILMER},
+    {gObjectEventPal_Wailord,               OBJ_EVENT_PAL_TAG_WAILORD},
+    {gObjectEventPal_Numel,                 OBJ_EVENT_PAL_TAG_NUMEL},
+    {gObjectEventPal_Camerupt,              OBJ_EVENT_PAL_TAG_CAMERUPT},
+    {gObjectEventPal_Torkoal,               OBJ_EVENT_PAL_TAG_TORKOAL},
+    {gObjectEventPal_Spoink,                OBJ_EVENT_PAL_TAG_SPOINK},
+    {gObjectEventPal_Grumpig,               OBJ_EVENT_PAL_TAG_GRUMPIG},
+    {gObjectEventPal_Spinda,                OBJ_EVENT_PAL_TAG_SPINDA},
+    {gObjectEventPal_Trapinch,              OBJ_EVENT_PAL_TAG_TRAPINCH},
+    {gObjectEventPal_Vibrava,               OBJ_EVENT_PAL_TAG_VIBRAVA},
+    {gObjectEventPal_Flygon,                OBJ_EVENT_PAL_TAG_FLYGON},
+    {gObjectEventPal_Cacnea,                OBJ_EVENT_PAL_TAG_CACNEA},
+    {gObjectEventPal_Altaria,               OBJ_EVENT_PAL_TAG_ALTARIA},
+    {gObjectEventPal_Zangoose,              OBJ_EVENT_PAL_TAG_ZANGOOSE},
+    {gObjectEventPal_Seviper,               OBJ_EVENT_PAL_TAG_SEVIPER},
+    {gObjectEventPal_Solrock,               OBJ_EVENT_PAL_TAG_SOLROCK},
+    {gObjectEventPal_Barboach,              OBJ_EVENT_PAL_TAG_BARBOACH},
+    {gObjectEventPal_Whiscash,              OBJ_EVENT_PAL_TAG_WHISCASH},
+    {gObjectEventPal_Corphish,              OBJ_EVENT_PAL_TAG_CORPHISH},
+    {gObjectEventPal_Crawdaunt,             OBJ_EVENT_PAL_TAG_CRAWDAUNT},
+    {gObjectEventPal_Baltoy,                OBJ_EVENT_PAL_TAG_BALTOY},
+    {gObjectEventPal_Claydol,               OBJ_EVENT_PAL_TAG_CLAYDOL},
+    {gObjectEventPal_Lileep,                OBJ_EVENT_PAL_TAG_LILEEP},
+    {gObjectEventPal_Cradily,               OBJ_EVENT_PAL_TAG_CRADILY},
+    {gObjectEventPal_Anorith,               OBJ_EVENT_PAL_TAG_ANORITH},
+    {gObjectEventPal_Armaldo,               OBJ_EVENT_PAL_TAG_ARMALDO},
+    {gObjectEventPal_Feebas,                OBJ_EVENT_PAL_TAG_FEEBAS},
+    {gObjectEventPal_Milotic,               OBJ_EVENT_PAL_TAG_MILOTIC},
+    {gObjectEventPal_Kecleon,               OBJ_EVENT_PAL_TAG_KECLEON},
+    {gObjectEventPal_Banette,               OBJ_EVENT_PAL_TAG_BANETTE},
+    {gObjectEventPal_Duskull,               OBJ_EVENT_PAL_TAG_DUSKULL},
+    {gObjectEventPal_Dusclops,              OBJ_EVENT_PAL_TAG_DUSCLOPS},
+    {gObjectEventPal_Tropius,               OBJ_EVENT_PAL_TAG_TROPIUS},
+    {gObjectEventPal_Chimecho,              OBJ_EVENT_PAL_TAG_CHIMECHO},
+    {gObjectEventPal_Absol,                 OBJ_EVENT_PAL_TAG_ABSOL},
+    {gObjectEventPal_Wynaut,                OBJ_EVENT_PAL_TAG_WYNAUT},
+    {gObjectEventPal_Snorunt,               OBJ_EVENT_PAL_TAG_SNORUNT},
+    {gObjectEventPal_Glalie,                OBJ_EVENT_PAL_TAG_GLALIE},
+    {gObjectEventPal_Spheal,                OBJ_EVENT_PAL_TAG_SPHEAL},
+    {gObjectEventPal_Sealeo,                OBJ_EVENT_PAL_TAG_SEALEO},
+    {gObjectEventPal_Walrein,               OBJ_EVENT_PAL_TAG_WALREIN},
+    {gObjectEventPal_Clamperl,              OBJ_EVENT_PAL_TAG_CLAMPERL},
+    {gObjectEventPal_Huntail,               OBJ_EVENT_PAL_TAG_HUNTAIL},
+    {gObjectEventPal_Gorebyss,              OBJ_EVENT_PAL_TAG_GOREBYSS},
+    {gObjectEventPal_Relicanth,             OBJ_EVENT_PAL_TAG_RELICANTH},
+    {gObjectEventPal_Luvdisc,               OBJ_EVENT_PAL_TAG_LUVDISC},
+    {gObjectEventPal_Bagon,                 OBJ_EVENT_PAL_TAG_BAGON},
+    {gObjectEventPal_Shelgon,               OBJ_EVENT_PAL_TAG_SHELGON},
+    {gObjectEventPal_Salamence,             OBJ_EVENT_PAL_TAG_SALAMENCE},
+    {gObjectEventPal_Beldum,                OBJ_EVENT_PAL_TAG_BELDUM},
+    {gObjectEventPal_Metang,                OBJ_EVENT_PAL_TAG_METANG},
+    {gObjectEventPal_Regirock,              OBJ_EVENT_PAL_TAG_REGIROCK},
+    {gObjectEventPal_Regice,                OBJ_EVENT_PAL_TAG_REGICE},
+    {gObjectEventPal_Registeel,             OBJ_EVENT_PAL_TAG_REGISTEEL},
+    {gObjectEventPal_Latias,                OBJ_EVENT_PAL_TAG_LATIAS},
+    {gObjectEventPal_Latios,                OBJ_EVENT_PAL_TAG_LATIOS},
+    {gObjectEventPal_Kyogre_Follower,       OBJ_EVENT_PAL_TAG_KYOGRE_FOLLOWER},
+    {gObjectEventPal_Groudon_Follower,      OBJ_EVENT_PAL_TAG_GROUDON_FOLLOWER},
+    {gObjectEventPal_Rayquaza,              OBJ_EVENT_PAL_TAG_RAYQUAZA},
+    {gObjectEventPal_Jirachi,               OBJ_EVENT_PAL_TAG_JIRACHI},
+    {gObjectEventPal_Deoxys_Follower,       OBJ_EVENT_PAL_TAG_DEOXYS_FOLLOWER},
+    {gObjectEventPal_GreatBall,             OBJ_EVENT_PAL_TAG_GREAT_BALL},
+    {gObjectEventPal_UltraBall,             OBJ_EVENT_PAL_TAG_ULTRA_BALL},
+    {gObjectEventPal_MasterBall,            OBJ_EVENT_PAL_TAG_MASTER_BALL},
+    {gObjectEventPal_SafariBall,            OBJ_EVENT_PAL_TAG_SAFARI_BALL},
+    {gObjectEventPal_NetBall,               OBJ_EVENT_PAL_TAG_NET_BALL},
+    {gObjectEventPal_DiveBall,              OBJ_EVENT_PAL_TAG_DIVE_BALL},
+    {gObjectEventPal_NestBall,              OBJ_EVENT_PAL_TAG_NEST_BALL},
+    {gObjectEventPal_RepeatBall,            OBJ_EVENT_PAL_TAG_REPEAT_BALL},
+    {gObjectEventPal_TimerBall,             OBJ_EVENT_PAL_TAG_TIMER_BALL},
+    {gObjectEventPal_LuxuryBall,            OBJ_EVENT_PAL_TAG_LUXURY_BALL},
+    {gObjectEventPal_PremierBall,           OBJ_EVENT_PAL_TAG_PREMIER_BALL},
+    {gObjectEventPal_HealBall,              OBJ_EVENT_PAL_TAG_HEAL_BALL},
+    {gObjectEventPal_DuskBall,              OBJ_EVENT_PAL_TAG_DUSK_BALL},
+    {gObjectEventPal_QuickBall,             OBJ_EVENT_PAL_TAG_QUICK_BALL},
+    {gObjectEventPal_LevelBall,             OBJ_EVENT_PAL_TAG_LEVEL_BALL},
+    {gObjectEventPal_LureBall,              OBJ_EVENT_PAL_TAG_LURE_BALL},
+    {gObjectEventPal_MoonBall,              OBJ_EVENT_PAL_TAG_MOON_BALL},
+    {gObjectEventPal_FriendBall,            OBJ_EVENT_PAL_TAG_FRIEND_BALL},
+    {gObjectEventPal_LoveBall,              OBJ_EVENT_PAL_TAG_LOVE_BALL},
+    {gObjectEventPal_FastBall,              OBJ_EVENT_PAL_TAG_FAST_BALL},
+    {gObjectEventPal_HeavyBall,             OBJ_EVENT_PAL_TAG_HEAVY_BALL},
+    {gObjectEventPal_DreamBall,             OBJ_EVENT_PAL_TAG_DREAM_BALL},
+    {gObjectEventPal_SportBall,             OBJ_EVENT_PAL_TAG_SPORT_BALL},
+    {gObjectEventPal_ParkBall,              OBJ_EVENT_PAL_TAG_PARK_BALL},
+    {gObjectEventPal_CherishBall,           OBJ_EVENT_PAL_TAG_CHERISH_BALL},
+    {gFieldEffectPal_SmallSparkle,          FLDEFF_PAL_TAG_SMALL_SPARKLE},
+    {gObjectEventPal_MimeJr,                OBJ_EVENT_PAL_TAG_MIME_JR},
+    {gObjectEventPal_Togekiss,              OBJ_EVENT_PAL_TAG_TOGEKISS},
+    {gObjectEventPal_PorygonZ,              OBJ_EVENT_PAL_TAG_PORYGON_Z},
+    {gObjectEventPal_Budew,                 OBJ_EVENT_PAL_TAG_BUDEW},
+    {gObjectEventPal_Roserade,              OBJ_EVENT_PAL_TAG_ROSERADE},
+    {gObjectEventPal_Rhyperior,             OBJ_EVENT_PAL_TAG_RHYPERIOR},
+    {gObjectEventPal_Yanmega,               OBJ_EVENT_PAL_TAG_YANMEGA},
+    {gObjectEventPal_Probopass,             OBJ_EVENT_PAL_TAG_PROBOPASS},
+    {gObjectEventPal_Dusknoir,              OBJ_EVENT_PAL_TAG_DUSKNOIR},
+    {gObjectEventPal_Froslass,              OBJ_EVENT_PAL_TAG_FROSLASS},
+    {gObjectEventPal_Ambipom,               OBJ_EVENT_PAL_TAG_AMBIPOM},
+    {gObjectEventPal_Gallade,               OBJ_EVENT_PAL_TAG_GALLADE},
+    {gObjectEventPal_Gliscor,               OBJ_EVENT_PAL_TAG_GLISCOR},
+    {gObjectEventPal_Lickilicky,            OBJ_EVENT_PAL_TAG_LICKILICKY},
+    {gObjectEventPal_Tangrowth,             OBJ_EVENT_PAL_TAG_TANGROWTH},
+    {gObjectEventPal_Electivire,            OBJ_EVENT_PAL_TAG_ELECTIVIRE},
+    {gObjectEventPal_Magmortar,             OBJ_EVENT_PAL_TAG_MAGMORTAR},
+    {gObjectEventPal_Mismagius,             OBJ_EVENT_PAL_TAG_MISMAGIUS},
+    {gObjectEventPal_Honchkrow,             OBJ_EVENT_PAL_TAG_HONCHKROW},
+    {gObjectEventPal_Magnezone,             OBJ_EVENT_PAL_TAG_MAGNEZONE},
+    {gObjectEventPal_Mamoswine,             OBJ_EVENT_PAL_TAG_MAMOSWINE},
+    {gObjectEventPal_Weavile,               OBJ_EVENT_PAL_TAG_WEAVILE},
+    {gObjectEventPal_Chingling,             OBJ_EVENT_PAL_TAG_CHINGLING},
+    {gObjectEventPal_Bonsly,                OBJ_EVENT_PAL_TAG_BONSLY},
+    {gObjectEventPal_Happiny,               OBJ_EVENT_PAL_TAG_HAPPINY},
+    {gObjectEventPal_Munchlax,              OBJ_EVENT_PAL_TAG_MUNCHLAX},
+    {gObjectEventPal_Mantyke,               OBJ_EVENT_PAL_TAG_MANTYKE},
+    {gObjectEventPal_Leafeon,               OBJ_EVENT_PAL_TAG_LEAFEON},
+    {gObjectEventPal_Glaceon,               OBJ_EVENT_PAL_TAG_GLACEON},
+    {gObjectEventPal_Sylveon,               OBJ_EVENT_PAL_TAG_SYLVEON},
+    {gObjectEventPal_Regigigas,             OBJ_EVENT_PAL_TAG_REGIGIGAS},
+    {gObjectEventPal_Quaxly,                OBJ_EVENT_PAL_TAG_QUAXLY},
+    {gObjectEventPal_Fuecoco,               OBJ_EVENT_PAL_TAG_FUECOCO},
+    {gObjectEventPal_Sprigatito,            OBJ_EVENT_PAL_TAG_SPRIGATITO},
+    {gObjectEventPal_Red,                   OBJ_EVENT_PAL_TAG_RED},
+    {gObjectEventPal_Leaf,                  OBJ_EVENT_PAL_TAG_LEAF},
+    {gObjectEventPal_Ethan,                 OBJ_EVENT_PAL_TAG_ETHAN},
+    {gObjectEventPal_Lyra,                  OBJ_EVENT_PAL_TAG_LYRA},
+    {gObjectEventPal_Kris,                  OBJ_EVENT_PAL_TAG_KRIS},
+    {gObjectEventPal_Lucas,                 OBJ_EVENT_PAL_TAG_LUCAS},
+    {gObjectEventPal_Dawn,                  OBJ_EVENT_PAL_TAG_DAWN},
+    {gObjectEventPal_LucasPlatinum,         OBJ_EVENT_PAL_TAG_LUCAS_PLATINUM},
+    {gObjectEventPal_DawnPlatinum,          OBJ_EVENT_PAL_TAG_DAWN_PLATINUM},
+    {gObjectEventPal_Enby,                  OBJ_EVENT_PAL_TAG_ENBY},
+
+    {gObjectEventPal_Anabel,                OBJ_EVENT_PAL_TAG_ANABEL},
+    {gObjectEventPal_Tucker,                OBJ_EVENT_PAL_TAG_TUCKER},
+    {gObjectEventPal_Spenser,               OBJ_EVENT_PAL_TAG_SPENSER},
+    {gObjectEventPal_Greta,                 OBJ_EVENT_PAL_TAG_GRETA},
+    {gObjectEventPal_Noland,                OBJ_EVENT_PAL_TAG_NOLAND},
+    {gObjectEventPal_Lucy,                  OBJ_EVENT_PAL_TAG_LUCY},
+    {gObjectEventPal_Brandon,               OBJ_EVENT_PAL_TAG_BRANDON},
+    {gObjectEventPal_Roxanne,               OBJ_EVENT_PAL_TAG_ROXANNE},
+    {gObjectEventPal_Brawly,                OBJ_EVENT_PAL_TAG_BRAWLY},
+    {gObjectEventPal_Norman,                OBJ_EVENT_PAL_TAG_NORMAN},
+    {gObjectEventPal_Wattson,               OBJ_EVENT_PAL_TAG_WATTSON},
+    {gObjectEventPal_Flannery,              OBJ_EVENT_PAL_TAG_FLANNERY},
+    {gObjectEventPal_Winona,                OBJ_EVENT_PAL_TAG_WINONA},
+    {gObjectEventPal_TateLiza,              OBJ_EVENT_PAL_TAG_TATE_LIZA},
+    {gObjectEventPal_Juan,                  OBJ_EVENT_PAL_TAG_JUAN},
+    {gObjectEventPal_Magma,                 OBJ_EVENT_PAL_TAG_MAGMA},
+    {gObjectEventPal_Aqua,                  OBJ_EVENT_PAL_TAG_AQUA},
+    {gObjectEventPal_Rocket,                OBJ_EVENT_PAL_TAG_ROCKET},
+    {gObjectEventPal_Sidney,                OBJ_EVENT_PAL_TAG_SIDNEY},
+    {gObjectEventPal_Phoebe,                OBJ_EVENT_PAL_TAG_PHOEBE},
+    {gObjectEventPal_Glacia,                OBJ_EVENT_PAL_TAG_GLACIA},
+    {gObjectEventPal_Scientist,             OBJ_EVENT_PAL_TAG_SCIENTIST},
+    {gObjectEventPal_TuberF,                OBJ_EVENT_PAL_TAG_TUBER_F},
+    {gObjectEventPal_TuberM,                OBJ_EVENT_PAL_TAG_TUBER_M},
+    {gObjectEventPal_FatMan,                OBJ_EVENT_PAL_TAG_FATMAN},
+    {gObjectEventPal_Zinnia,                OBJ_EVENT_PAL_TAG_ZINNIA},
+    {gObjectEventPal_Wally,                 OBJ_EVENT_PAL_TAG_WALLY},
+    {gObjectEventPal_Youngster,             OBJ_EVENT_PAL_TAG_YOUNGSTER},
+    {gObjectEventPal_Woman2,                OBJ_EVENT_PAL_TAG_WOMAN_2},
+    {gObjectEventPal_Woman3,                OBJ_EVENT_PAL_TAG_WOMAN_3},
+    {gObjectEventPal_Woman4,                OBJ_EVENT_PAL_TAG_WOMAN_4},
+    {gObjectEventPal_Woman5,                OBJ_EVENT_PAL_TAG_WOMAN_5},
+    {gObjectEventPal_Man2,                  OBJ_EVENT_PAL_TAG_MAN_2},
+    {gObjectEventPal_Man3,                  OBJ_EVENT_PAL_TAG_MAN_3},
+    {gObjectEventPal_Man4,                  OBJ_EVENT_PAL_TAG_MAN_4},
+    {gObjectEventPal_Man5,                  OBJ_EVENT_PAL_TAG_MAN_5},
+    {gObjectEventPal_Socialite,             OBJ_EVENT_PAL_TAG_SOCIALITE},
+    {gObjectEventPal_ChampRed,              OBJ_EVENT_PAL_TAG_CHAMP_RED},
+    {gObjectEventPal_Nurse,                 OBJ_EVENT_PAL_TAG_NURSE},
+    {gObjectEventPal_ReporterM,             OBJ_EVENT_PAL_TAG_REPORTER_M},
+    {gObjectEventPal_ReporterF,             OBJ_EVENT_PAL_TAG_REPORTER_F},
+    {gObjectEventPal_Psychic,               OBJ_EVENT_PAL_TAG_PSYCHIC},
+    {gObjectEventPal_LittleKid,             OBJ_EVENT_PAL_TAG_LITTLE_KID},
+    {gObjectEventPal_Mom,                   OBJ_EVENT_PAL_TAG_MOM},
+    {gObjectEventPal_Wallace,               OBJ_EVENT_PAL_TAG_WALLACE},
+    {gObjectEventPal_Attendant,             OBJ_EVENT_PAL_TAG_ATTENDANT},
+    {gObjectEventPal_Twin,                  OBJ_EVENT_PAL_TAG_TWIN},
+    {gObjectEventPal_SwimmerM,              OBJ_EVENT_PAL_TAG_SWIMMER_M},
+    {gObjectEventPal_SwimmerF,              OBJ_EVENT_PAL_TAG_SWIMMER_F},
+    {gObjectEventPal_Delivery,              OBJ_EVENT_PAL_TAG_DELIVERY},
+    {gObjectEventPal_Teala,                 OBJ_EVENT_PAL_TAG_TEALA},
+    {gObjectEventPal_Scott,                 OBJ_EVENT_PAL_TAG_SCOTT},
+    {gObjectEventPal_Mart,                  OBJ_EVENT_PAL_TAG_MART},
+    {gObjectEventPal_ExpertF,               OBJ_EVENT_PAL_TAG_EXPERT_F},
+    {gObjectEventPal_SchoolKidM,            OBJ_EVENT_PAL_TAG_SCHOOL_KID_M},
+    {gObjectEventPal_SchoolKidF,            OBJ_EVENT_PAL_TAG_SCHOOL_KID_F},
+    {gObjectEventPal_Lanette,               OBJ_EVENT_PAL_TAG_LANETTE},
+    {gObjectEventPal_AthleteM,              OBJ_EVENT_PAL_TAG_ATHLETE_M},
+    {gObjectEventPal_AthleteF,              OBJ_EVENT_PAL_TAG_ATHLETE_F},
+    {gObjectEventPal_Sailor,                OBJ_EVENT_PAL_TAG_SAILOR},
+    {gObjectEventPal_Boy1,                  OBJ_EVENT_PAL_TAG_BOY_1},
+    {gObjectEventPal_Boy2,                  OBJ_EVENT_PAL_TAG_BOY_2},
+    {gObjectEventPal_Boy3,                  OBJ_EVENT_PAL_TAG_BOY_3},
+    {gObjectEventPal_ProfBirch,             OBJ_EVENT_PAL_TAG_BIRCH},
+    {gObjectEventPal_ProfOak,               OBJ_EVENT_PAL_TAG_OAK},
+    {gObjectEventPal_Employee,              OBJ_EVENT_PAL_TAG_EMPLOYEE},
+    {gObjectEventPal_Hiker,                 OBJ_EVENT_PAL_TAG_HIKER},
+    {gObjectEventPal_BugCatcher,            OBJ_EVENT_PAL_TAG_BUG_CATCHER},
+    {gObjectEventPal_CycleF,                OBJ_EVENT_PAL_TAG_CYCLER_F},
+    {gObjectEventPal_CycleM,                OBJ_EVENT_PAL_TAG_CYCLER_M},
+    {gObjectEventPal_Girl1,                 OBJ_EVENT_PAL_TAG_GIRL_1},
+    {gObjectEventPal_Girl2,                 OBJ_EVENT_PAL_TAG_GIRL_2},
+    {gObjectEventPal_Girl3,                 OBJ_EVENT_PAL_TAG_GIRL_3},
+    {gObjectEventPal_CoolTrainer,           OBJ_EVENT_PAL_TAG_COOL_TRAINER},
+    {gObjectEventPal_BlackBelt,             OBJ_EVENT_PAL_TAG_BLACKBELT},
+    {gObjectEventPal_Beauty,                OBJ_EVENT_PAL_TAG_BEAUTY},
+    {gObjectEventPal_Blue,                  OBJ_EVENT_PAL_TAG_BLUE},
+    {gObjectEventPal_Scout,                 OBJ_EVENT_PAL_TAG_SCOUT},
+    {gObjectEventPal_OldMan,                OBJ_EVENT_PAL_TAG_OLDMAN},
+    {gObjectEventPal_OldWoman,              OBJ_EVENT_PAL_TAG_OLDWOMAN},
+    {gObjectEventPal_ExpertM,               OBJ_EVENT_PAL_TAG_EXPERT_M},
+    {gObjectEventPal_NinjaBoy,              OBJ_EVENT_PAL_TAG_NINJABOY},
+    {gObjectEventPal_RichBoy,               OBJ_EVENT_PAL_TAG_RICHBOY},
+    {gObjectEventPal_PokefanM,              OBJ_EVENT_PAL_TAG_POKEFAN_M},
+    {gObjectEventPal_PokefanF,              OBJ_EVENT_PAL_TAG_POKEFAN_F},
+    {gObjectEventPal_Cook,                  OBJ_EVENT_PAL_TAG_COOK},
+    {gObjectEventPal_Receptionist,          OBJ_EVENT_PAL_TAG_RECEPTIONIST},
+    {gObjectEventPal_Gentleman,             OBJ_EVENT_PAL_TAG_GENTLEMAN},
+    {gObjectEventPal_Fisherman,             OBJ_EVENT_PAL_TAG_FISHERMAN},
+    {gObjectEventPal_Artist,                OBJ_EVENT_PAL_TAG_ARTIST},
+    {gObjectEventPal_Cameraman,             OBJ_EVENT_PAL_TAG_CAMERAMAN},
+    {gObjectEventPal_Gameboy,               OBJ_EVENT_PAL_TAG_GAMEBOY},
+    {gObjectEventPal_Judge,                 OBJ_EVENT_PAL_TAG_JUDGE},
+    {gObjectEventPal_Lass,                  OBJ_EVENT_PAL_TAG_LASS},
+    {gObjectEventPal_Steven,                OBJ_EVENT_PAL_TAG_STEVEN},
     {},
-};
-
-static const u16 sReflectionPaletteTags_Brendan[] = {
-    OBJ_EVENT_PAL_TAG_BRENDAN_REFLECTION,
-    OBJ_EVENT_PAL_TAG_BRENDAN_REFLECTION,
-    OBJ_EVENT_PAL_TAG_BRENDAN_REFLECTION,
-    OBJ_EVENT_PAL_TAG_BRENDAN_REFLECTION,
-};
-
-static const u16 sReflectionPaletteTags_May[] = {
-    OBJ_EVENT_PAL_TAG_MAY_REFLECTION,
-    OBJ_EVENT_PAL_TAG_MAY_REFLECTION,
-    OBJ_EVENT_PAL_TAG_MAY_REFLECTION,
-    OBJ_EVENT_PAL_TAG_MAY_REFLECTION,
-};
-
-static const u16 sReflectionPaletteTags_PlayerUnderwater[] = {
-    OBJ_EVENT_PAL_TAG_PLAYER_UNDERWATER,
-    OBJ_EVENT_PAL_TAG_PLAYER_UNDERWATER,
-    OBJ_EVENT_PAL_TAG_PLAYER_UNDERWATER,
-    OBJ_EVENT_PAL_TAG_PLAYER_UNDERWATER,
-};
-
-static const struct PairedPalettes sPlayerReflectionPaletteSets[] = {
-    {OBJ_EVENT_PAL_TAG_BRENDAN,           sReflectionPaletteTags_Brendan},
-    {OBJ_EVENT_PAL_TAG_MAY,               sReflectionPaletteTags_May},
-    {OBJ_EVENT_PAL_TAG_PLAYER_UNDERWATER, sReflectionPaletteTags_PlayerUnderwater},
-    {OBJ_EVENT_PAL_TAG_NONE,              NULL},
-};
-
-static const u16 sReflectionPaletteTags_QuintyPlump[] = {
-    OBJ_EVENT_PAL_TAG_QUINTY_PLUMP_REFLECTION,
-    OBJ_EVENT_PAL_TAG_QUINTY_PLUMP_REFLECTION,
-    OBJ_EVENT_PAL_TAG_QUINTY_PLUMP_REFLECTION,
-    OBJ_EVENT_PAL_TAG_QUINTY_PLUMP_REFLECTION,
-};
-
-static const u16 sReflectionPaletteTags_Truck[] = {
-    OBJ_EVENT_PAL_TAG_TRUCK,
-    OBJ_EVENT_PAL_TAG_TRUCK,
-    OBJ_EVENT_PAL_TAG_TRUCK,
-    OBJ_EVENT_PAL_TAG_TRUCK,
-};
-
-static const u16 sReflectionPaletteTags_VigorothMover[] = {
-    OBJ_EVENT_PAL_TAG_VIGOROTH,
-    OBJ_EVENT_PAL_TAG_VIGOROTH,
-    OBJ_EVENT_PAL_TAG_VIGOROTH,
-    OBJ_EVENT_PAL_TAG_VIGOROTH,
-};
-
-static const u16 sReflectionPaletteTags_MovingBox[] = {
-    OBJ_EVENT_PAL_TAG_MOVING_BOX,
-    OBJ_EVENT_PAL_TAG_MOVING_BOX,
-    OBJ_EVENT_PAL_TAG_MOVING_BOX,
-    OBJ_EVENT_PAL_TAG_MOVING_BOX,
-};
-
-static const u16 sReflectionPaletteTags_CableCar[] = {
-    OBJ_EVENT_PAL_TAG_CABLE_CAR,
-    OBJ_EVENT_PAL_TAG_CABLE_CAR,
-    OBJ_EVENT_PAL_TAG_CABLE_CAR,
-    OBJ_EVENT_PAL_TAG_CABLE_CAR,
-};
-
-static const u16 sReflectionPaletteTags_SSTidal[] = {
-    OBJ_EVENT_PAL_TAG_SSTIDAL,
-    OBJ_EVENT_PAL_TAG_SSTIDAL,
-    OBJ_EVENT_PAL_TAG_SSTIDAL,
-    OBJ_EVENT_PAL_TAG_SSTIDAL,
-};
-
-static const u16 sReflectionPaletteTags_SubmarineShadow[] = {
-    OBJ_EVENT_PAL_TAG_SUBMARINE_SHADOW,
-    OBJ_EVENT_PAL_TAG_SUBMARINE_SHADOW,
-    OBJ_EVENT_PAL_TAG_SUBMARINE_SHADOW,
-    OBJ_EVENT_PAL_TAG_SUBMARINE_SHADOW,
-};
-
-static const u16 sReflectionPaletteTags_Kyogre[] = {
-    OBJ_EVENT_PAL_TAG_KYOGRE_REFLECTION,
-    OBJ_EVENT_PAL_TAG_KYOGRE_REFLECTION,
-    OBJ_EVENT_PAL_TAG_KYOGRE_REFLECTION,
-    OBJ_EVENT_PAL_TAG_KYOGRE_REFLECTION,
-};
-
-static const u16 sReflectionPaletteTags_Groudon[] = {
-    OBJ_EVENT_PAL_TAG_GROUDON_REFLECTION,
-    OBJ_EVENT_PAL_TAG_GROUDON_REFLECTION,
-    OBJ_EVENT_PAL_TAG_GROUDON_REFLECTION,
-    OBJ_EVENT_PAL_TAG_GROUDON_REFLECTION,
-};
-
-static const u16 sReflectionPaletteTags_Npc3[] = { // Only used by the Route 120 bridge Kecleon
-    OBJ_EVENT_PAL_TAG_NPC_3_REFLECTION,
-    OBJ_EVENT_PAL_TAG_NPC_3_REFLECTION,
-    OBJ_EVENT_PAL_TAG_NPC_3_REFLECTION,
-    OBJ_EVENT_PAL_TAG_NPC_3_REFLECTION,
-};
-
-static const u16 sReflectionPaletteTags_RedLeaf[] = {
-    OBJ_EVENT_PAL_TAG_RED_LEAF,
-    OBJ_EVENT_PAL_TAG_RED_LEAF,
-    OBJ_EVENT_PAL_TAG_RED_LEAF,
-    OBJ_EVENT_PAL_TAG_RED_LEAF,
-};
-
-static const struct PairedPalettes sSpecialObjectReflectionPaletteSets[] = {
-    {OBJ_EVENT_PAL_TAG_BRENDAN,          sReflectionPaletteTags_Brendan},
-    {OBJ_EVENT_PAL_TAG_MAY,              sReflectionPaletteTags_May},
-    {OBJ_EVENT_PAL_TAG_QUINTY_PLUMP,     sReflectionPaletteTags_QuintyPlump},
-    {OBJ_EVENT_PAL_TAG_TRUCK,            sReflectionPaletteTags_Truck},
-    {OBJ_EVENT_PAL_TAG_VIGOROTH,         sReflectionPaletteTags_VigorothMover},
-    {OBJ_EVENT_PAL_TAG_MOVING_BOX,       sReflectionPaletteTags_MovingBox},
-    {OBJ_EVENT_PAL_TAG_CABLE_CAR,        sReflectionPaletteTags_CableCar},
-    {OBJ_EVENT_PAL_TAG_SSTIDAL,          sReflectionPaletteTags_SSTidal},
-    {OBJ_EVENT_PAL_TAG_KYOGRE,           sReflectionPaletteTags_Kyogre},
-    {OBJ_EVENT_PAL_TAG_GROUDON,          sReflectionPaletteTags_Groudon},
-    {OBJ_EVENT_PAL_TAG_NPC_3,            sReflectionPaletteTags_Npc3},
-    {OBJ_EVENT_PAL_TAG_SUBMARINE_SHADOW, sReflectionPaletteTags_SubmarineShadow},
-    {OBJ_EVENT_PAL_TAG_RED_LEAF,         sReflectionPaletteTags_RedLeaf},
-    {OBJ_EVENT_PAL_TAG_NONE,             NULL},
-};
-
-static const u16 sObjectPaletteTags0[] = {
-    OBJ_EVENT_PAL_TAG_BRENDAN,
-    OBJ_EVENT_PAL_TAG_BRENDAN_REFLECTION,
-    OBJ_EVENT_PAL_TAG_NPC_1,
-    OBJ_EVENT_PAL_TAG_NPC_2,
-    OBJ_EVENT_PAL_TAG_NPC_3,
-    OBJ_EVENT_PAL_TAG_NPC_4,
-    OBJ_EVENT_PAL_TAG_NPC_1_REFLECTION,
-    OBJ_EVENT_PAL_TAG_NPC_2_REFLECTION,
-    OBJ_EVENT_PAL_TAG_NPC_3_REFLECTION,
-    OBJ_EVENT_PAL_TAG_NPC_4_REFLECTION,
-};
-
-static const u16 sObjectPaletteTags1[] = {
-    OBJ_EVENT_PAL_TAG_BRENDAN,
-    OBJ_EVENT_PAL_TAG_BRENDAN_REFLECTION,
-    OBJ_EVENT_PAL_TAG_NPC_1,
-    OBJ_EVENT_PAL_TAG_NPC_2,
-    OBJ_EVENT_PAL_TAG_NPC_3,
-    OBJ_EVENT_PAL_TAG_NPC_4,
-    OBJ_EVENT_PAL_TAG_NPC_1_REFLECTION,
-    OBJ_EVENT_PAL_TAG_NPC_2_REFLECTION,
-    OBJ_EVENT_PAL_TAG_NPC_3_REFLECTION,
-    OBJ_EVENT_PAL_TAG_NPC_4_REFLECTION,
-};
-
-static const u16 sObjectPaletteTags2[] = {
-    OBJ_EVENT_PAL_TAG_BRENDAN,
-    OBJ_EVENT_PAL_TAG_BRENDAN_REFLECTION,
-    OBJ_EVENT_PAL_TAG_NPC_1,
-    OBJ_EVENT_PAL_TAG_NPC_2,
-    OBJ_EVENT_PAL_TAG_NPC_3,
-    OBJ_EVENT_PAL_TAG_NPC_4,
-    OBJ_EVENT_PAL_TAG_NPC_1_REFLECTION,
-    OBJ_EVENT_PAL_TAG_NPC_2_REFLECTION,
-    OBJ_EVENT_PAL_TAG_NPC_3_REFLECTION,
-    OBJ_EVENT_PAL_TAG_NPC_4_REFLECTION,
-};
-
-static const u16 sObjectPaletteTags3[] = {
-    OBJ_EVENT_PAL_TAG_BRENDAN,
-    OBJ_EVENT_PAL_TAG_BRENDAN_REFLECTION,
-    OBJ_EVENT_PAL_TAG_NPC_1,
-    OBJ_EVENT_PAL_TAG_NPC_2,
-    OBJ_EVENT_PAL_TAG_NPC_3,
-    OBJ_EVENT_PAL_TAG_NPC_4,
-    OBJ_EVENT_PAL_TAG_NPC_1_REFLECTION,
-    OBJ_EVENT_PAL_TAG_NPC_2_REFLECTION,
-    OBJ_EVENT_PAL_TAG_NPC_3_REFLECTION,
-    OBJ_EVENT_PAL_TAG_NPC_4_REFLECTION,
-};
-
-static const u16 *const sObjectPaletteTagSets[] = {
-    sObjectPaletteTags0,
-    sObjectPaletteTags1,
-    sObjectPaletteTags2,
-    sObjectPaletteTags3,
 };
 
 #include "data/object_events/berry_tree_graphics_tables.h"
@@ -1199,7 +2027,9 @@ u8 GetFirstInactiveObjectEventId(void)
 
 u8 GetObjectEventIdByLocalIdAndMap(u8 localId, u8 mapNum, u8 mapGroupId)
 {
-    if (localId < OBJ_EVENT_ID_PLAYER)
+    if (localId == OBJ_EVENT_ID_FOLLOWER)
+        return GetFollowerObjectId();
+    else if (localId < OBJ_EVENT_ID_PLAYER)
         return GetObjectEventIdByLocalIdAndMapInternal(localId, mapNum, mapGroupId);
 
     return GetObjectEventIdByLocalId(localId);
@@ -1346,7 +2176,7 @@ static bool8 GetAvailableObjectEventId(u16 localId, u8 mapNum, u8 mapGroup, u8 *
     return FALSE;
 }
 
-static void RemoveObjectEvent(struct ObjectEvent *objectEvent)
+void RemoveObjectEvent(struct ObjectEvent *objectEvent)
 {
     objectEvent->active = FALSE;
     RemoveObjectEventInternal(objectEvent);
@@ -1364,10 +2194,14 @@ void RemoveObjectEventByLocalIdAndMap(u8 localId, u8 mapNum, u8 mapGroup)
 
 static void RemoveObjectEventInternal(struct ObjectEvent *objectEvent)
 {
+    u8 paletteNum;
+
     struct SpriteFrameImage image;
     image.size = GetObjectEventGraphicsInfo(objectEvent->graphicsId)->size;
     gSprites[objectEvent->spriteId].images = &image;
+    paletteNum = gSprites[objectEvent->spriteId].oam.paletteNum;
     DestroySprite(&gSprites[objectEvent->spriteId]);
+    FieldEffectFreePaletteIfUnused(paletteNum);
 }
 
 void RemoveAllObjectEventsExceptPlayer(void)
@@ -1396,25 +2230,15 @@ static u8 TrySetupObjectEventSprite(struct ObjectEventTemplate *objectEventTempl
 
     objectEvent = &gObjectEvents[objectEventId];
     graphicsInfo = GetObjectEventGraphicsInfo(objectEvent->graphicsId);
-    paletteSlot = graphicsInfo->paletteSlot;
-    if (paletteSlot == 0)
+    if (spriteTemplate->paletteTag != 0xFFFF)
     {
-        LoadPlayerObjectReflectionPalette(graphicsInfo->paletteTag, 0);
-    }
-    else if (paletteSlot == 10)
-    {
-        LoadSpecialObjectReflectionPalette(graphicsInfo->paletteTag, 10);
-    }
-    else if (paletteSlot >= 16)
-    {
-        paletteSlot -= 16;
-        _PatchObjectPalette(graphicsInfo->paletteTag, paletteSlot);
+        LoadObjectEventPalette(spriteTemplate->paletteTag);
+        UpdatePaletteGammaType(IndexOfSpritePaletteTag(spriteTemplate->paletteTag), GAMMA_ALT);
     }
 
     if (objectEvent->movementType == MOVEMENT_TYPE_INVISIBLE)
         objectEvent->invisible = TRUE;
 
-    *(u16 *)&spriteTemplate->paletteTag = TAG_NONE;
     spriteId = CreateSprite(spriteTemplate, 0, 0, 0);
     if (spriteId == MAX_SPRITES)
     {
@@ -1428,7 +2252,7 @@ static u8 TrySetupObjectEventSprite(struct ObjectEventTemplate *objectEventTempl
     sprite->centerToCornerVecY = -(graphicsInfo->height >> 1);
     sprite->x += 8;
     sprite->y += 16 + sprite->centerToCornerVecY;
-    sprite->oam.paletteNum = paletteSlot;
+    sprite->oam.paletteNum = IndexOfSpritePaletteTag(spriteTemplate->paletteTag);
     sprite->coordOffsetEnabled = TRUE;
     sprite->sObjEventId = objectEventId;
     objectEvent->spriteId = spriteId;
@@ -1441,7 +2265,7 @@ static u8 TrySetupObjectEventSprite(struct ObjectEventTemplate *objectEventTempl
     return objectEventId;
 }
 
-static u8 TrySpawnObjectEventTemplate(struct ObjectEventTemplate *objectEventTemplate, u8 mapNum, u8 mapGroup, s16 cameraX, s16 cameraY)
+u8 TrySpawnObjectEventTemplate(struct ObjectEventTemplate *objectEventTemplate, u8 mapNum, u8 mapGroup, s16 cameraX, s16 cameraY)
 {
     u8 objectEventId;
     struct SpriteTemplate spriteTemplate;
@@ -1473,7 +2297,7 @@ u8 SpawnSpecialObjectEvent(struct ObjectEventTemplate *objectEventTemplate)
     return TrySpawnObjectEventTemplate(objectEventTemplate, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, cameraX, cameraY);
 }
 
-u8 SpawnSpecialObjectEventParameterized(u8 graphicsId, u8 movementBehavior, u8 localId, s16 x, s16 y, u8 elevation)
+u8 SpawnSpecialObjectEventParameterized(u16 graphicsId, u8 movementBehavior, u8 localId, s16 x, s16 y, u8 z)
 {
     struct ObjectEventTemplate objectEventTemplate;
 
@@ -1481,10 +2305,10 @@ u8 SpawnSpecialObjectEventParameterized(u8 graphicsId, u8 movementBehavior, u8 l
     y -= MAP_OFFSET;
     objectEventTemplate.localId = localId;
     objectEventTemplate.graphicsId = graphicsId;
-    objectEventTemplate.inConnection = 0;
+    //objectEventTemplate.inConnection = 0;
     objectEventTemplate.x = x;
     objectEventTemplate.y = y;
-    objectEventTemplate.elevation = elevation;
+    objectEventTemplate.elevation = z;
     objectEventTemplate.movementType = movementBehavior;
     objectEventTemplate.movementRangeX = 0;
     objectEventTemplate.movementRangeY = 0;
@@ -1563,7 +2387,7 @@ u8 CreateObjectGraphicsSprite(u16 graphicsId, void (*callback)(struct Sprite *),
 // A unique id is given as an argument and stored in the sprite data to allow referring back to the same virtual object.
 // They can be turned (and, in the case of the Union Room, animated teleporting in and out) but do not have movement types
 // or any of the other data normally associated with object events.
-u8 CreateVirtualObject(u8 graphicsId, u8 virtualObjId, s16 x, s16 y, u8 elevation, u8 direction)
+u8 CreateVirtualObject(u16 graphicsId, u8 virtualObjId, s16 x, s16 y, u8 elevation, u8 direction)
 {
     u8 spriteId;
     struct Sprite *sprite;
@@ -1573,7 +2397,11 @@ u8 CreateVirtualObject(u8 graphicsId, u8 virtualObjId, s16 x, s16 y, u8 elevatio
 
     graphicsInfo = GetObjectEventGraphicsInfo(graphicsId);
     CopyObjectGraphicsInfoToSpriteTemplate(graphicsId, SpriteCB_VirtualObject, &spriteTemplate, &subspriteTables);
-    *(u16 *)&spriteTemplate.paletteTag = TAG_NONE;
+    if (spriteTemplate.paletteTag != 0xFFFF)
+    {
+        LoadObjectEventPalette(spriteTemplate.paletteTag);
+        UpdatePaletteGammaType(IndexOfSpritePaletteTag(spriteTemplate.paletteTag), GAMMA_ALT);
+    }
     x += MAP_OFFSET;
     y += MAP_OFFSET;
     SetSpritePosToOffsetMapCoords(&x, &y, 8, 16);
@@ -1584,18 +2412,10 @@ u8 CreateVirtualObject(u8 graphicsId, u8 virtualObjId, s16 x, s16 y, u8 elevatio
         sprite->centerToCornerVecX = -(graphicsInfo->width >> 1);
         sprite->centerToCornerVecY = -(graphicsInfo->height >> 1);
         sprite->y += sprite->centerToCornerVecY;
-        sprite->oam.paletteNum = graphicsInfo->paletteSlot;
-        if (sprite->oam.paletteNum >= 16)
-            sprite->oam.paletteNum -= 16;
-
+        sprite->oam.paletteNum = IndexOfSpritePaletteTag(spriteTemplate.paletteTag);
         sprite->coordOffsetEnabled = TRUE;
         sprite->sVirtualObjId = virtualObjId;
         sprite->sVirtualObjElev = elevation;
-        if (graphicsInfo->paletteSlot == 10)
-            LoadSpecialObjectReflectionPalette(graphicsInfo->paletteTag, graphicsInfo->paletteSlot);
-        else if (graphicsInfo->paletteSlot >= 16)
-            _PatchObjectPalette(graphicsInfo->paletteTag, graphicsInfo->paletteSlot | 0xf0);
-
         if (subspriteTables != NULL)
         {
             SetSubspriteTables(sprite, subspriteTables);
@@ -1656,7 +2476,7 @@ void RemoveObjectEventsOutsideView(void)
         {
             struct ObjectEvent *objectEvent = &gObjectEvents[i];
 
-            if (objectEvent->active && !objectEvent->isPlayer)
+            if (objectEvent->active && !objectEvent->isPlayer && i != GetFollowerObjectId())
                 RemoveObjectEventIfOutsideView(objectEvent);
         }
     }
@@ -1694,7 +2514,6 @@ void SpawnObjectEventsOnReturnToField(s16 x, s16 y)
 static void SpawnObjectEventOnReturnToField(u8 objectEventId, s16 x, s16 y)
 {
     u8 i;
-    u8 paletteSlot;
     struct Sprite *sprite;
     struct ObjectEvent *objectEvent;
     struct SpriteTemplate spriteTemplate;
@@ -1714,23 +2533,11 @@ static void SpawnObjectEventOnReturnToField(u8 objectEventId, s16 x, s16 y)
     spriteFrameImage.size = graphicsInfo->size;
     CopyObjectGraphicsInfoToSpriteTemplate_WithMovementType(objectEvent->graphicsId, objectEvent->movementType, &spriteTemplate, &subspriteTables);
     spriteTemplate.images = &spriteFrameImage;
-
-    *(u16 *)&spriteTemplate.paletteTag = TAG_NONE;
-    paletteSlot = graphicsInfo->paletteSlot;
-    if (paletteSlot == 0)
+    if (spriteTemplate.paletteTag != 0xFFFF)
     {
-        LoadPlayerObjectReflectionPalette(graphicsInfo->paletteTag, graphicsInfo->paletteSlot);
+        LoadObjectEventPalette(spriteTemplate.paletteTag);
+        UpdatePaletteGammaType(IndexOfSpritePaletteTag(spriteTemplate.paletteTag), GAMMA_ALT);
     }
-    else if (paletteSlot == 10)
-    {
-        LoadSpecialObjectReflectionPalette(graphicsInfo->paletteTag, graphicsInfo->paletteSlot);
-    }
-    else if (paletteSlot >= 16)
-    {
-        paletteSlot -= 16;
-        _PatchObjectPalette(graphicsInfo->paletteTag, paletteSlot);
-    }
-    *(u16 *)&spriteTemplate.paletteTag = TAG_NONE;
 
     i = CreateSprite(&spriteTemplate, 0, 0, 0);
     if (i != MAX_SPRITES)
@@ -1749,8 +2556,7 @@ static void SpawnObjectEventOnReturnToField(u8 objectEventId, s16 x, s16 y)
         }
         if (subspriteTables != NULL)
             SetSubspriteTables(sprite, subspriteTables);
-
-        sprite->oam.paletteNum = paletteSlot;
+        sprite->oam.paletteNum = IndexOfSpritePaletteTag(spriteTemplate.paletteTag);
         sprite->coordOffsetEnabled = TRUE;
         sprite->sObjEventId = objectEventId;
         objectEvent->spriteId = i;
@@ -1783,7 +2589,7 @@ static void SetPlayerAvatarObjectEventIdAndObjectId(u8 objectEventId, u8 spriteI
     SetPlayerAvatarExtraStateTransition(gObjectEvents[objectEventId].graphicsId, PLAYER_AVATAR_FLAG_CONTROLLABLE);
 }
 
-void ObjectEventSetGraphicsId(struct ObjectEvent *objectEvent, u8 graphicsId)
+void ObjectEventSetGraphicsId(struct ObjectEvent *objectEvent, u16 graphicsId)
 {
     const struct ObjectEventGraphicsInfo *graphicsInfo;
     struct Sprite *sprite;
@@ -1791,26 +2597,17 @@ void ObjectEventSetGraphicsId(struct ObjectEvent *objectEvent, u8 graphicsId)
 
     graphicsInfo = GetObjectEventGraphicsInfo(graphicsId);
     sprite = &gSprites[objectEvent->spriteId];
-    paletteSlot = graphicsInfo->paletteSlot;
-    if (paletteSlot == 0)
+    if (graphicsInfo->paletteTag != 0xFFFF)
     {
-        PatchObjectPalette(graphicsInfo->paletteTag, graphicsInfo->paletteSlot);
-    }
-    else if (paletteSlot == 10)
-    {
-        LoadSpecialObjectReflectionPalette(graphicsInfo->paletteTag, graphicsInfo->paletteSlot);
-    }
-    else if (paletteSlot >= 16)
-    {
-        paletteSlot -= 16;
-        _PatchObjectPalette(graphicsInfo->paletteTag, paletteSlot);
+        LoadObjectEventPalette(graphicsInfo->paletteTag);
+        UpdatePaletteGammaType(IndexOfSpritePaletteTag(graphicsInfo->paletteTag), GAMMA_ALT);
     }
     sprite->oam.shape = graphicsInfo->oam->shape;
     sprite->oam.size = graphicsInfo->oam->size;
     sprite->images = graphicsInfo->images;
     sprite->anims = graphicsInfo->anims;
     sprite->subspriteTables = graphicsInfo->subspriteTables;
-    sprite->oam.paletteNum = paletteSlot;
+    sprite->oam.paletteNum = IndexOfSpritePaletteTag(graphicsInfo->paletteTag);
     objectEvent->inanimate = graphicsInfo->inanimate;
     objectEvent->graphicsId = graphicsId;
     SetSpritePosToMapCoords(objectEvent->currentCoords.x, objectEvent->currentCoords.y, &sprite->x, &sprite->y);
@@ -1822,7 +2619,7 @@ void ObjectEventSetGraphicsId(struct ObjectEvent *objectEvent, u8 graphicsId)
         CameraObjectReset1();
 }
 
-void ObjectEventSetGraphicsIdByLocalIdAndMap(u8 localId, u8 mapNum, u8 mapGroup, u8 graphicsId)
+void ObjectEventSetGraphicsIdByLocalIdAndMap(u8 localId, u8 mapNum, u8 mapGroup, u16 graphicsId)
 {
     u8 objectEventId;
 
@@ -1870,14 +2667,16 @@ static void SetBerryTreeGraphics(struct ObjectEvent *objectEvent, struct Sprite 
         if (berryId > ITEM_TO_BERRY(LAST_BERRY_INDEX))
             berryId = 0;
 
+        LoadObjectEventPalette(gBerryTreePaletteTagTablePointers[berryId][berryStage]);
         ObjectEventSetGraphicsId(objectEvent, gBerryTreeObjectEventGraphicsIdTablePointers[berryId][berryStage]);
         sprite->images = gBerryTreePicTablePointers[berryId];
-        sprite->oam.paletteNum = gBerryTreePaletteSlotTablePointers[berryId][berryStage];
+        sprite->oam.paletteNum = IndexOfSpritePaletteTag(gBerryTreePaletteTagTablePointers[berryId][berryStage]);
+        UpdatePaletteGammaType(sprite->oam.paletteNum, GAMMA_ALT);
         StartSpriteAnim(sprite, berryStage);
     }
 }
 
-const struct ObjectEventGraphicsInfo *GetObjectEventGraphicsInfo(u8 graphicsId)
+const struct ObjectEventGraphicsInfo *GetObjectEventGraphicsInfo(u16 graphicsId)
 {
     u8 bard;
 
@@ -1977,7 +2776,7 @@ void FreeAndReserveObjectSpritePalettes(void)
     gReservedSpritePaletteCount = 12;
 }
 
-static void LoadObjectEventPalette(u16 paletteTag)
+void LoadObjectEventPalette(u16 paletteTag)
 {
     u16 i = FindObjectEventPaletteIndexByTag(paletteTag);
 
@@ -1994,7 +2793,9 @@ static void LoadObjectEventPaletteSet(u16 *paletteTags)
         LoadObjectEventPalette(paletteTags[i]);
 }
 
+
 static u8 LoadSpritePaletteIfTagExists(const struct SpritePalette *spritePalette)
+
 {
     if (IndexOfSpritePaletteTag(spritePalette->tag) != 0xFF)
         return 0xFF;
@@ -2004,9 +2805,9 @@ static u8 LoadSpritePaletteIfTagExists(const struct SpritePalette *spritePalette
 
 void PatchObjectPalette(u16 paletteTag, u8 paletteSlot)
 {
-    u8 paletteIndex = FindObjectEventPaletteIndexByTag(paletteTag);
+    u16 paletteIndex = FindObjectEventPaletteIndexByTag(paletteTag);
 
-    LoadPalette(sObjectEventSpritePalettes[paletteIndex].data, 16 * paletteSlot + 0x100, 0x20);
+    LoadPaletteDayNight(sObjectEventSpritePalettes[paletteIndex].data, 16 * paletteSlot + 0x100, 0x20);
 }
 
 void PatchObjectPaletteRange(const u16 *paletteTags, u8 minSlot, u8 maxSlot)
@@ -2019,9 +2820,9 @@ void PatchObjectPaletteRange(const u16 *paletteTags, u8 minSlot, u8 maxSlot)
     }
 }
 
-static u8 FindObjectEventPaletteIndexByTag(u16 tag)
+static u16 FindObjectEventPaletteIndexByTag(u16 tag)
 {
-    u8 i;
+    u16 i;
 
     for (i = 0; sObjectEventSpritePalettes[i].tag != OBJ_EVENT_PAL_TAG_NONE; i++)
     {
@@ -2029,37 +2830,6 @@ static u8 FindObjectEventPaletteIndexByTag(u16 tag)
             return i;
     }
     return 0xFF;
-}
-
-void LoadPlayerObjectReflectionPalette(u16 tag, u8 slot)
-{
-    u8 i;
-
-    PatchObjectPalette(tag, slot);
-    for (i = 0; sPlayerReflectionPaletteSets[i].tag != OBJ_EVENT_PAL_TAG_NONE; i++)
-    {
-        if (sPlayerReflectionPaletteSets[i].tag == tag)
-        {
-            PatchObjectPalette(sPlayerReflectionPaletteSets[i].data[sCurrentReflectionType], gReflectionEffectPaletteMap[slot]);
-            return;
-        }
-    }
-}
-
-void LoadSpecialObjectReflectionPalette(u16 tag, u8 slot)
-{
-    u8 i;
-
-    sCurrentSpecialObjectPaletteTag = tag;
-    PatchObjectPalette(tag, slot);
-    for (i = 0; sSpecialObjectReflectionPaletteSets[i].tag != OBJ_EVENT_PAL_TAG_NONE; i++)
-    {
-        if (sSpecialObjectReflectionPaletteSets[i].tag == tag)
-        {
-            PatchObjectPalette(sSpecialObjectReflectionPaletteSets[i].data[sCurrentReflectionType], gReflectionEffectPaletteMap[slot]);
-            return;
-        }
-    }
 }
 
 static void _PatchObjectPalette(u16 tag, u8 slot)
@@ -2398,7 +3168,7 @@ u8 GetObjectEventBerryTreeId(u8 objectEventId)
     return gObjectEvents[objectEventId].trainerRange_berryTreeId;
 }
 
-static struct ObjectEventTemplate *GetObjectEventTemplateByLocalIdAndMap(u8 localId, u8 mapNum, u8 mapGroup)
+struct ObjectEventTemplate *GetObjectEventTemplateByLocalIdAndMap(u8 localId, u8 mapNum, u8 mapGroup)
 {
     struct ObjectEventTemplate *templates;
     const struct MapHeader *mapHeader;
@@ -2498,37 +3268,6 @@ void OverrideSecretBaseDecorationSpriteScript(u8 localId, u8 mapNum, u8 mapGroup
             break;
         }
     }
-}
-
-void InitObjectEventPalettes(u8 palSlot)
-{
-    FreeAndReserveObjectSpritePalettes();
-    sCurrentSpecialObjectPaletteTag = OBJ_EVENT_PAL_TAG_NONE;
-    sCurrentReflectionType = palSlot;
-    if (palSlot == 1)
-    {
-        PatchObjectPaletteRange(sObjectPaletteTagSets[sCurrentReflectionType], 0, 6);
-        gReservedSpritePaletteCount = 8;
-    }
-    else
-    {
-        PatchObjectPaletteRange(sObjectPaletteTagSets[sCurrentReflectionType], 0, 10);
-    }
-}
-
-u16 GetObjectPaletteTag(u8 palSlot)
-{
-    u8 i;
-
-    if (palSlot < 10)
-        return sObjectPaletteTagSets[sCurrentReflectionType][palSlot];
-
-    for (i = 0; sSpecialObjectReflectionPaletteSets[i].tag != OBJ_EVENT_PAL_TAG_NONE; i++)
-    {
-        if (sSpecialObjectReflectionPaletteSets[i].tag == sCurrentSpecialObjectPaletteTag)
-            return sSpecialObjectReflectionPaletteSets[i].data[sCurrentReflectionType];
-    }
-    return OBJ_EVENT_PAL_TAG_NONE;
 }
 
 movement_type_empty_callback(MovementType_None)
@@ -2810,6 +3549,38 @@ u8 TryGetTrainerEncounterDirection(struct ObjectEvent *objectEvent, u8 movementT
         absdy = -absdy;
 
     return gGetVectorDirectionFuncs[movementType](dx, dy, absdx, absdy);
+}
+
+movement_type_def(MovementType_FollowingPokemon, gMovementTypeFuncs_FollowingPokemon)
+
+bool8 MovementType_FollowingPokemon_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
+{
+    ClearObjectEventMovement(objectEvent, sprite);
+    sprite->data[1] = 1;
+    return TRUE;
+}
+
+bool8 MovementType_FollowingPokemon_Step1(struct ObjectEvent *objectEvent, struct Sprite *sprite)
+{
+    ObjectEventSetSingleMovement(objectEvent, sprite, MOVEMENT_ACTION_FOLLOWING_POKEMON);
+    sprite->data[1] = 2;
+    return TRUE;
+}
+
+bool8 MovementType_FollowingPokemon_Step2(struct ObjectEvent *objectEvent, struct Sprite *sprite)
+{
+    if (ObjectEventExecSingleMovementAction(objectEvent, sprite))
+    {
+        objectEvent->singleMovementActive = FALSE;
+        sprite->data[1] = 3;
+    }
+    return FALSE;
+}
+
+bool8 MovementType_FollowingPokemon_Step3(struct ObjectEvent *objectEvent, struct Sprite *sprite)
+{
+    sprite->data[1] = 1;
+    return TRUE;
 }
 
 movement_type_def(MovementType_LookAround, gMovementTypeFuncs_LookAround)
@@ -4706,8 +5477,9 @@ static bool8 DoesObjectCollideWithObjectAt(struct ObjectEvent *objectEvent, s16 
     for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
     {
         curObject = &gObjectEvents[i];
-        if (curObject->active && curObject != objectEvent)
+        if (curObject->active && curObject != objectEvent && !FollowMe_IsCollisionExempt(curObject, objectEvent))
         {
+            // check for collision if curObject is active, not the object in question, and not exempt from collisions
             if ((curObject->currentCoords.x == x && curObject->currentCoords.y == y) || (curObject->previousCoords.x == x && curObject->previousCoords.y == y))
             {
                 if (AreElevationsCompatible(objectEvent->currentElevation, curObject->currentElevation))
@@ -4855,6 +5627,7 @@ bool8 ObjectEventSetHeldMovement(struct ObjectEvent *objectEvent, u8 movementAct
     objectEvent->heldMovementActive = TRUE;
     objectEvent->heldMovementFinished = FALSE;
     gSprites[objectEvent->spriteId].sActionFuncId = 0;
+    FollowMe(objectEvent, movementActionId, FALSE);
     return FALSE;
 }
 
@@ -4953,6 +5726,41 @@ dirn_to_anim(GetWalkInPlaceFasterMovementAction, gWalkInPlaceFasterMovementActio
 bool8 ObjectEventFaceOppositeDirection(struct ObjectEvent *objectEvent, u8 direction)
 {
     return ObjectEventSetHeldMovement(objectEvent, GetFaceDirectionMovementAction(GetOppositeDirection(direction)));
+}
+
+bool8 ObjectEventPokemonFacePlayer(struct ObjectEvent *follower, struct ObjectEvent *player)
+{
+    if(follower->currentCoords.x == player->currentCoords.x)
+    {
+        // Follower is south of player
+        if(follower->currentCoords.y > player->currentCoords.y)
+        {
+            gSprites[follower->spriteId].animNum = 5;
+            follower->facingDirection = DIR_NORTH;
+        }
+        // Follower is north of player
+        else
+        {
+            gSprites[follower->spriteId].animNum = 4;
+            follower->facingDirection = DIR_SOUTH;
+        }
+    }
+    else
+    {
+        // Follower is east of player
+        if(follower->currentCoords.x > player->currentCoords.x)
+        {
+            gSprites[follower->spriteId].animNum = 6;
+            follower->facingDirection = DIR_WEST;
+        }
+        // Follower is west of player
+        else
+        {
+            gSprites[follower->spriteId].animNum = 7;
+            follower->facingDirection = DIR_EAST;
+        }
+    }
+    return ObjectEventSetHeldMovement(follower, MOVEMENT_ACTION_FOLLOWING_POKEMON);
 }
 
 dirn_to_anim(GetAcroWheelieFaceDirectionMovementAction, gAcroWheelieFaceDirectionMovementActions);
@@ -5097,7 +5905,8 @@ static bool8 UpdateMovementNormal(struct ObjectEvent *objectEvent, struct Sprite
     {
         ShiftStillObjectEventCoords(objectEvent);
         objectEvent->triggerGroundEffectsOnStop = TRUE;
-        sprite->animPaused = TRUE;
+        if (!(gSaveBlock2Ptr->follower.inProgress && objectEvent == &gObjectEvents[gSaveBlock2Ptr->follower.objId]))
+            sprite->animPaused = TRUE;
         return TRUE;
     }
     return FALSE;
@@ -5331,7 +6140,19 @@ bool8 MovementAction_WalkNormalDiagonalDownRight_Step1(struct ObjectEvent *objec
 
 bool8 MovementAction_WalkNormalDown_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {
-    InitMovementNormal(objectEvent, sprite, DIR_SOUTH, MOVE_SPEED_NORMAL);
+    if(gSaveBlock2Ptr->follower.inProgress && objectEvent == &gObjectEvents[gSaveBlock2Ptr->follower.objId])
+    {
+        if(sprite->data[7] != 2)
+        {
+            sprite->data[7] = 2;
+            sprite->animNum = 4;
+            sprite->x2 = 0;
+            SeekSpriteAnim(sprite, ++sprite->animCmdIndex);
+        }
+        InitNpcForMovement(objectEvent, sprite, DIR_SOUTH, 0);
+    }
+    else
+        InitMovementNormal(objectEvent, sprite, DIR_SOUTH, MOVE_SPEED_NORMAL);
     return MovementAction_WalkNormalDown_Step1(objectEvent, sprite);
 }
 
@@ -5347,7 +6168,19 @@ bool8 MovementAction_WalkNormalDown_Step1(struct ObjectEvent *objectEvent, struc
 
 bool8 MovementAction_WalkNormalUp_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {
-    InitMovementNormal(objectEvent, sprite, DIR_NORTH, MOVE_SPEED_NORMAL);
+    if(gSaveBlock2Ptr->follower.inProgress && objectEvent == &gObjectEvents[gSaveBlock2Ptr->follower.objId])
+    {
+        if(sprite->data[7] != 3)
+        {
+            sprite->data[7] = 3;
+            sprite->animNum = 5;
+            sprite->x2 = 0;
+            SeekSpriteAnim(sprite, ++sprite->animCmdIndex);
+        }
+        InitNpcForMovement(objectEvent, sprite, DIR_NORTH, 0);
+    }
+    else
+        InitMovementNormal(objectEvent, sprite, DIR_NORTH, MOVE_SPEED_NORMAL);
     return MovementAction_WalkNormalUp_Step1(objectEvent, sprite);
 }
 
@@ -5363,7 +6196,19 @@ bool8 MovementAction_WalkNormalUp_Step1(struct ObjectEvent *objectEvent, struct 
 
 bool8 MovementAction_WalkNormalLeft_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {
-    InitMovementNormal(objectEvent, sprite, DIR_WEST, MOVE_SPEED_NORMAL);
+    if(gSaveBlock2Ptr->follower.inProgress && objectEvent == &gObjectEvents[gSaveBlock2Ptr->follower.objId])
+    {
+        if(sprite->data[7] != 4)
+        {
+            sprite->data[7] = 4;
+            sprite->animNum = 6;
+            sprite->x2 = 8;
+            SeekSpriteAnim(sprite, ++sprite->animCmdIndex);
+        }
+        InitNpcForMovement(objectEvent, sprite, DIR_WEST, 0);
+    }
+    else
+        InitMovementNormal(objectEvent, sprite, DIR_WEST, MOVE_SPEED_NORMAL);
     return MovementAction_WalkNormalLeft_Step1(objectEvent, sprite);
 }
 
@@ -5379,7 +6224,19 @@ bool8 MovementAction_WalkNormalLeft_Step1(struct ObjectEvent *objectEvent, struc
 
 bool8 MovementAction_WalkNormalRight_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {
-    InitMovementNormal(objectEvent, sprite, DIR_EAST, MOVE_SPEED_NORMAL);
+    if(gSaveBlock2Ptr->follower.inProgress && objectEvent == &gObjectEvents[gSaveBlock2Ptr->follower.objId])
+    {
+        if(sprite->data[7] != 5)
+        {
+            sprite->data[7] = 5;
+            sprite->animNum = 7;
+            sprite->x2 = -8;
+            SeekSpriteAnim(sprite, ++sprite->animCmdIndex);
+        }
+        InitNpcForMovement(objectEvent, sprite, DIR_EAST, 0);
+    }
+    else
+        InitMovementNormal(objectEvent, sprite, DIR_EAST, MOVE_SPEED_NORMAL);
     return MovementAction_WalkNormalRight_Step1(objectEvent, sprite);
 }
 
@@ -5453,7 +6310,8 @@ static u8 UpdateJumpAnim(struct ObjectEvent *objectEvent, struct Sprite *sprite,
         ShiftStillObjectEventCoords(objectEvent);
         objectEvent->triggerGroundEffectsOnStop = TRUE;
         objectEvent->landingJump = TRUE;
-        sprite->animPaused = TRUE;
+        if (!(gSaveBlock2Ptr->follower.inProgress && objectEvent == &gObjectEvents[gSaveBlock2Ptr->follower.objId]))
+            sprite->animPaused = TRUE;
     }
     return result;
 }
@@ -5502,6 +6360,11 @@ static bool8 DoJumpInPlaceAnim(struct ObjectEvent *objectEvent, struct Sprite *s
 
 bool8 MovementAction_Jump2Down_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {
+    if(gSaveBlock2Ptr->follower.inProgress && objectEvent == &gObjectEvents[gSaveBlock2Ptr->follower.objId])
+    {
+        sprite->x2 = 0;
+        sprite->data[7] = 10;
+    }
     InitJumpRegular(objectEvent, sprite, DIR_SOUTH, JUMP_DISTANCE_FAR, JUMP_TYPE_HIGH);
     return MovementAction_Jump2Down_Step1(objectEvent, sprite);
 }
@@ -5519,6 +6382,11 @@ bool8 MovementAction_Jump2Down_Step1(struct ObjectEvent *objectEvent, struct Spr
 
 bool8 MovementAction_Jump2Up_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {
+    if(gSaveBlock2Ptr->follower.inProgress && objectEvent == &gObjectEvents[gSaveBlock2Ptr->follower.objId])
+    {
+        sprite->x2 = 0;
+        sprite->data[7] = 10;
+    }
     InitJumpRegular(objectEvent, sprite, DIR_NORTH, JUMP_DISTANCE_FAR, JUMP_TYPE_HIGH);
     return MovementAction_Jump2Up_Step1(objectEvent, sprite);
 }
@@ -5536,6 +6404,11 @@ bool8 MovementAction_Jump2Up_Step1(struct ObjectEvent *objectEvent, struct Sprit
 
 bool8 MovementAction_Jump2Left_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {
+    if(gSaveBlock2Ptr->follower.inProgress && objectEvent == &gObjectEvents[gSaveBlock2Ptr->follower.objId])
+    {
+        sprite->x2 = 8;
+        sprite->data[7] = 10;
+    }
     InitJumpRegular(objectEvent, sprite, DIR_WEST, JUMP_DISTANCE_FAR, JUMP_TYPE_HIGH);
     return MovementAction_Jump2Left_Step1(objectEvent, sprite);
 }
@@ -5553,6 +6426,11 @@ bool8 MovementAction_Jump2Left_Step1(struct ObjectEvent *objectEvent, struct Spr
 
 bool8 MovementAction_Jump2Right_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {
+    if(gSaveBlock2Ptr->follower.inProgress && objectEvent == &gObjectEvents[gSaveBlock2Ptr->follower.objId])
+    {
+        sprite->x2 = -8;
+        sprite->data[7] = 10;
+    }
     InitJumpRegular(objectEvent, sprite, DIR_EAST, JUMP_DISTANCE_FAR, JUMP_TYPE_HIGH);
     return MovementAction_Jump2Right_Step1(objectEvent, sprite);
 }
@@ -5616,7 +6494,19 @@ bool8 MovementAction_Delay16_Step0(struct ObjectEvent *objectEvent, struct Sprit
 
 bool8 MovementAction_WalkFastDown_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {
-    InitMovementNormal(objectEvent, sprite, DIR_SOUTH, MOVE_SPEED_FAST_1);
+    if(gSaveBlock2Ptr->follower.inProgress && objectEvent == &gObjectEvents[gSaveBlock2Ptr->follower.objId])
+    {
+        if(sprite->data[7] != 6)
+        {
+            sprite->data[7] = 6;
+            sprite->animNum = 20;
+            sprite->x2 = 0;
+            SeekSpriteAnim(sprite, ++sprite->animCmdIndex);
+        }
+        InitNpcForMovement(objectEvent, sprite, DIR_SOUTH, 1);
+    }
+    else
+        InitMovementNormal(objectEvent, sprite, DIR_SOUTH, MOVE_SPEED_FAST_1);
     return MovementAction_WalkFastDown_Step1(objectEvent, sprite);
 }
 
@@ -5632,7 +6522,19 @@ bool8 MovementAction_WalkFastDown_Step1(struct ObjectEvent *objectEvent, struct 
 
 bool8 MovementAction_WalkFastUp_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {
-    InitMovementNormal(objectEvent, sprite, DIR_NORTH, MOVE_SPEED_FAST_1);
+    if(gSaveBlock2Ptr->follower.inProgress && objectEvent == &gObjectEvents[gSaveBlock2Ptr->follower.objId])
+    {
+        if(sprite->data[7] != 7)
+        {
+            sprite->data[7] = 7;
+            sprite->animNum = 21;
+            sprite->x2 = 0;
+            SeekSpriteAnim(sprite, ++sprite->animCmdIndex);
+        }
+        InitNpcForMovement(objectEvent, sprite, DIR_NORTH, 1);
+    }
+    else
+        InitMovementNormal(objectEvent, sprite, DIR_NORTH, MOVE_SPEED_FAST_1);
     return MovementAction_WalkFastUp_Step1(objectEvent, sprite);
 }
 
@@ -5648,7 +6550,19 @@ bool8 MovementAction_WalkFastUp_Step1(struct ObjectEvent *objectEvent, struct Sp
 
 bool8 MovementAction_WalkFastLeft_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {
-    InitMovementNormal(objectEvent, sprite, DIR_WEST, MOVE_SPEED_FAST_1);
+    if(gSaveBlock2Ptr->follower.inProgress && objectEvent == &gObjectEvents[gSaveBlock2Ptr->follower.objId])
+    {
+        if(sprite->data[7] != 8)
+        {
+            sprite->data[7] = 8;
+            sprite->animNum = 22;
+            sprite->x2 = 8;
+            SeekSpriteAnim(sprite, ++sprite->animCmdIndex);
+        }
+        InitNpcForMovement(objectEvent, sprite, DIR_WEST, 1);
+    }
+    else
+        InitMovementNormal(objectEvent, sprite, DIR_WEST, MOVE_SPEED_FAST_1);
     return MovementAction_WalkFastLeft_Step1(objectEvent, sprite);
 }
 
@@ -5664,7 +6578,19 @@ bool8 MovementAction_WalkFastLeft_Step1(struct ObjectEvent *objectEvent, struct 
 
 bool8 MovementAction_WalkFastRight_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {
-    InitMovementNormal(objectEvent, sprite, DIR_EAST, MOVE_SPEED_FAST_1);
+    if(gSaveBlock2Ptr->follower.inProgress && objectEvent == &gObjectEvents[gSaveBlock2Ptr->follower.objId])
+    {
+        if(sprite->data[7] != 9)
+        {
+            sprite->data[7] = 9;
+            sprite->animNum = 23;
+            sprite->x2 = -8;
+            SeekSpriteAnim(sprite, ++sprite->animCmdIndex);
+        }
+        InitNpcForMovement(objectEvent, sprite, DIR_EAST, 1);
+    }
+    else
+        InitMovementNormal(objectEvent, sprite, DIR_EAST, MOVE_SPEED_FAST_1);
     return MovementAction_WalkFastRight_Step1(objectEvent, sprite);
 }
 
@@ -7848,6 +8774,9 @@ static void (*const sGroundEffectTracksFuncs[])(struct ObjectEvent *objEvent, st
     [TRACKS_NONE] = DoTracksGroundEffect_None,
     [TRACKS_FOOT] = DoTracksGroundEffect_Footprints,
     [TRACKS_BIKE_TIRE] = DoTracksGroundEffect_BikeTireTracks,
+    [TRACKS_SLITHER] = DoTracksGroundEffect_SlitherTracks,
+    [TRACKS_BUG] = DoTracksGroundEffect_FootprintsBug,
+    [TRACKS_SPOT] = DoTracksGroundEffect_FootprintsSpot,
 };
 
 void GroundEffect_SandTracks(struct ObjectEvent *objEvent, struct Sprite *sprite)
@@ -7880,6 +8809,73 @@ static void DoTracksGroundEffect_Footprints(struct ObjectEvent *objEvent, struct
     gFieldEffectArguments[3] = 2;
     gFieldEffectArguments[4] = objEvent->facingDirection;
     FieldEffectStart(sandFootprints_FieldEffectData[a]);
+}
+
+static void DoTracksGroundEffect_FootprintsSpot(struct ObjectEvent *objEvent, struct Sprite *sprite, u8 a)
+{
+	// First half-word is a Field Effect script id. (gFieldEffectScriptPointers)
+	u16 otherFootprintsA_FieldEffectData[2] = {
+		FLDEFF_TRACKS_SPOT,
+		FLDEFF_TRACKS_SPOT
+	};
+
+	gFieldEffectArguments[0] = objEvent->previousCoords.x;
+	gFieldEffectArguments[1] = objEvent->previousCoords.y;
+	gFieldEffectArguments[2] = 149;
+	gFieldEffectArguments[3] = 2;
+	gFieldEffectArguments[4] = objEvent->facingDirection;
+	if (Random() % 2 == 0)
+		PlaySE(159);
+	if (Random() % 2 == 1)
+		PlaySE12WithPanning(159, 1);
+	FieldEffectStart(otherFootprintsA_FieldEffectData[a]);
+}
+
+static void DoTracksGroundEffect_FootprintsBug(struct ObjectEvent *objEvent, struct Sprite *sprite, u8 a)
+{
+	// First half-word is a Field Effect script id. (gFieldEffectScriptPointers)
+	u16 otherFootprintsB_FieldEffectData[2] = {
+		FLDEFF_TRACKS_BUG,
+		FLDEFF_TRACKS_BUG
+	};
+
+	gFieldEffectArguments[0] = objEvent->previousCoords.x;
+	gFieldEffectArguments[1] = objEvent->previousCoords.y;
+	gFieldEffectArguments[2] = 149;
+	gFieldEffectArguments[3] = 2;
+	gFieldEffectArguments[4] = objEvent->facingDirection;
+	if (Random() % 2 == 0)
+		PlaySE(159);
+	if (Random() % 2 == 1)
+		PlaySE12WithPanning(159, 1);
+	FieldEffectStart(otherFootprintsB_FieldEffectData[a]);
+}
+
+static void DoTracksGroundEffect_SlitherTracks(struct ObjectEvent *objEvent, struct Sprite *sprite, u8 a)
+{
+	//  Specifies which bike track shape to show next.
+	//  For example, when the bike turns from up to right, it will show
+	//  a track that curves to the right.
+	//  Each 4-byte row corresponds to the initial direction of the bike, and
+	//  each byte in that row is for the next direction of the bike in the order
+	//  of down, up, left, right.
+	static const u8 slitherTracks_Transitions[4][4] = {
+		1, 2, 7, 8,
+		1, 2, 6, 5,
+		5, 8, 3, 4,
+		6, 7, 3, 4,
+	};
+
+	if (objEvent->currentCoords.x != objEvent->previousCoords.x || objEvent->currentCoords.y != objEvent->previousCoords.y)
+	{
+		gFieldEffectArguments[0] = objEvent->previousCoords.x;
+		gFieldEffectArguments[1] = objEvent->previousCoords.y;
+		gFieldEffectArguments[2] = 149;
+		gFieldEffectArguments[3] = 2;
+		gFieldEffectArguments[4] =
+			slitherTracks_Transitions[objEvent->previousMovementDirection][objEvent->facingDirection - 5];
+		FieldEffectStart(FLDEFF_TRACKS_SLITHER);
+	}
 }
 
 static void DoTracksGroundEffect_BikeTireTracks(struct ObjectEvent *objEvent, struct Sprite *sprite, u8 a)
@@ -8597,7 +9593,7 @@ void TurnVirtualObject(u8 virtualObjId, u8 direction)
         StartSpriteAnim(&gSprites[spriteId], GetFaceDirectionAnimNum(direction));
 }
 
-void SetVirtualObjectGraphics(u8 virtualObjId, u8 graphicsId)
+void SetVirtualObjectGraphics(u8 virtualObjId, u16 graphicsId)
 {
     int spriteId = GetVirtualObjectSpriteId(virtualObjId);
 
@@ -8775,6 +9771,42 @@ u8 (*const gMovementActionFuncs_FlyDown[])(struct ObjectEvent *, struct Sprite *
     MovementAction_Fly_Finish,
 };
 
+u8 (*const gMovementActionFuncs_FollowingPokemon[])(struct ObjectEvent *, struct Sprite *) = {
+    MovementAction_FollowingPokemon_Step0,
+};
+
+u8 (*const gMovementActionFuncs_FollowingPokemon_FaceSouth[])(struct ObjectEvent *, struct Sprite *) = {
+    MovementAction_FollowingPokemon_FaceSouth_Step0,
+    MovementAction_Finish,
+};
+
+u8 (*const gMovementActionFuncs_FollowingPokemon_FaceNorth[])(struct ObjectEvent *, struct Sprite *) = {
+    MovementAction_FollowingPokemon_FaceNorth_Step0,
+    MovementAction_Finish,
+};
+
+u8 (*const gMovementActionFuncs_FollowingPokemon_FaceWest[])(struct ObjectEvent *, struct Sprite *) = {
+    MovementAction_FollowingPokemon_FaceWest_Step0,
+    MovementAction_Finish,
+};
+
+u8 (*const gMovementActionFuncs_FollowingPokemon_FaceEast[])(struct ObjectEvent *, struct Sprite *) = {
+    MovementAction_FollowingPokemon_FaceEast_Step0,
+    MovementAction_Finish,
+};
+
+u8 (*const gMovementActionFuncs_FollowingPokemon_Shrink[])(struct ObjectEvent *, struct Sprite *) = {
+    MovementAction_FollowingPokemon_Shrink_Step0,
+    MovementAction_FollowingPokemon_Shrink_Step1,
+    MovementAction_Finish,
+};
+
+u8 (*const gMovementActionFuncs_FollowingPokemon_Grow[])(struct ObjectEvent *, struct Sprite *) = {
+    MovementAction_FollowingPokemon_Grow_Step0,
+    MovementAction_FollowingPokemon_Grow_Step1,
+    MovementAction_Finish,
+};
+
 u8 MovementAction_StoreAndLockAnim_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {
     bool32 ableToStore = FALSE;
@@ -8943,8 +9975,578 @@ u8 MovementAction_FlyDown_Step1(struct ObjectEvent *objectEvent, struct Sprite *
     return FALSE;
 }
 
+u8 MovementAction_FollowingPokemon_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
+{    
+    switch(sprite->animNum % 4)
+    {
+        case 0:
+        case 1:
+            sprite->x2 = 0;
+            break;
+        case 2:
+            sprite->x2 = 8;
+            break;
+        case 3:
+            sprite->x2 = -8;
+            break;
+    }
+    if(sprite->data[7] != 1)
+    {
+        sprite->data[7] = 1;
+        sprite->animPaused = FALSE;
+        if(sprite->animNum > 3)
+            sprite->animNum = sprite->animNum % 4;
+        SeekSpriteAnim(sprite, ++sprite->animCmdIndex);        
+    }
+    return FALSE;
+}
+
+void RecreateObjectEvent(struct ObjectEvent *objectEvent, struct Sprite *sprite)
+{
+    u8 newSpriteId;
+    struct ObjectEventTemplate clone;
+    struct ObjectEvent backupFollower = *objectEvent;
+    backupFollower.graphicsId = objectEvent->graphicsId;
+    DestroySprite(sprite);
+    RemoveObjectEvent(objectEvent);
+
+    clone = *GetObjectEventTemplateByLocalIdAndMap(objectEvent->localId, objectEvent->mapNum, objectEvent->mapGroup);
+    clone.graphicsId = objectEvent->graphicsId;
+
+    objectEvent = &gObjectEvents[TrySpawnObjectEventTemplate(&clone, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, clone.x, clone.y)];
+    newSpriteId = objectEvent->spriteId;
+    *objectEvent = backupFollower;
+    objectEvent->spriteId = newSpriteId;
+}
+
+u8 MovementAction_FollowingPokemon_FaceSouth_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
+{
+    RecreateObjectEvent(objectEvent, sprite);
+    sprite->animNum = 0;
+    MoveObjectEventToMapCoords(objectEvent, objectEvent->currentCoords.x, objectEvent->currentCoords.y);
+    sprite->data[2]++;
+    return FALSE;
+}
+
+u8 MovementAction_FollowingPokemon_FaceNorth_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
+{
+    RecreateObjectEvent(objectEvent, sprite);
+    sprite->animNum = 1;
+    MoveObjectEventToMapCoords(objectEvent, objectEvent->currentCoords.x, objectEvent->currentCoords.y);
+    sprite->data[2]++;
+    return FALSE;
+}
+
+u8 MovementAction_FollowingPokemon_FaceWest_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
+{
+    RecreateObjectEvent(objectEvent, sprite);
+    sprite->animNum = 2;
+    sprite->x2 = 8;
+    MoveObjectEventToMapCoords(objectEvent, objectEvent->currentCoords.x, objectEvent->currentCoords.y);
+    sprite->data[2]++;
+    return FALSE;
+}
+
+u8 MovementAction_FollowingPokemon_FaceEast_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
+{
+    RecreateObjectEvent(objectEvent, sprite);
+    sprite->animNum = 3;
+    sprite->x2 = -8;
+    MoveObjectEventToMapCoords(objectEvent, objectEvent->currentCoords.x, objectEvent->currentCoords.y);
+    sprite->data[2]++;
+    return FALSE;
+}
+
+static void PokeballCallback(struct Sprite *sprite)
+{
+    if (++sprite->data[0] == 21)
+        DestroySprite(sprite);
+}
+
+u8 MovementAction_FollowingPokemon_Shrink_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
+{
+    s16 x = objectEvent->currentCoords.x;
+    s16 y = objectEvent->currentCoords.y;
+    u8 spriteId;
+    bool8 playerPriority;
+
+    sprite->data[7] = 1;
+    sprite->oam.affineMode = ST_OAM_AFFINE_NORMAL;
+    InitSpriteAffineAnim(sprite);
+
+    if (objectEvent->facingDirection == DIR_EAST && GetObjectEventGraphicsInfo(objectEvent->graphicsId)->anims != gObjectEventImageAnimTable_FollowingPokemon_UniqueEast && objectEvent->graphicsId != OBJ_EVENT_GFX_KRABBY)
+        StartSpriteAffineAnim(sprite, 2);
+    else
+        StartSpriteAffineAnim(sprite, 0);
+
+    if (y == gObjectEvents[gPlayerAvatar.objectEventId].currentCoords.y) // If follower is to the east or west of player
+    {
+        SetSpritePosToOffsetMapCoords(&x, &y, 8, 8);
+        playerPriority = FALSE;
+    }
+    else if (y < gObjectEvents[gPlayerAvatar.objectEventId].currentCoords.y) // If follower is north of player
+    {
+        SetSpritePosToOffsetMapCoords(&x, &y, 8, 4);
+        playerPriority = TRUE;
+    }
+    else // If follower is south of player
+    {
+        SetSpritePosToOffsetMapCoords(&x, &y, 8, 0);
+        playerPriority = FALSE;
+    }
+
+    switch(GetMonData(&gPlayerParty[GetLeadMonNotFaintedIndex()], MON_DATA_POKEBALL))
+    {
+        case ITEM_MASTER_BALL:
+            spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_MASTER_BALL, &PokeballCallback, x, y, 2);
+            break;
+        case ITEM_ULTRA_BALL:
+            spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_ULTRA_BALL, &PokeballCallback, x, y, 2);
+            break;
+        case ITEM_GREAT_BALL:
+            spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_GREAT_BALL, &PokeballCallback, x, y, 2);
+            break;
+        case ITEM_SAFARI_BALL:
+            spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_SAFARI_BALL, &PokeballCallback, x, y, 2);
+            break;
+        case ITEM_NET_BALL:
+            spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_NET_BALL, &PokeballCallback, x, y, 2);
+            break;
+        case ITEM_DIVE_BALL:
+            spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_DIVE_BALL, &PokeballCallback, x, y, 2);
+            break;
+        case ITEM_NEST_BALL:
+            spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_NEST_BALL, &PokeballCallback, x, y, 2);
+            break;
+        case ITEM_REPEAT_BALL:
+            spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_REPEAT_BALL, &PokeballCallback, x, y, 2);
+            break;
+        case ITEM_TIMER_BALL:
+            spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_TIMER_BALL, &PokeballCallback, x, y, 2);
+            break;
+        case ITEM_LUXURY_BALL:
+            spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_LUXURY_BALL, &PokeballCallback, x, y, 2);
+            break;
+        case ITEM_PREMIER_BALL:
+            spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_PREMIER_BALL, &PokeballCallback, x, y, 2);
+            break;
+        #ifdef ITEM_EXPANSION
+        case ITEM_HEAL_BALL:
+            spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_HEAL_BALL, &PokeballCallback, x, y, 2);
+            break;
+        case ITEM_DUSK_BALL:
+            spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_DUSK_BALL, &PokeballCallback, x, y, 2);
+            break;
+        case ITEM_QUICK_BALL:
+            spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_QUICK_BALL, &PokeballCallback, x, y, 2);
+            break;
+        case ITEM_LEVEL_BALL:
+            spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_LEVEL_BALL, &PokeballCallback, x, y, 2);
+            break;
+        case ITEM_LURE_BALL:
+            spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_LURE_BALL, &PokeballCallback, x, y, 2);
+            break;    
+        case ITEM_MOON_BALL:
+            spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_MOON_BALL, &PokeballCallback, x, y, 2);
+            break;
+        case ITEM_FRIEND_BALL:
+            spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_FRIEND_BALL, &PokeballCallback, x, y, 2);
+            break;
+        case ITEM_LOVE_BALL:
+            spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_LOVE_BALL, &PokeballCallback, x, y, 2);
+            break;
+        case ITEM_FAST_BALL:
+            spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_FAST_BALL, &PokeballCallback, x, y, 2);
+            break;
+        case ITEM_HEAVY_BALL:
+            spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_HEAVY_BALL, &PokeballCallback, x, y, 2);
+            break;
+        case ITEM_DREAM_BALL:
+            spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_DREAM_BALL, &PokeballCallback, x, y, 2);
+            break;
+        case ITEM_SPORT_BALL:
+            spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_SPORT_BALL, &PokeballCallback, x, y, 2);
+            break;
+        case ITEM_PARK_BALL:
+            spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_PARK_BALL, &PokeballCallback, x, y, 2);
+            break;
+        case ITEM_CHERISH_BALL:
+            spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_CHERISH_BALL, &PokeballCallback, x, y, 2);
+            break;
+        #endif
+        default: // PokeBall
+            spriteId = CreateObjectGraphicsSprite(OBJ_EVENT_GFX_ITEM_BALL, &PokeballCallback, x, y, 2);
+            break;
+    }
+
+    if (spriteId != MAX_SPRITES)
+    {
+        gSprites[spriteId].coordOffsetEnabled = TRUE;
+        gSprites[spriteId].oam.priority = 2;
+        gSprites[spriteId].data[0] = 0;
+    }
+
+    if (playerPriority)
+    {
+        gSprites[gPlayerAvatar.spriteId].oam.priority = 1;
+        gSprites[gPlayerAvatar.spriteId].subpriority = 1;
+        gObjectEvents[gPlayerAvatar.objectEventId].fixedPriority = TRUE;
+    }
+
+    sprite->oam.priority = 1;
+    sprite->subpriority = 1;
+
+    sprite->data[2]++;
+    return FALSE;
+}
+
+u8 MovementAction_FollowingPokemon_Shrink_Step1(struct ObjectEvent *objectEvent, struct Sprite *sprite)
+{
+    sprite->data[7]++;
+
+    if (objectEvent->currentCoords.x > gObjectEvents[gPlayerAvatar.objectEventId].currentCoords.x) // east side
+    {
+        switch(objectEvent->facingDirection)
+        {
+            case DIR_EAST:
+                if (sprite->data[7] < 8)
+                    sprite->x2 += sprite->data[7] - 1;
+                else
+                    sprite->x2 += 7;
+                break;
+            case DIR_WEST:
+                if (sprite->data[7] <= 5)
+                {
+                    if (sprite->data[7] > 3)
+                        sprite->x2 += 1 - sprite->data[7];
+                    else
+                        sprite->x2 -= sprite->data[7];
+                }            
+                else if (sprite->data[7] == 6)
+                    sprite->x2 += -5;
+                else
+                    sprite->x2 += 1 - sprite->data[7];
+                break;
+        }
+
+        // Adjust the height of the 64x64 sprites differently
+        if (IsBigSprite(objectEvent->graphicsId))
+        {
+            if (sprite->data[7] < 3)
+                sprite->y2 = sprite->data[7] * 2 + 1;
+            else if (sprite->data[7] < 5)
+                sprite->y2 = sprite->data[7] * 2 + 2;
+            else if (sprite->data[7] < 6)
+                sprite->y2 = sprite->data[7] * 2 + 3;
+            else if (sprite->data[7] < 8)
+                sprite->y2 = sprite->data[7] * 2 + 4;
+            else if (sprite->data[7] < 9)
+                sprite->y2 = sprite->data[7] * 2 + 5;
+            else
+                sprite->y2 = sprite->data[7] * 2 + 6;
+        }
+        else
+        {
+            if (sprite->data[7] >= 10)
+                sprite->y2 = 10;
+            else
+                sprite->y2 = sprite->data[7];
+        }
+    }
+    else if (objectEvent->currentCoords.x < gObjectEvents[gPlayerAvatar.objectEventId].currentCoords.x) // west side
+    {
+        switch(objectEvent->facingDirection)
+        {
+            case DIR_EAST:
+                if (sprite->data[7] <= 5)
+                {
+                    if (sprite->data[7] > 3)
+                        sprite->x2 -= 2 - sprite->data[7];
+                    else
+                        sprite->x2 += sprite->data[7] - 1;
+                }            
+                else if (sprite->data[7] == 6)
+                    sprite->x2 -= -4;
+                else
+                    sprite->x2 -= 2 - sprite->data[7];
+                break;
+            case DIR_WEST:
+                if (sprite->data[7] < 9)
+                    sprite->x2 -= sprite->data[7] - 1;
+                else
+                    sprite->x2 -= 8;
+                break;
+        }
+
+        // Adjust the height of the 64x64 sprites differently
+        if (IsBigSprite(objectEvent->graphicsId))
+        {
+            if (sprite->data[7] < 3)
+                sprite->y2 = sprite->data[7] * 2 + 1;
+            else if (sprite->data[7] < 5)
+                sprite->y2 = sprite->data[7] * 2 + 2;
+            else if (sprite->data[7] < 6)
+                sprite->y2 = sprite->data[7] * 2 + 3;
+            else if (sprite->data[7] < 8)
+                sprite->y2 = sprite->data[7] * 2 + 4;
+            else if (sprite->data[7] < 9)
+                sprite->y2 = sprite->data[7] * 2 + 5;
+            else
+                sprite->y2 = sprite->data[7] * 2 + 6;
+        }
+        else
+        {
+            if (sprite->data[7] >= 10)
+                sprite->y2 = 10;
+            else
+                sprite->y2 = sprite->data[7];
+        }
+    }
+    else if (objectEvent->currentCoords.y > gObjectEvents[gPlayerAvatar.objectEventId].currentCoords.y) // south side
+    {
+        switch(objectEvent->facingDirection)
+        {
+            case DIR_EAST:
+                if (sprite->data[7] < 7)
+                    sprite->x2 += sprite->data[7] - 1;
+                else
+                    sprite->x2 += 6;
+                break;
+            case DIR_WEST:
+                if (sprite->data[7] < 8)
+                    sprite->x2 -= sprite->data[7] - 1;
+                else
+                    sprite->x2 -= 7;
+                break;
+        }
+
+        // Adjust the height of the 64x64 sprites differently
+        if (IsBigSprite(objectEvent->graphicsId))
+        {
+            if (sprite->data[7] < 3)
+                sprite->y2 = sprite->data[7] + 3;
+            else if (sprite->data[7] < 5)
+                sprite->y2 = sprite->data[7] + 4;
+            else if (sprite->data[7] < 6)
+                sprite->y2 = sprite->data[7] + 5;
+            else if (sprite->data[7] < 8)
+                sprite->y2 = sprite->data[7] + 6;
+            else if (sprite->data[7] < 9)
+                sprite->y2 = sprite->data[7] + 7;
+            else
+                sprite->y2 = sprite->data[7] + 8;
+        }
+        else
+            sprite->y2 = 1;
+    }
+    else // north side
+    {
+        switch(objectEvent->facingDirection)
+        {
+            case DIR_EAST:
+                if (sprite->data[7] < 7)
+                    sprite->x2 += sprite->data[7] - 1;
+                else
+                    sprite->x2 += 6;
+                break;
+            case DIR_WEST:
+                if (sprite->data[7] < 8)
+                    sprite->x2 -= sprite->data[7] - 1;
+                else
+                    sprite->x2 -= 7;
+                break;
+        }
+
+        // Adjust the height of the 64x64 sprites differently
+        if (IsBigSprite(objectEvent->graphicsId))
+        {
+            if (sprite->data[7] < 5)
+                sprite->y2 = sprite->data[7] * 2 + 1;
+            else if (sprite->data[7] < 8)
+                sprite->y2 = sprite->data[7] * 2 + 2;
+            else
+                sprite->y2 = sprite->data[7] * 2 + 3;
+        }
+        else
+        {
+            if (sprite->data[7] < 6)
+                sprite->y2 = sprite->data[7];
+            else
+                sprite->y2 = 6;
+        }
+    }
+
+    if (sprite->data[7] >= 11)
+    {
+        FreeSpriteOamMatrix(sprite);
+        gObjectEvents[gPlayerAvatar.objectEventId].fixedPriority = FALSE;
+        objectEvent->invisible = TRUE;
+        sprite->data[2]++;
+    }
+
+    return FALSE;
+}
+
+u8 MovementAction_FollowingPokemon_Grow_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
+{
+    sprite->data[7] = 11;
+    sprite->oam.affineMode = ST_OAM_AFFINE_NORMAL;
+    InitSpriteAffineAnim(sprite);
+
+    if (gObjectEvents[gPlayerAvatar.objectEventId].facingDirection == DIR_EAST && GetObjectEventGraphicsInfo(objectEvent->graphicsId)->anims != gObjectEventImageAnimTable_FollowingPokemon_UniqueEast && objectEvent->graphicsId != OBJ_EVENT_GFX_KRABBY)
+        StartSpriteAffineAnim(sprite, 3);
+    else
+        StartSpriteAffineAnim(sprite, 1);
+
+    switch(gObjectEvents[gPlayerAvatar.objectEventId].facingDirection)
+    {
+        case DIR_SOUTH:
+            sprite->y2 = 6;
+            sprite->x2 = 0;
+            break;
+        case DIR_NORTH:
+            sprite->y2 = 1;
+            sprite->x2 = 0;
+            break;
+        case DIR_EAST:
+            sprite->y2 = 10;
+            sprite->x2 += 9;
+            break;
+        case DIR_WEST:
+            sprite->y2 = 10;
+            sprite->x2 -= 9;
+            break;
+    }
+    sprite->data[2]++;
+    return FALSE;
+}
+
+u8 MovementAction_FollowingPokemon_Grow_Step1(struct ObjectEvent *objectEvent, struct Sprite *sprite)
+{
+    sprite->data[7]--;
+
+    if (sprite->data[7] == 10)
+        gObjectEvents[gSaveBlock2Ptr->follower.objId].invisible = FALSE;
+
+    switch(gObjectEvents[gPlayerAvatar.objectEventId].facingDirection)
+    {
+        case DIR_SOUTH:            
+            if (sprite->data[7] < 6)
+                sprite->y2 = sprite->data[7];
+            else
+                sprite->y2 = 6;
+            break;
+        case DIR_NORTH:
+            sprite->y2 = 1;
+            break;
+        case DIR_WEST:
+            if (sprite->data[7] <= 5)
+            {
+                if (sprite->data[7] > 3)
+                    sprite->x2 += 1 - sprite->data[7];
+                else
+                    sprite->x2 -= sprite->data[7];
+            }            
+            else if (sprite->data[7] == 6)
+                sprite->x2 += -5;
+            else
+                sprite->x2 += 1 - sprite->data[7];
+
+            if (sprite->data[7] >= 10)
+                sprite->y2 = 10;
+            else
+                sprite->y2 = sprite->data[7];
+
+            break;
+        case DIR_EAST:
+            if (sprite->data[7] <= 5)
+            {
+                if (sprite->data[7] > 3)
+                    sprite->x2 -= 2 - sprite->data[7];
+                else
+                    sprite->x2 += sprite->data[7] - 1;
+            }            
+            else if (sprite->data[7] == 6)
+                sprite->x2 -= -4;
+            else
+                sprite->x2 -= 2 - sprite->data[7];
+
+            if (sprite->data[7] >= 10)
+                sprite->y2 = 10;
+            else
+                sprite->y2 = sprite->data[7];
+
+            break;
+    }
+
+    // Adjust the height of the 64x64 sprites differently
+    if (IsBigSprite(objectEvent->graphicsId))
+    {
+        if (sprite->data[7] > 9)
+            sprite->y2 -= (11 - sprite->data[7]) + 2;
+        else if (sprite->data[7] > 7)
+            sprite->y2 -= (11 - sprite->data[7]) + 3;
+        else if (sprite->data[7] > 6)
+            sprite->y2 -= (11 - sprite->data[7]) + 4;
+        else if (sprite->data[7] > 4)
+            sprite->y2 -= (11 - sprite->data[7]) + 5;
+        else if (sprite->data[7] > 3)
+            sprite->y2 -= (11 - sprite->data[7]) + 6;
+        else
+            sprite->y2 -= (11 - sprite->data[7]) + 7;
+    }
+
+    if (sprite->data[7] <= 1)
+    {
+        // Set y2 of the 64x64 sprites back to 0, and compensate with y.
+        if (IsBigSprite(objectEvent->graphicsId))
+        {
+            sprite->y -= 16;
+            sprite->y2 = 0;
+        }
+
+        FreeSpriteOamMatrix(sprite);
+        
+        // Make sure water ripples at the feet of the follower if they are appearing on top of shallow water.
+        if (MetatileBehavior_IsShallowFlowingWater(MapGridGetMetatileBehaviorAt(objectEvent->currentCoords.x, objectEvent->currentCoords.y)))
+        {
+            objectEvent->inShallowFlowingWater = TRUE;
+            StartFieldEffectForObjectEvent(FLDEFF_FEET_IN_FLOWING_WATER, objectEvent);
+        }
+        
+        sprite->data[2]++;
+    }
+
+    return FALSE;
+}
+
 // though this function returns TRUE without doing anything, this header is required due to being in an array of functions which needs it.
 u8 MovementAction_Fly_Finish(struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {
     return TRUE;
+}
+
+// NEW
+u16 GetMiniStepCount(u8 speed)
+{
+    return (u16)sStepTimes[speed];
+}
+
+void RunMiniStep(struct Sprite *sprite, u8 speed, u8 currentFrame)
+{
+    sNpcStepFuncTables[speed][currentFrame](sprite, sprite->data[3]);
+}
+
+bool8 PlayerIsUnderWaterfall(struct ObjectEvent *objectEvent)
+{
+    s16 x;
+    s16 y;
+
+    x = objectEvent->currentCoords.x;
+    y = objectEvent->currentCoords.y;
+    MoveCoordsInDirection(DIR_NORTH, &x, &y, 0, 1);
+    if (MetatileBehavior_IsWaterfall(MapGridGetMetatileBehaviorAt(x, y)))
+        return TRUE;
+
+    return FALSE;
 }

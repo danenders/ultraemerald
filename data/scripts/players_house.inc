@@ -69,8 +69,6 @@ PlayersHouse_2F_EventScript_WallClock::
 	checkplayergender
 	call_if_eq VAR_RESULT, MALE, PlayersHouse_2F_EventScript_MomComesUpstairsMale
 	call_if_eq VAR_RESULT, FEMALE, PlayersHouse_2F_EventScript_MomComesUpstairsFemale
-	playse SE_EXIT
-	removeobject VAR_0x8008
 	releaseall
 	end
 
@@ -83,8 +81,14 @@ PlayersHouse_2F_EventScript_MomComesUpstairsMale::
 	waitmovement 0
 	msgbox PlayersHouse_2F_Text_HowDoYouLikeYourRoom, MSGBOX_DEFAULT
 	closemessage
-	applymovement VAR_0x8008, PlayersHouse_2F_Movement_MomExitsMale
+	call_if_unset FLAG_SET_COSTUME, PlayersHouse_2F_EventScript_ChangeYourClothes
+	applymovement VAR_0x8008, PlayersHouse_2F_Movement_MomWaitAtDoorMale
 	waitmovement 0
+	return
+
+PlayersHouse_2F_EventScript_ChangeYourClothes::
+	msgbox PlayersHouse_2F_Text_ChangeYourClothes, MSGBOX_DEFAULT
+	closemessage
 	return
 
 PlayersHouse_2F_EventScript_MomComesUpstairsFemale::
@@ -96,9 +100,16 @@ PlayersHouse_2F_EventScript_MomComesUpstairsFemale::
 	waitmovement 0
 	msgbox PlayersHouse_2F_Text_HowDoYouLikeYourRoom, MSGBOX_DEFAULT
 	closemessage
-	applymovement VAR_0x8008, PlayersHouse_2F_Movement_MomExitsFemale
+	call_if_unset FLAG_SET_COSTUME, PlayersHouse_2F_EventScript_ChangeYourClothes
+	applymovement VAR_0x8008, PlayersHouse_2F_Movement_MomWaitAtDoorFemale
 	waitmovement 0
 	return
+
+PlayersHouse_2F_EventScript_MomExit::
+	playse SE_EXIT
+	removeobject VAR_0x8008
+	releaseall
+	end
 
 PlayersHouse_2F_EventScript_CheckWallClock::
 	incrementgamestat GAME_STAT_CHECKED_CLOCK
@@ -123,10 +134,9 @@ PlayersHouse_2F_Movement_MomEntersMale:
 	walk_left
 	step_end
 
-PlayersHouse_2F_Movement_MomExitsMale:
+PlayersHouse_2F_Movement_MomWaitAtDoorMale:
 	walk_right
-	walk_up
-	delay_8
+	face_down
 	step_end
 
 PlayersHouse_2F_Movement_MomEntersFemale:
@@ -138,8 +148,22 @@ PlayersHouse_2F_Movement_MomEntersFemale:
 	walk_right
 	step_end
 
-PlayersHouse_2F_Movement_MomExitsFemale:
+PlayersHouse_2F_Movement_MomWaitAtDoorFemale:
 	walk_left
+	face_down
+	step_end
+
+PlayersHouse_2F_EventScript_YouLookNice::
+	msgbox PlayersHouse_2F_Text_YouLookNice, MSGBOX_DEFAULT
+	closemessage
+	applymovement VAR_0x8008, PlayersHouse_2F_Movement_MomExits
+	waitmovement 0
+	playse SE_EXIT
+	removeobject VAR_0x8008
+	releaseall
+	end
+
+PlayersHouse_2F_Movement_MomExits:
 	walk_up
 	delay_8
 	step_end

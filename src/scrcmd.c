@@ -8,6 +8,7 @@
 #include "contest_util.h"
 #include "contest_painting.h"
 #include "data.h"
+#include "day_night.h"
 #include "decoration.h"
 #include "decoration_inventory.h"
 #include "event_data.h"
@@ -62,6 +63,7 @@ static EWRAM_DATA u16 sMovingNpcMapNum = 0;
 static EWRAM_DATA u16 sFieldEffectScriptId = 0;
 
 static u8 sBrailleWindowId;
+static bool8 gIsScriptedWildDouble;
 
 extern const SpecialFunc gSpecials[];
 extern const u8 *gStdScripts[];
@@ -699,6 +701,7 @@ bool8 ScrCmd_gettime(struct ScriptContext *ctx)
     gSpecialVar_0x8000 = gLocalTime.hours;
     gSpecialVar_0x8001 = gLocalTime.minutes;
     gSpecialVar_0x8002 = gLocalTime.seconds;
+    gSpecialVar_0x8003 = GetCurrentTimeOfDay();
     return FALSE;
 }
 
@@ -1179,7 +1182,7 @@ bool8 ScrCmd_setobjectmovementtype(struct ScriptContext *ctx)
 
 bool8 ScrCmd_createvobject(struct ScriptContext *ctx)
 {
-    u8 graphicsId = ScriptReadByte(ctx);
+    u16 graphicsId = ScriptReadHalfword(ctx);
     u8 virtualObjId = ScriptReadByte(ctx);
     u16 x = VarGet(ScriptReadHalfword(ctx));
     u32 y = VarGet(ScriptReadHalfword(ctx));
@@ -1874,15 +1877,37 @@ bool8 ScrCmd_setwildbattle(struct ScriptContext *ctx)
     u16 species = ScriptReadHalfword(ctx);
     u8 level = ScriptReadByte(ctx);
     u16 item = ScriptReadHalfword(ctx);
+    u16 species2 = ScriptReadHalfword(ctx);
+    u8 level2 = ScriptReadByte(ctx);
+    u16 item2 = ScriptReadHalfword(ctx);
 
-    CreateScriptedWildMon(species, level, item);
+    if(species2 == SPECIES_NONE)
+    {
+        CreateScriptedWildMon(species, level, item);
+        gIsScriptedWildDouble = FALSE;
+    }
+    else
+    { 
+        CreateScriptedDoubleWildMon(species, level, item, species2, level2, item2);
+        gIsScriptedWildDouble = TRUE;
+    }
+
     return FALSE;
 }
 
 bool8 ScrCmd_dowildbattle(struct ScriptContext *ctx)
 {
-    BattleSetup_StartScriptedWildBattle();
-    ScriptContext1_Stop();
+    if(gIsScriptedWildDouble == FALSE)
+    {
+        BattleSetup_StartScriptedWildBattle();
+        ScriptContext1_Stop();
+    }
+    else
+    {
+        BattleSetup_StartScriptedDoubleWildBattle();
+        ScriptContext1_Stop();
+    }
+
     return TRUE;
 }
 
@@ -2307,4 +2332,80 @@ bool8 ScrCmd_warpwhitefade(struct ScriptContext *ctx)
     DoWhiteFadeWarp();
     ResetInitialPlayerAvatarState();
     return TRUE;
+}
+
+bool8 ScrCmd_pokemonfaceplayer(struct ScriptContext *ctx)
+{
+    // The script will affect the following Pokemon if no argument is passed to it.
+    if(gSpecialVar_Unused_0x8014 == OBJ_EVENT_ID_FOLLOWER)
+    {
+        ObjectEventClearHeldMovement(&gObjectEvents[gSaveBlock2Ptr->follower.objId]);
+        ObjectEventPokemonFacePlayer(&gObjectEvents[gSaveBlock2Ptr->follower.objId], &gObjectEvents[gPlayerAvatar.objectEventId]);
+    }
+    // The script will affect an event object based on the local id passed to the script.
+    else
+    {
+        gSpecialVar_Unused_0x8014 = GetObjectEventIdByLocalIdAndMap(gSpecialVar_Unused_0x8014, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup);
+        ObjectEventClearHeldMovement(&gObjectEvents[gSpecialVar_Unused_0x8014]);
+
+        #define POW2(num) (num * num)
+
+        // Checks to see whether the object is furthest away from the player along the x or y axis.
+        if(POW2((gObjectEvents[gSpecialVar_Unused_0x8014].currentCoords.x - gObjectEvents[gPlayerAvatar.objectEventId].currentCoords.x)) < POW2((gObjectEvents[gSpecialVar_Unused_0x8014].currentCoords.y - gObjectEvents[gPlayerAvatar.objectEventId].currentCoords.y)))
+        {
+            // Player is South of object
+            if(gObjectEvents[gSpecialVar_Unused_0x8014].currentCoords.y < gObjectEvents[gPlayerAvatar.objectEventId].currentCoords.y)
+            {
+                ObjectEventSetHeldMovement(&gObjectEvents[gSpecialVar_Unused_0x8014], 159);
+            }
+            // Player is North of object
+            else
+            {
+                ObjectEventSetHeldMovement(&gObjectEvents[gSpecialVar_Unused_0x8014], 160);
+            }
+        }
+        else
+        {
+            // Player is East of object
+            if(gObjectEvents[gSpecialVar_Unused_0x8014].currentCoords.x < gObjectEvents[gPlayerAvatar.objectEventId].currentCoords.x)
+            {
+                ObjectEventSetHeldMovement(&gObjectEvents[gSpecialVar_Unused_0x8014], 162);
+            }
+            // Player is West of object
+            else
+            {
+                ObjectEventSetHeldMovement(&gObjectEvents[gSpecialVar_Unused_0x8014], 161);
+            }
+        }
+    }
+    return TRUE;
+}
+
+// follow me script commands
+#include "follow_me.h"
+bool8 ScrCmd_setfollower(struct ScriptContext *ctx)
+{
+    u8 localId = ScriptReadByte(ctx);
+    u16 flags = ScriptReadHalfword(ctx);
+
+    SetUpFollowerSprite(localId, flags);
+    return FALSE;
+}
+
+bool8 ScrCmd_destroyfollower(struct ScriptContext *ctx)
+{
+    DestroyFollower();
+    return FALSE;
+}
+
+bool8 ScrCmd_facefollower(struct ScriptContext *ctx)
+{
+    PlayerFaceFollowerSprite();
+    return FALSE;
+}
+
+bool8 ScrCmd_checkfollower(struct ScriptContext *ctx)
+{
+    CheckPlayerHasFollower();
+    return FALSE;
 }

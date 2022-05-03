@@ -5,6 +5,7 @@ extern bool8 gBikeCyclingChallenge;
 extern u8 gBikeCollisions;
 
 u8 GetLeadMonIndex(void);
+u8 GetLeadMonNotFaintedIndex(void);
 u8 IsDestinationBoxFull(void);
 u16 GetPCBoxToSendMon(void);
 bool8 InMultiPartnerRoom(void);
@@ -31,5 +32,6 @@ bool8 UsedPokemonCenterWarp(void);
 void ResetFanClub(void);
 bool8 ShouldShowBoxWasFullMessage(void);
 void SetPCBoxToSendMon(u8 boxId);
+u8 GetPlayerCostumeId(void);
 
 #endif // GUARD_FIELD_SPECIALS_H
