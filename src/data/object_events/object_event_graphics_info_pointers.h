@@ -839,6 +839,7 @@ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_DawnPlatinumWateri
 const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_DawnPlatinumDecorating;
 
 const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Enby;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_SnorlaxSleeping;
 
 //Hats
 const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_BrendanHat;
@@ -1685,6 +1686,8 @@ const struct ObjectEventGraphicsInfo *const gObjectEventGraphicsInfoPointers[NUM
     [OBJ_EVENT_GFX_SCHOOL_KID_F] =           		 &gObjectEventGraphicsInfo_SchoolKidF,
     [OBJ_EVENT_GFX_COOL_TRAINER_M] =           	 	 &gObjectEventGraphicsInfo_CoolTrainerM,
     [OBJ_EVENT_GFX_COOL_TRAINER_F] =       		 	 &gObjectEventGraphicsInfo_CoolTrainerF,
+
+    [OBJ_EVENT_GFX_SNORLAX_SLEEPING] =           	 &gObjectEventGraphicsInfo_SnorlaxSleeping,
 };
 
 const struct ObjectEventGraphicsInfo *const gMauvilleOldManGraphicsInfoPointers[] = {

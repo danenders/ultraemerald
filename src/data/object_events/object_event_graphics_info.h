@@ -850,6 +850,7 @@ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Probopass = {0xFFF
 const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Chingling = {0xFFFF, OBJ_EVENT_PAL_TAG_CHINGLING, OBJ_EVENT_PAL_TAG_NONE, 512, 32, 32, 10, SHADOW_SIZE_M, FALSE, FALSE, TRACKS_NONE, &gObjectEventBaseOam_32x32, sOamTables_32x32, gObjectEventImageAnimTable_FollowingPokemon, gObjectEventPicTable_Chingling, FollowerAffineTable};
 const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_PorygonZ = {0xFFFF, OBJ_EVENT_PAL_TAG_PORYGON_Z, OBJ_EVENT_PAL_TAG_NONE, 512, 32, 32, 10, SHADOW_SIZE_M, FALSE, FALSE, TRACKS_NONE, &gObjectEventBaseOam_32x32, sOamTables_32x32, gObjectEventImageAnimTable_FollowingPokemon, gObjectEventPicTable_PorygonZ, FollowerAffineTable};
 
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_SnorlaxSleeping = {TAG_NONE, OBJ_EVENT_PAL_TAG_SNORLAX, OBJ_EVENT_PAL_TAG_NONE, 1152, 48, 48, 10, SHADOW_SIZE_M, TRUE, FALSE, TRACKS_NONE, &gObjectEventBaseOam_32x32, sOamTables_48x48, sAnimTable_Inanimate, sPicTable_SnorlaxSleeping, gDummySpriteAffineAnimTable};
 
 
 

@@ -2431,3 +2431,7 @@ $(OBJEVENTGFXDIR)/people/ruby_sapphire_may/watering.4bpp: %.4bpp: %.png
 
 $(OBJEVENTGFXDIR)/people/ruby_sapphire_may/underwater.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -mwidth 4 -mheight 4
+
+
+$(OBJEVENTGFXDIR)/pokemon/snorlax_sleep.4bpp: %.4bpp: %.png
+	$(GFX) $< $@ -mwidth 6 -mheight 6

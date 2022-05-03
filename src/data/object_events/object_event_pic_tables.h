@@ -7952,3 +7952,7 @@ static const struct SpriteFrameImage sPicTable_LucasPlatinumHat[] = {
 static const struct SpriteFrameImage sPicTable_DawnPlatinumHat[] = {
     obj_frame_tiles(gObjectEventPic_DawnPlatinumHat),
 };
+
+static const struct SpriteFrameImage sPicTable_SnorlaxSleeping[] = {
+    obj_frame_tiles(gObjectEventPic_SnorlaxSleeping),
+};
