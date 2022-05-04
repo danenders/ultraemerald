@@ -660,6 +660,8 @@ const u8 gText_Dissatisfied[] = _("Dissatisfied");
 const u8 gText_DeepSeaTooth[] = _("DEEPSEATOOTH");
 const u8 gText_DeepSeaScale[] = _("DEEPSEASCALE");
 
+const u8 gText_ThrowInPremierBalls[] = _("I'll throw in some Premier Balls, too.{PAUSE_UNTIL_PRESS}");
+
 const u8 gText_SportyOutfit[] = _("Sporty");
 const u8 gText_StylishOutfit[] = _("Stylish");
 const u8 gText_ClassicOutfit[] = _("Classic");
