@@ -929,6 +929,7 @@
 #define ITEM_SAPPHIRE 757
 
 #define ITEMS_COUNT 758
+
 #define ITEM_FIELD_ARROW ITEMS_COUNT
 
 // Range of berries given out by various NPCS
