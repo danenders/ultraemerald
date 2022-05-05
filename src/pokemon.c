@@ -5891,7 +5891,8 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
         if (gMain.inBattle)
             holdEffect = gEnigmaBerries[gBattlerInMenuId].holdEffect;
         else
-            holdEffect = gSaveBlock1Ptr->enigmaBerry.holdEffect;
+            //holdEffect = gSaveBlock1Ptr->enigmaBerry.holdEffect;
+            holdEffect = 0;
     }
     else
     {
@@ -5932,7 +5933,8 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
         if (gMain.inBattle)
             itemEffect = gEnigmaBerries[gActiveBattler].itemEffect;
         else
-            itemEffect = gSaveBlock1Ptr->enigmaBerry.itemEffect;
+            //itemEffect = gSaveBlock1Ptr->enigmaBerry.itemEffect;
+            itemEffect = 0;
     }
     else
     {
@@ -6692,7 +6694,8 @@ u8 *UseStatIncreaseItem(u16 itemId)
         if (gMain.inBattle)
             itemEffect = gEnigmaBerries[gBattlerInMenuId].itemEffect;
         else
-            itemEffect = gSaveBlock1Ptr->enigmaBerry.itemEffect;
+            //itemEffect = gSaveBlock1Ptr->enigmaBerry.itemEffect;
+            itemEffect = 0;
     }
     else
     {
@@ -6790,7 +6793,8 @@ u16 GetEvolutionTargetSpecies(struct Pokemon *mon, u8 mode, u16 evolutionItem, u
     u16 currentMap;
 
     if (heldItem == ITEM_ENIGMA_BERRY_E_READER)
-        holdEffect = gSaveBlock1Ptr->enigmaBerry.holdEffect;
+        //holdEffect = gSaveBlock1Ptr->enigmaBerry.holdEffect;
+        holdEffect = 0;
     else
         holdEffect = ItemId_GetHoldEffect(heldItem);
 
@@ -7351,7 +7355,8 @@ void AdjustFriendship(struct Pokemon *mon, u8 event)
         if (gMain.inBattle)
             holdEffect = gEnigmaBerries[0].holdEffect;
         else
-            holdEffect = gSaveBlock1Ptr->enigmaBerry.holdEffect;
+            //holdEffect = gSaveBlock1Ptr->enigmaBerry.holdEffect;
+            holdEffect = 0;
     }
     else
     {
@@ -7408,7 +7413,8 @@ void MonGainEVs(struct Pokemon *mon, u16 defeatedSpecies)
         if (gMain.inBattle)
             holdEffect = gEnigmaBerries[0].holdEffect;
         else
-            holdEffect = gSaveBlock1Ptr->enigmaBerry.holdEffect;
+            //holdEffect = gSaveBlock1Ptr->enigmaBerry.holdEffect;
+            holdEffect = 0;
     }
     else
     {
