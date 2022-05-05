@@ -754,8 +754,8 @@ const u8 gText_SouthernIsland[] = _("SOUTHERN ISLAND");
 const u8 gText_BirthIsland[] = _("BIRTH ISLAND");
 const u8 gText_FarawayIsland[] = _("FARAWAY ISLAND");
 const u8 gText_NavelRock[] = _("NAVEL ROCK");
-const u8 gText_ClawFossil[] = _("CLAW FOSSIL");
-const u8 gText_RootFossil[] = _("ROOT FOSSIL");
+const u8 gText_ClawFossil[] = _("Claw Fossil");
+const u8 gText_RootFossil[] = _("Root Fossil");
 const u8 gText_No4[] = _("NO");
 const u8 gText_IllBattleNow[] = _("I'll battle now!");
 const u8 gText_IWon[] = _("I won!");
@@ -1954,3 +1954,8 @@ const u8 gText_FORMS_NONE[]                         = _("{STR_VAR_1} has no alte
 
 const u8 gOtherText_ExpShareOn[] = _("Turned on the Exp. Share.\pParty will now gain a portion\nof the Experience Points.{PAUSE_UNTIL_PRESS}");
 const u8 gOtherText_ExpShareOff[] = _("Turned off the Exp. Share.\pParty will no longer gain a portion\nof any Experience Points.{PAUSE_UNTIL_PRESS}");
+
+const u8 gText_DomeFossil[] = _("Dome Fossil");
+const u8 gText_HelixFossil[] = _("Helix Fossil");
+const u8 gText_OldAmber[] = _("Old Amber");
+

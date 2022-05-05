@@ -3156,4 +3156,8 @@ extern const u8 gText_ThrowInPremierBalls[];
 extern const u8 gOtherText_ExpShareOn[];
 extern const u8 gOtherText_ExpShareOff[];
 
+extern const u8 gText_DomeFossil[];
+extern const u8 gText_HelixFossil[];
+extern const u8 gText_OldAmber[];
+
 #endif // GUARD_STRINGS_H
