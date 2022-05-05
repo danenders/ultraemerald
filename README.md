@@ -1,7 +1,6 @@
 # pokeemerald Expansion
 
 ## What is the pokeemerald Expansion?
-
 The pokeemerald Expansion is a collection of feature branches that can be integrated into existing [pokeemerald](https://github.com/pret/pokeemerald) projects.
 
 ## What feature branches are included?

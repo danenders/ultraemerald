@@ -50,4 +50,3 @@ gText_Birch_AreYouReady::
     .string "A world of dreams and adventures\n"
     .string "with Pokémon awaits! Let's go!\p"
     .string "$"
-
