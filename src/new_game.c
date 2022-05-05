@@ -206,6 +206,7 @@ void NewGameInitData(void)
     ResetContestLinkResults();
     memset(&gSaveBlock2Ptr->follower, 0, sizeof(gSaveBlock2Ptr->follower));
     gSaveBlock2Ptr->costumeId = 0;
+    gSaveBlock2Ptr->expShare = 0;
 }
 
 static void ResetMiniGamesRecords(void)
