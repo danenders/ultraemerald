@@ -522,13 +522,6 @@ static void (*const sTextPrinterFunctions[])(void) =
 static const u8 sMemoNatureTextColor[] = _("{COLOR 5}{SHADOW 6}");
 static const u8 sMemoMiscTextColor[] = _("{COLOR 7}{SHADOW 8}");
 
-
-static const u8 sMemoHiddenNatureTextColor[] = _(" ({COLOR BLUE}{SHADOW DARK_GRAY}");
-static const u8 sText_EndParentheses[] = _("{COLOR WHITE}{SHADOW DARK_GRAY})");
-static const u8 sStatsLeftColumnLayout[] = _("{DYNAMIC 0x00}/{DYNAMIC 0x01}\n{DYNAMIC 0x02}\n{DYNAMIC 0x03}");
-
-
-
 #define TAG_MOVE_SELECTOR   30000
 #define TAG_MON_STATUS      30001
 #define TAG_MOVE_TYPES      30002
@@ -3092,7 +3085,15 @@ static void BufferCharacteristicString(void)
     }
 
     DynamicPlaceholderTextUtil_SetPlaceholderPtr(6, gCharacteristicPointers[(highestValue % 5) * 6 + highestIV]);
-    DynamicPlaceholderTextUtil_SetPlaceholderPtr(7, gNatureFlavorPointers[sum->nature]);
+    if (sum->hiddenNature != HIDDEN_NATURE_NONE)
+    {
+        DynamicPlaceholderTextUtil_SetPlaceholderPtr(7, gNatureFlavorPointers[sum->hiddenNature]);
+    }
+    else
+    {
+        DynamicPlaceholderTextUtil_SetPlaceholderPtr(7, gNatureFlavorPointers[sum->nature]);
+    }
+    
 }
 
 static void GetMetLevelString(u8 *output)
@@ -3271,223 +3272,121 @@ static void PrintSkillsPage(void)
     s64 numHPBarTicks;
     u16 *dst;
     struct Pokemon *mon = &sMonSummaryScreen->currentMon;
-    struct PokeSummary *sum = &sMonSummaryScreen->summary;
     struct PokeSummary *summary = &sMonSummaryScreen->summary;
 
-    if (sum->hiddenNature != HIDDEN_NATURE_NONE)
+    u8 natureStatType;
+    const s8 *natureMod = gNatureStatTable[natureStatType];
+
+    if (summary->hiddenNature != HIDDEN_NATURE_NONE) 
     {
-      const s8 *natureMod = gNatureStatTable[sMonSummaryScreen->summary.hiddenNature];
+       natureStatType = summary->hiddenNature;
+    } else 
+    {
+       natureStatType = summary->nature;
+    }
 
-        FillWindowPixelBuffer(PSS_LABEL_PANE_RIGHT, PIXEL_FILL(0));
+    FillWindowPixelBuffer(PSS_LABEL_PANE_RIGHT, PIXEL_FILL(0));
 
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gText_HP3, 12, 1, 0, PSS_COLOR_WHITE_BLACK_SHADOW);
-        if (sMonSummaryScreen->currStatIndex == 0)
-        {
-            ConvertIntToDecimalStringN(gStringVar1, summary->currentHP, STR_CONV_MODE_LEFT_ALIGN, 3);
-            StringAppend(gStringVar1, gText_Slash);
-            ConvertIntToDecimalStringN(gStringVar2, summary->maxHP, STR_CONV_MODE_LEFT_ALIGN, 3);
-            StringAppend(gStringVar1, gStringVar2);
-        }
-        else if (sMonSummaryScreen->currStatIndex == 1)
-        {
-            ConvertIntToDecimalStringN(gStringVar1, summary->hpIV, STR_CONV_MODE_LEFT_ALIGN, 2);
-        }
-        else
-        {
-            ConvertIntToDecimalStringN(gStringVar1, summary->hpEV, STR_CONV_MODE_LEFT_ALIGN, 3);
-        }
-            x = GetStringCenterAlignXOffset(1, gStringVar1, 72) + 76;
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gStringVar1, x, 1, 0, 0);
-
-        numHPBarTicks = summary->currentHP * 64 / summary->maxHP;
-        if (numHPBarTicks == 0 && summary->currentHP != 0)
-            numHPBarTicks = 1;
-        if (natureMod[STAT_ATK - 1] > 0)
-            PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureUp, 0, 24, 0, COLOR_STAT_ARROWS);
-        else if (natureMod[STAT_ATK - 1] < 0)
-            PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureDown, 0, 24, 0, COLOR_STAT_ARROWS);
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_Attack, 12, 24, 0, 1);
-        if (sMonSummaryScreen->currStatIndex == 0)
-            ConvertIntToDecimalStringN(gStringVar1, summary->atk, STR_CONV_MODE_LEFT_ALIGN, 3);
-        else if (sMonSummaryScreen->currStatIndex == 1)
-            ConvertIntToDecimalStringN(gStringVar1, summary->atkIV, STR_CONV_MODE_LEFT_ALIGN, 2);
-        else
-            ConvertIntToDecimalStringN(gStringVar1, summary->atkEV, STR_CONV_MODE_LEFT_ALIGN, 3);
-        x = GetStringCenterAlignXOffset(1, gStringVar1, 72) + 76;
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gStringVar1, x, 24, 0, 0);
-
-        if (natureMod[STAT_DEF - 1] > 0)
-            PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureUp, 0, 40, 0, COLOR_STAT_ARROWS);
-        else if (natureMod[STAT_DEF - 1] < 0)
-            PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureDown, 0, 40, 0, COLOR_STAT_ARROWS);
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_Defense, 12, 40, 0, 1);
-        if (sMonSummaryScreen->currStatIndex == 0)
-            ConvertIntToDecimalStringN(gStringVar1, summary->def, STR_CONV_MODE_LEFT_ALIGN, 3);
-        else if (sMonSummaryScreen->currStatIndex == 1)
-            ConvertIntToDecimalStringN(gStringVar1, summary->defIV, STR_CONV_MODE_LEFT_ALIGN, 2);
-        else
-            ConvertIntToDecimalStringN(gStringVar1, summary->defEV, STR_CONV_MODE_LEFT_ALIGN, 3);
-        x = GetStringCenterAlignXOffset(1, gStringVar1, 72) + 76;
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gStringVar1, x, 40, 0, 0);
-
-        if (natureMod[STAT_SPATK - 1] > 0)
-            PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureUp, 0, 56, 0, COLOR_STAT_ARROWS);
-        else if (natureMod[STAT_SPATK - 1] < 0)
-            PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureDown, 0, 56, 0, COLOR_STAT_ARROWS);
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_SpecialAttack, 12, 56, 0, PSS_COLOR_WHITE_BLACK_SHADOW);
-        if (sMonSummaryScreen->currStatIndex == 0)
-            ConvertIntToDecimalStringN(gStringVar1, summary->spatk, STR_CONV_MODE_LEFT_ALIGN, 3);
-        else if (sMonSummaryScreen->currStatIndex == 1)
-            ConvertIntToDecimalStringN(gStringVar1, summary->spatkIV, STR_CONV_MODE_LEFT_ALIGN, 2);
-        else
-            ConvertIntToDecimalStringN(gStringVar1, summary->spatkEV, STR_CONV_MODE_LEFT_ALIGN, 3);
-        x = GetStringCenterAlignXOffset(1, gStringVar1, 72) + 76;
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gStringVar1, x, 56, 0, 0);
-
-        if (natureMod[STAT_SPDEF - 1] > 0)
-            PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureUp, 0, 72, 0, COLOR_STAT_ARROWS);
-        else if (natureMod[STAT_SPDEF - 1] < 0)
-            PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureDown, 0, 72, 0, COLOR_STAT_ARROWS);
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_SpecialDefense, 12, 72, 0, 1);
-        if (sMonSummaryScreen->currStatIndex == 0)
-            ConvertIntToDecimalStringN(gStringVar1, summary->spdef, STR_CONV_MODE_LEFT_ALIGN, 3);
-        else if (sMonSummaryScreen->currStatIndex == 1)
-            ConvertIntToDecimalStringN(gStringVar1, summary->spdefIV, STR_CONV_MODE_LEFT_ALIGN, 2);
-        else
-            ConvertIntToDecimalStringN(gStringVar1, summary->spdefEV, STR_CONV_MODE_LEFT_ALIGN, 3);
-        x = GetStringCenterAlignXOffset(1, gStringVar1, 72) + 76;
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gStringVar1, x, 72, 0, PSS_COLOR_BLACK_GRAY_SHADOW);
-
-        if (natureMod[STAT_SPEED - 1] > 0)
-            PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureUp, 0, 88, 0, COLOR_STAT_ARROWS);
-        else if (natureMod[STAT_SPEED - 1] < 0)
-            PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureDown, 0, 88, 0, COLOR_STAT_ARROWS);
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_Speed, 12, 88, 0, PSS_COLOR_WHITE_BLACK_SHADOW);
-        if (sMonSummaryScreen->currStatIndex == 0)
-            ConvertIntToDecimalStringN(gStringVar1, summary->speed, STR_CONV_MODE_LEFT_ALIGN, 3);
-        else if (sMonSummaryScreen->currStatIndex == 1)
-            ConvertIntToDecimalStringN(gStringVar1, summary->speedIV, STR_CONV_MODE_LEFT_ALIGN, 2);
-        else
-            ConvertIntToDecimalStringN(gStringVar1, summary->speedEV, STR_CONV_MODE_LEFT_ALIGN, 3);
-        x = GetStringCenterAlignXOffset(1, gStringVar1, 72) + 76;
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gStringVar1, x, 88, 0, PSS_COLOR_BLACK_GRAY_SHADOW);
-
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_Ability, 8, 112, 0, PSS_COLOR_WHITE_BLACK_SHADOW);
-        StringCopy(gStringVar1, gAbilityNames[GetAbilityBySpecies(sMonSummaryScreen->summary.species, summary->abilityNum)]);
-        x = GetStringCenterAlignXOffset(1, gStringVar1, 88) + 58;
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gStringVar1, x, 112, 0, PSS_COLOR_BLACK_GRAY_SHADOW);
-        StringCopy(gStringVar1, gAbilityDescriptionPointers[GetAbilityBySpecies(sMonSummaryScreen->summary.species, summary->abilityNum)]);
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gStringVar1, 8, 128, 0, PSS_COLOR_BLACK_GRAY_SHADOW);
-        ScheduleBgCopyTilemapToVram(0);
-        PutWindowTilemap(PSS_LABEL_PANE_RIGHT);  
+    PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gText_HP3, 12, 1, 0, PSS_COLOR_WHITE_BLACK_SHADOW);
+    if (sMonSummaryScreen->currStatIndex == 0)
+    {
+        ConvertIntToDecimalStringN(gStringVar1, summary->currentHP, STR_CONV_MODE_LEFT_ALIGN, 3);
+        StringAppend(gStringVar1, gText_Slash);
+        ConvertIntToDecimalStringN(gStringVar2, summary->maxHP, STR_CONV_MODE_LEFT_ALIGN, 3);
+        StringAppend(gStringVar1, gStringVar2);
+    }
+    else if (sMonSummaryScreen->currStatIndex == 1)
+    {
+        ConvertIntToDecimalStringN(gStringVar1, summary->hpIV, STR_CONV_MODE_LEFT_ALIGN, 2);
     }
     else
     {
-        const s8 *natureMod = gNatureStatTable[sMonSummaryScreen->summary.nature];
-
-        FillWindowPixelBuffer(PSS_LABEL_PANE_RIGHT, PIXEL_FILL(0));
-
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gText_HP3, 12, 1, 0, PSS_COLOR_WHITE_BLACK_SHADOW);
-        if (sMonSummaryScreen->currStatIndex == 0)
-        {
-            ConvertIntToDecimalStringN(gStringVar1, summary->currentHP, STR_CONV_MODE_LEFT_ALIGN, 3);
-            StringAppend(gStringVar1, gText_Slash);
-            ConvertIntToDecimalStringN(gStringVar2, summary->maxHP, STR_CONV_MODE_LEFT_ALIGN, 3);
-            StringAppend(gStringVar1, gStringVar2);
-        }
-        else if (sMonSummaryScreen->currStatIndex == 1)
-        {
-            ConvertIntToDecimalStringN(gStringVar1, summary->hpIV, STR_CONV_MODE_LEFT_ALIGN, 2);
-        }
-        else
-        {
-            ConvertIntToDecimalStringN(gStringVar1, summary->hpEV, STR_CONV_MODE_LEFT_ALIGN, 3);
-        }
-            x = GetStringCenterAlignXOffset(1, gStringVar1, 72) + 76;
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gStringVar1, x, 1, 0, 0);
-
-        numHPBarTicks = summary->currentHP * 64 / summary->maxHP;
-        if (numHPBarTicks == 0 && summary->currentHP != 0)
-            numHPBarTicks = 1;
-        if (natureMod[STAT_ATK - 1] > 0)
-            PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureUp, 0, 24, 0, COLOR_STAT_ARROWS);
-        else if (natureMod[STAT_ATK - 1] < 0)
-            PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureDown, 0, 24, 0, COLOR_STAT_ARROWS);
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_Attack, 12, 24, 0, 1);
-        if (sMonSummaryScreen->currStatIndex == 0)
-            ConvertIntToDecimalStringN(gStringVar1, summary->atk, STR_CONV_MODE_LEFT_ALIGN, 3);
-        else if (sMonSummaryScreen->currStatIndex == 1)
-            ConvertIntToDecimalStringN(gStringVar1, summary->atkIV, STR_CONV_MODE_LEFT_ALIGN, 2);
-        else
-            ConvertIntToDecimalStringN(gStringVar1, summary->atkEV, STR_CONV_MODE_LEFT_ALIGN, 3);
-        x = GetStringCenterAlignXOffset(1, gStringVar1, 72) + 76;
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gStringVar1, x, 24, 0, 0);
-
-        if (natureMod[STAT_DEF - 1] > 0)
-            PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureUp, 0, 40, 0, COLOR_STAT_ARROWS);
-        else if (natureMod[STAT_DEF - 1] < 0)
-            PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureDown, 0, 40, 0, COLOR_STAT_ARROWS);
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_Defense, 12, 40, 0, 1);
-        if (sMonSummaryScreen->currStatIndex == 0)
-            ConvertIntToDecimalStringN(gStringVar1, summary->def, STR_CONV_MODE_LEFT_ALIGN, 3);
-        else if (sMonSummaryScreen->currStatIndex == 1)
-            ConvertIntToDecimalStringN(gStringVar1, summary->defIV, STR_CONV_MODE_LEFT_ALIGN, 2);
-        else
-            ConvertIntToDecimalStringN(gStringVar1, summary->defEV, STR_CONV_MODE_LEFT_ALIGN, 3);
-        x = GetStringCenterAlignXOffset(1, gStringVar1, 72) + 76;
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gStringVar1, x, 40, 0, 0);
-
-        if (natureMod[STAT_SPATK - 1] > 0)
-            PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureUp, 0, 56, 0, COLOR_STAT_ARROWS);
-        else if (natureMod[STAT_SPATK - 1] < 0)
-            PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureDown, 0, 56, 0, COLOR_STAT_ARROWS);
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_SpecialAttack, 12, 56, 0, PSS_COLOR_WHITE_BLACK_SHADOW);
-        if (sMonSummaryScreen->currStatIndex == 0)
-            ConvertIntToDecimalStringN(gStringVar1, summary->spatk, STR_CONV_MODE_LEFT_ALIGN, 3);
-        else if (sMonSummaryScreen->currStatIndex == 1)
-            ConvertIntToDecimalStringN(gStringVar1, summary->spatkIV, STR_CONV_MODE_LEFT_ALIGN, 2);
-        else
-            ConvertIntToDecimalStringN(gStringVar1, summary->spatkEV, STR_CONV_MODE_LEFT_ALIGN, 3);
-        x = GetStringCenterAlignXOffset(1, gStringVar1, 72) + 76;
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gStringVar1, x, 56, 0, 0);
-
-        if (natureMod[STAT_SPDEF - 1] > 0)
-            PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureUp, 0, 72, 0, COLOR_STAT_ARROWS);
-        else if (natureMod[STAT_SPDEF - 1] < 0)
-            PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureDown, 0, 72, 0, COLOR_STAT_ARROWS);
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_SpecialDefense, 12, 72, 0, 1);
-        if (sMonSummaryScreen->currStatIndex == 0)
-            ConvertIntToDecimalStringN(gStringVar1, summary->spdef, STR_CONV_MODE_LEFT_ALIGN, 3);
-        else if (sMonSummaryScreen->currStatIndex == 1)
-            ConvertIntToDecimalStringN(gStringVar1, summary->spdefIV, STR_CONV_MODE_LEFT_ALIGN, 2);
-        else
-            ConvertIntToDecimalStringN(gStringVar1, summary->spdefEV, STR_CONV_MODE_LEFT_ALIGN, 3);
-        x = GetStringCenterAlignXOffset(1, gStringVar1, 72) + 76;
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gStringVar1, x, 72, 0, PSS_COLOR_BLACK_GRAY_SHADOW);
-
-        if (natureMod[STAT_SPEED - 1] > 0)
-            PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureUp, 0, 88, 0, COLOR_STAT_ARROWS);
-        else if (natureMod[STAT_SPEED - 1] < 0)
-            PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureDown, 0, 88, 0, COLOR_STAT_ARROWS);
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_Speed, 12, 88, 0, PSS_COLOR_WHITE_BLACK_SHADOW);
-        if (sMonSummaryScreen->currStatIndex == 0)
-            ConvertIntToDecimalStringN(gStringVar1, summary->speed, STR_CONV_MODE_LEFT_ALIGN, 3);
-        else if (sMonSummaryScreen->currStatIndex == 1)
-            ConvertIntToDecimalStringN(gStringVar1, summary->speedIV, STR_CONV_MODE_LEFT_ALIGN, 2);
-        else
-            ConvertIntToDecimalStringN(gStringVar1, summary->speedEV, STR_CONV_MODE_LEFT_ALIGN, 3);
-        x = GetStringCenterAlignXOffset(1, gStringVar1, 72) + 76;
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gStringVar1, x, 88, 0, PSS_COLOR_BLACK_GRAY_SHADOW);
-
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_Ability, 8, 112, 0, PSS_COLOR_WHITE_BLACK_SHADOW);
-        StringCopy(gStringVar1, gAbilityNames[GetAbilityBySpecies(sMonSummaryScreen->summary.species, summary->abilityNum)]);
-        x = GetStringCenterAlignXOffset(1, gStringVar1, 88) + 58;
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gStringVar1, x, 112, 0, PSS_COLOR_BLACK_GRAY_SHADOW);
-        StringCopy(gStringVar1, gAbilityDescriptionPointers[GetAbilityBySpecies(sMonSummaryScreen->summary.species, summary->abilityNum)]);
-        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gStringVar1, 8, 128, 0, PSS_COLOR_BLACK_GRAY_SHADOW);
-        ScheduleBgCopyTilemapToVram(0);
-        PutWindowTilemap(PSS_LABEL_PANE_RIGHT);
+        ConvertIntToDecimalStringN(gStringVar1, summary->hpEV, STR_CONV_MODE_LEFT_ALIGN, 3);
     }
+        x = GetStringCenterAlignXOffset(1, gStringVar1, 72) + 76;
+    PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gStringVar1, x, 1, 0, 0);
+
+    numHPBarTicks = summary->currentHP * 64 / summary->maxHP;
+    if (numHPBarTicks == 0 && summary->currentHP != 0)
+        numHPBarTicks = 1;
+    if (natureMod[STAT_ATK - 1] > 0)
+        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureUp, 0, 24, 0, COLOR_STAT_ARROWS);
+    else if (natureMod[STAT_ATK - 1] < 0)
+        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureDown, 0, 24, 0, COLOR_STAT_ARROWS);
+    PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_Attack, 12, 24, 0, 1);
+    if (sMonSummaryScreen->currStatIndex == 0)
+        ConvertIntToDecimalStringN(gStringVar1, summary->atk, STR_CONV_MODE_LEFT_ALIGN, 3);
+    else if (sMonSummaryScreen->currStatIndex == 1)
+        ConvertIntToDecimalStringN(gStringVar1, summary->atkIV, STR_CONV_MODE_LEFT_ALIGN, 2);
+    else
+        ConvertIntToDecimalStringN(gStringVar1, summary->atkEV, STR_CONV_MODE_LEFT_ALIGN, 3);
+    x = GetStringCenterAlignXOffset(1, gStringVar1, 72) + 76;
+    PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gStringVar1, x, 24, 0, 0);
+
+    if (natureMod[STAT_DEF - 1] > 0)
+        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureUp, 0, 40, 0, COLOR_STAT_ARROWS);
+    else if (natureMod[STAT_DEF - 1] < 0)
+        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureDown, 0, 40, 0, COLOR_STAT_ARROWS);
+    PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_Defense, 12, 40, 0, 1);
+    if (sMonSummaryScreen->currStatIndex == 0)
+        ConvertIntToDecimalStringN(gStringVar1, summary->def, STR_CONV_MODE_LEFT_ALIGN, 3);
+    else if (sMonSummaryScreen->currStatIndex == 1)
+        ConvertIntToDecimalStringN(gStringVar1, summary->defIV, STR_CONV_MODE_LEFT_ALIGN, 2);
+    else
+        ConvertIntToDecimalStringN(gStringVar1, summary->defEV, STR_CONV_MODE_LEFT_ALIGN, 3);
+    x = GetStringCenterAlignXOffset(1, gStringVar1, 72) + 76;
+    PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gStringVar1, x, 40, 0, 0);
+
+    if (natureMod[STAT_SPATK - 1] > 0)
+        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureUp, 0, 56, 0, COLOR_STAT_ARROWS);
+    else if (natureMod[STAT_SPATK - 1] < 0)
+        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureDown, 0, 56, 0, COLOR_STAT_ARROWS);
+    PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_SpecialAttack, 12, 56, 0, PSS_COLOR_WHITE_BLACK_SHADOW);
+    if (sMonSummaryScreen->currStatIndex == 0)
+        ConvertIntToDecimalStringN(gStringVar1, summary->spatk, STR_CONV_MODE_LEFT_ALIGN, 3);
+    else if (sMonSummaryScreen->currStatIndex == 1)
+        ConvertIntToDecimalStringN(gStringVar1, summary->spatkIV, STR_CONV_MODE_LEFT_ALIGN, 2);
+    else
+        ConvertIntToDecimalStringN(gStringVar1, summary->spatkEV, STR_CONV_MODE_LEFT_ALIGN, 3);
+    x = GetStringCenterAlignXOffset(1, gStringVar1, 72) + 76;
+    PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gStringVar1, x, 56, 0, 0);
+
+    if (natureMod[STAT_SPDEF - 1] > 0)
+        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureUp, 0, 72, 0, COLOR_STAT_ARROWS);
+    else if (natureMod[STAT_SPDEF - 1] < 0)
+        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureDown, 0, 72, 0, COLOR_STAT_ARROWS);
+    PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_SpecialDefense, 12, 72, 0, 1);
+    if (sMonSummaryScreen->currStatIndex == 0)
+        ConvertIntToDecimalStringN(gStringVar1, summary->spdef, STR_CONV_MODE_LEFT_ALIGN, 3);
+    else if (sMonSummaryScreen->currStatIndex == 1)
+        ConvertIntToDecimalStringN(gStringVar1, summary->spdefIV, STR_CONV_MODE_LEFT_ALIGN, 2);
+    else
+        ConvertIntToDecimalStringN(gStringVar1, summary->spdefEV, STR_CONV_MODE_LEFT_ALIGN, 3);
+    x = GetStringCenterAlignXOffset(1, gStringVar1, 72) + 76;
+    PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gStringVar1, x, 72, 0, PSS_COLOR_BLACK_GRAY_SHADOW);
+
+    if (natureMod[STAT_SPEED - 1] > 0)
+        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureUp, 0, 88, 0, COLOR_STAT_ARROWS);
+    else if (natureMod[STAT_SPEED - 1] < 0)
+        PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_NatureDown, 0, 88, 0, COLOR_STAT_ARROWS);
+    PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_Speed, 12, 88, 0, PSS_COLOR_WHITE_BLACK_SHADOW);
+    if (sMonSummaryScreen->currStatIndex == 0)
+        ConvertIntToDecimalStringN(gStringVar1, summary->speed, STR_CONV_MODE_LEFT_ALIGN, 3);
+    else if (sMonSummaryScreen->currStatIndex == 1)
+        ConvertIntToDecimalStringN(gStringVar1, summary->speedIV, STR_CONV_MODE_LEFT_ALIGN, 2);
+    else
+        ConvertIntToDecimalStringN(gStringVar1, summary->speedEV, STR_CONV_MODE_LEFT_ALIGN, 3);
+    x = GetStringCenterAlignXOffset(1, gStringVar1, 72) + 76;
+    PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gStringVar1, x, 88, 0, PSS_COLOR_BLACK_GRAY_SHADOW);
+
+    PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, sText_Ability, 8, 112, 0, PSS_COLOR_WHITE_BLACK_SHADOW);
+    StringCopy(gStringVar1, gAbilityNames[GetAbilityBySpecies(sMonSummaryScreen->summary.species, summary->abilityNum)]);
+    x = GetStringCenterAlignXOffset(1, gStringVar1, 88) + 58;
+    PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gStringVar1, x, 112, 0, PSS_COLOR_BLACK_GRAY_SHADOW);
+    StringCopy(gStringVar1, gAbilityDescriptionPointers[GetAbilityBySpecies(sMonSummaryScreen->summary.species, summary->abilityNum)]);
+    PrintTextOnWindow(PSS_LABEL_PANE_RIGHT, gStringVar1, 8, 128, 0, PSS_COLOR_BLACK_GRAY_SHADOW);
+    ScheduleBgCopyTilemapToVram(0);
+    PutWindowTilemap(PSS_LABEL_PANE_RIGHT);
 }
 
 static void PrintConditionPage(void)
