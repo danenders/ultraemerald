@@ -338,6 +338,7 @@ static void PrintInfoBar(u8 pageIndex, bool8 detailsShown);
 static u8 WhatRegionWasMonCaughtIn(struct Pokemon *mon);
 static u8 *GetMapNameHoennKanto(u8 *dest, u16 mapSecId);
 static u8 *GetMapNameOrre(u8 *dest, u16 mapSecId, bool8 isXD);
+static void GetNatureModForSkillsPage(const s8 *natureMod);
 
 // const rom data
 #include "data/text/move_descriptions.h"
@@ -3268,22 +3269,27 @@ static void BufferEggMemo(void)
 
 static void PrintSkillsPage(void)
 {
+    struct PokeSummary *summary = &sMonSummaryScreen->summary;
+
+    u8 natureStatType;
+
+    if (summary->hiddenNature != HIDDEN_NATURE_NONE) 
+    {
+        GetNatureModForSkillsPage(gNatureStatTable[summary->hiddenNature]);
+    }
+    else
+    {
+       GetNatureModForSkillsPage(gNatureStatTable[summary->nature]);
+    }
+}
+
+static void GetNatureModForSkillsPage(const s8 *natureMod)
+{
     u8 x, i;
     s64 numHPBarTicks;
     u16 *dst;
     struct Pokemon *mon = &sMonSummaryScreen->currentMon;
     struct PokeSummary *summary = &sMonSummaryScreen->summary;
-
-    u8 natureStatType;
-    const s8 *natureMod = gNatureStatTable[natureStatType];
-
-    if (summary->hiddenNature != HIDDEN_NATURE_NONE) 
-    {
-       natureStatType = summary->hiddenNature;
-    } else 
-    {
-       natureStatType = summary->nature;
-    }
 
     FillWindowPixelBuffer(PSS_LABEL_PANE_RIGHT, PIXEL_FILL(0));
 
