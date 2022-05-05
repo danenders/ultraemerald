@@ -364,7 +364,7 @@ RivalsHouse_2F_Text_BrendanGettingReady:
 	.string "Items all packed, and…$"
 
 RivalsHouse_2F_Text_ItsRivalsPokeBall:
-	.string "It's {RIVAL}'s Poké ball!\p"
+	.string "It's {RIVAL}'s Poké Ball!\p"
 	.string "Better leave it right where it is.$"
 
 RivalsHouse_2F_Text_MayJustCheckingMyPokedex:
