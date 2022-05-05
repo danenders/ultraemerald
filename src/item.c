@@ -952,3 +952,8 @@ u8 ItemId_GetFlingPower(u16 itemId)
 {
     return gItems[SanitizeItemId(itemId)].flingPower;
 }
+
+void ItemId_GetHoldEffectParam_Script()
+{
+    VarSet(VAR_RESULT, ItemId_GetHoldEffectParam(VarGet(VAR_0x8004)));
+}
