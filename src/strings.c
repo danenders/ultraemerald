@@ -284,14 +284,24 @@ const u8 gText_ItemsPocket[] = _("Items");
 const u8 gText_PokeBallsPocket[] = _("Poké Balls");
 const u8 gText_TMHMPocket[] = _("TMs & HMs");
 const u8 gText_BerriesPocket[] = _("Berries");
-const u8 gText_KeyItemsPocket[] = _("Key items");
+const u8 gText_KeyItemsPocket[] = _("Key Items");
+const u8 gText_MedicinePocket[] = _("Medicine");
+const u8 gText_BattleItemsPocket[] = _("Battle Items");
+const u8 gText_TreasuresPocket[] = _("Treasures");
+const u8 gText_MegaStonesPocket[] = _("Mega Stones");
+const u8 gText_TrainingPocket[] = _("Training");
 
 const u8 *const gPocketNamesStringsTable[] =
 {
     [ITEMS_POCKET] = gText_ItemsPocket,
+    [MEDICINE_POCKET] = gText_MedicinePocket,
     [BALLS_POCKET] = gText_PokeBallsPocket,
-    [TMHM_POCKET]  = gText_TMHMPocket,
+    [BATTLEITEMS_POCKET] = gText_BattleItemsPocket,
     [BERRIES_POCKET] = gText_BerriesPocket,
+    [TREASURES_POCKET] = gText_TreasuresPocket,
+    [MEGASTONES_POCKET] = gText_MegaStonesPocket,
+    [TRAINING_POCKET] = gText_TrainingPocket,
+    [TMHM_POCKET]  = gText_TMHMPocket,
     [KEYITEMS_POCKET] = gText_KeyItemsPocket
 };
 
@@ -718,6 +728,12 @@ const u8 gText_TMs_Hms[] = _("TMs & HMs");
 const u8 gText_Berries2[] = _("Berries");
 const u8 gText_SomeonesPC[] = _("Someone's PC");
 const u8 gText_LanettesPC[] = _("Lanette's PC");
+const u8 gText_Medicine[] = _("Medicine");
+const u8 gText_BattleItems[] = _("Battle Items");
+const u8 gText_Treasures[] = _("Treasures");
+const u8 gText_MegaStones[] = _("Mega Stones");
+const u8 gText_ZCrystals[] = _("Z-Crystals");
+const u8 gText_Training[] = _("Training");
 const u8 gText_PlayersPC[] = _("{PLAYER}'s PC");
 const u8 gText_HallOfFame[] = _("Hall of Fame");
 const u8 gText_LogOff[] = _("Log off");

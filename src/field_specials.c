@@ -128,7 +128,8 @@ static void Task_CloseBattlePikeCurtain(u8 taskId);
 static u8 DidPlayerGetFirstFans(void);
 static void SetInitialFansOfPlayer(void);
 static u16 PlayerGainRandomTrainerFan(void);
-static void BufferFanClubTrainerName_(struct LinkBattleRecords *linkRecords, u8 a, u8 b);
+//static void BufferFanClubTrainerName_(struct LinkBattleRecords *linkRecords, u8 a, u8 b);
+static void BufferFanClubTrainerName_(u8 whichLinkTrainer, u8 whichNPCTrainer);
 
 void Special_ShowDiploma(void)
 {
@@ -4142,10 +4143,11 @@ void BufferFanClubTrainerName(void)
     case FANCLUB_MEMBER8:
         break;
     }
-    BufferFanClubTrainerName_(&gSaveBlock1Ptr->linkBattleRecords, whichLinkTrainer, whichNPCTrainer);
+    //BufferFanClubTrainerName_(&gSaveBlock1Ptr->linkBattleRecords, whichLinkTrainer, whichNPCTrainer);
+    BufferFanClubTrainerName_(whichLinkTrainer, whichNPCTrainer);
 }
 
-static void BufferFanClubTrainerName_(struct LinkBattleRecords *linkRecords, u8 whichLinkTrainer, u8 whichNPCTrainer)
+/*static void BufferFanClubTrainerName_(struct LinkBattleRecords *linkRecords, u8 whichLinkTrainer, u8 whichNPCTrainer)
 {
     struct LinkBattleRecord *record = &linkRecords->entries[whichLinkTrainer];
     if (record->name[0] == EOS)
@@ -4180,6 +4182,34 @@ static void BufferFanClubTrainerName_(struct LinkBattleRecords *linkRecords, u8 
         StringCopyN(gStringVar1, record->name, PLAYER_NAME_LENGTH);
         gStringVar1[PLAYER_NAME_LENGTH] = EOS;
         ConvertInternationalString(gStringVar1, linkRecords->languages[whichLinkTrainer]);
+    }
+}*/
+
+static void BufferFanClubTrainerName_(u8 whichLinkTrainer, u8 whichNPCTrainer)
+{
+    switch (whichNPCTrainer)
+    {
+        case 0:
+            StringCopy(gStringVar1, gText_Wallace);
+            break;
+        case 1:
+            StringCopy(gStringVar1, gText_Steven);
+            break;
+        case 2:
+            StringCopy(gStringVar1, gText_Brawly);
+            break;
+        case 3:
+            StringCopy(gStringVar1, gText_Winona);
+            break;
+        case 4:
+            StringCopy(gStringVar1, gText_Phoebe);
+            break;
+        case 5:
+            StringCopy(gStringVar1, gText_Glacia);
+            break;
+        default:
+            StringCopy(gStringVar1, gText_Wallace);
+            break;
     }
 }
 
