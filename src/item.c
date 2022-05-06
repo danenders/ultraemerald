@@ -93,8 +93,8 @@ void SetBagItemsPointers(void)
     gBagPockets[MEGASTONES_POCKET].itemSlots = gSaveBlock1Ptr->bagPocket_MegaStones;
     gBagPockets[MEGASTONES_POCKET].capacity = BAG_MEGASTONES_COUNT;
 
-    gBagPockets[ZCRYSTALS_POCKET].itemSlots = gSaveBlock1Ptr->bagPocket_ZCrystals;
-    gBagPockets[ZCRYSTALS_POCKET].capacity = BAG_ZCRYSTALS_COUNT;
+    gBagPockets[TRAINING_POCKET].itemSlots = gSaveBlock1Ptr->bagPocket_Training;
+    gBagPockets[TRAINING_POCKET].capacity = BAG_TRAINING_COUNT;
 }
 
 void CopyItemName(u16 itemId, u8 *dst)

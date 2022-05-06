@@ -64,7 +64,7 @@
                             max(BAG_ITEMS_COUNT,             \
                             max(BAG_BATTLEITEMS_COUNT,       \
                             max(BAG_MEGASTONES_COUNT,        \
-                            max(BAG_ZCRYSTALS_COUNT,         \
+                            max(BAG_TRAINING_COUNT,         \
                             max(BAG_TREASURES_COUNT,         \
                             max(BAG_MEDICINE_COUNT,          \
                             max(BAG_KEYITEMS_COUNT,          \
@@ -1664,7 +1664,7 @@ static void OpenContextMenu(u8 taskId)
                 gBagMenu->contextMenuItemsPtr = sContextMenuItems_ItemsPocket;
                 gBagMenu->contextMenuNumItems = ARRAY_COUNT(sContextMenuItems_ItemsPocket);
                 break;
-            case ZCRYSTALS_POCKET:
+            case TRAINING_POCKET:
                 gBagMenu->contextMenuItemsPtr = sContextMenuItems_ItemsPocket;
                 gBagMenu->contextMenuNumItems = ARRAY_COUNT(sContextMenuItems_ItemsPocket);
                 break;

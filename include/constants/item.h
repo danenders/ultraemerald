@@ -10,7 +10,7 @@
 #define POCKET_BERRIES      5
 #define POCKET_TREASURES    6
 #define POCKET_MEGA_STONES  7
-#define POCKET_Z_CRYSTALS   8
+#define POCKET_TRAINING  	8
 #define POCKET_TM_HM        9
 #define POCKET_KEY_ITEMS    10
 
@@ -21,7 +21,7 @@
 #define BERRIES_POCKET      4
 #define TREASURES_POCKET    5
 #define MEGASTONES_POCKET   6
-#define ZCRYSTALS_POCKET    7
+#define TRAINING_POCKET    	7
 #define TMHM_POCKET         8
 #define KEYITEMS_POCKET     9
 #define POCKETS_COUNT       10

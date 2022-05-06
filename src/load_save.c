@@ -30,7 +30,7 @@ struct LoadedSaveData
  /*0x0230*/ struct ItemSlot battleItems[BAG_BATTLEITEMS_COUNT];
  /*0x0230*/ struct ItemSlot treasures[BAG_TREASURES_COUNT];
  /*0x0230*/ struct ItemSlot megastones[BAG_MEGASTONES_COUNT];
- /*0x0230*/ struct ItemSlot zcrystals[BAG_ZCRYSTALS_COUNT];
+ /*0x0230*/ struct ItemSlot training[BAG_TRAINING_COUNT];
 };
 
 // EWRAM DATA
@@ -254,9 +254,9 @@ void LoadPlayerBag(void)
     for (i = 0; i < BAG_MEGASTONES_COUNT; i++)
         gLoadedSaveData.megastones[i] = gSaveBlock1Ptr->bagPocket_MegaStones[i];
 
-    // load player Z-Crystals.
-    for (i = 0; i < BAG_ZCRYSTALS_COUNT; i++)
-        gLoadedSaveData.zcrystals[i] = gSaveBlock1Ptr->bagPocket_ZCrystals[i];
+    // load player training items.
+    for (i = 0; i < BAG_TRAINING_COUNT; i++)
+        gLoadedSaveData.training[i] = gSaveBlock1Ptr->bagPocket_Training[i];
 
     gLastEncryptionKey = gSaveBlock2Ptr->encryptionKey;
 }
@@ -306,9 +306,9 @@ void SavePlayerBag(void)
     for (i = 0; i < BAG_MEGASTONES_COUNT; i++)
         gSaveBlock1Ptr->bagPocket_MegaStones[i] = gLoadedSaveData.megastones[i];
 
-    // save player z-crystals.
-    for (i = 0; i < BAG_ZCRYSTALS_COUNT; i++)
-        gSaveBlock1Ptr->bagPocket_ZCrystals[i] = gLoadedSaveData.zcrystals[i];
+    // save player training items.
+    for (i = 0; i < BAG_TRAINING_COUNT; i++)
+        gSaveBlock1Ptr->bagPocket_Training[i] = gLoadedSaveData.training[i];
 
     encryptionKeyBackup = gSaveBlock2Ptr->encryptionKey;
     gSaveBlock2Ptr->encryptionKey = gLastEncryptionKey;

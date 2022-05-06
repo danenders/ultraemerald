@@ -980,7 +980,7 @@ const u8 *const gStdStrings[] =
     [STDSTRING_BATTLEITEMS] = gText_BattleItems,
     [STDSTRING_TREASURES] = gText_Treasures,
     [STDSTRING_MEGASTONES] = gText_MegaStones,
-    [STDSTRING_ZCRYSTALS] = gText_ZCrystals,
+    [STDSTRING_TRAINING] = gText_Training,
 };
 
 static const u8 sLinkServicesMultichoiceIds[] =
