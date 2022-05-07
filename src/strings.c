@@ -1980,3 +1980,5 @@ const u8 gText_DomeFossil[] = _("Dome Fossil");
 const u8 gText_HelixFossil[] = _("Helix Fossil");
 const u8 gText_OldAmber[] = _("Old Amber");
 
+const u8 gText_YouAlreadyHaveThis[] = _("You already have this item.{PAUSE_UNTIL_PRESS}");
+

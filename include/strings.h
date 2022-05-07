@@ -3167,4 +3167,6 @@ extern const u8 gText_DomeFossil[];
 extern const u8 gText_HelixFossil[];
 extern const u8 gText_OldAmber[];
 
+extern const u8 gText_YouAlreadyHaveThis[];
+
 #endif // GUARD_STRINGS_H
