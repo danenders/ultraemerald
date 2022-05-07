@@ -207,8 +207,8 @@ gFieldEffectScript_FlyIn::
 	field_eff_callnative FldEff_FlyIn
 	field_eff_end
 
-gFieldEffectScript_QuestionMarkIcon::
-	field_eff_callnative FldEff_QuestionMarkIcon
+gFieldEffectScript_QuestionMarkIcon:: @ 82DBBEF
+	field_eff_loadfadedpalnotint_callnative gSpritePalette_ArrowEmotionsFieldEffect, FldEff_QuestionMarkIcon
 	field_eff_end
 
 gFieldEffectScript_FeetInFlowingWater::

@@ -1,3 +1,4 @@
+
 #ifndef GUARD_OVERWORLD_H
 #define GUARD_OVERWORLD_H
 
@@ -54,6 +55,7 @@ extern u8 gFieldLinkPlayerCount;
 
 extern const struct UCoords32 gDirectionToVectors[];
 
+void UpdateAmbientCry(s16 *state, u16 *delayCounter);
 void DoWhiteOut(void);
 void Overworld_ResetStateAfterFly(void);
 void Overworld_ResetStateAfterTeleport(void);
