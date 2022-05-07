@@ -492,7 +492,7 @@ void RemoveBagSprite(u8 id)
 void AddBagVisualSprite(u8 bagPocketId)
 {
     u8 *spriteId = &gBagMenu->spriteIds[ITEMMENUSPRITE_BAG];
-    *spriteId = CreateSprite(&sBagSpriteTemplate, 68, 66, 0);
+    *spriteId = CreateSprite(&sBagSpriteTemplate, 28, 66, 0);
     SetBagVisualPocketId(bagPocketId, FALSE);
     //SetBagVisualPocketId(-1, FALSE);
 }
@@ -597,8 +597,8 @@ void AddBagItemIconSprite(u16 itemId, u8 id)
         if (iconSpriteId != MAX_SPRITES)
         {
             *spriteId = iconSpriteId;
-            gSprites[iconSpriteId].x2 = 24;
-            gSprites[iconSpriteId].y2 = 88;
+            gSprites[iconSpriteId].x2 = 79;
+            gSprites[iconSpriteId].y2 = 64;
         }
     }
 }
