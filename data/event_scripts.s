@@ -1061,14 +1061,9 @@ Common_EventScript_LegendaryFlewAway::
 	.include "data/text/save.inc"
 	.include "data/text/birch_speech.inc"
 	.include "data/scripts/costume_swap.inc"
-
-
 	.include "data/maps/RustboroCity_Tailor/scripts.inc"
-
 	.include "data/maps/Mauville_Tailor/scripts.inc"
-
 	.include "data/maps/LilycoveCity_DepartmentStore_6F/scripts.inc"
-
 	.include "data/maps/LilycoveCity_DepartmentStore_7F/scripts.inc"
-
 	.include "data/maps/LilycoveCity_DepartmentStore_8F/scripts.inc"
+    .include "data/scripts/dexnav.inc"
