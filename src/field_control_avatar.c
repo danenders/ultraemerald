@@ -82,6 +82,7 @@ void FieldClearPlayerInput(struct FieldInput *input)
     input->heldDirection2 = FALSE;
     input->tookStep = FALSE;
     input->pressedBButton = FALSE;
+    input->pressedLButton = FALSE;
     input->pressedRButton = FALSE;
     input->input_field_1_0 = FALSE;
     input->input_field_1_1 = FALSE;
@@ -102,13 +103,15 @@ void FieldGetPlayerInput(struct FieldInput *input, u16 newKeys, u16 heldKeys)
         {
             if (newKeys & START_BUTTON)
                 input->pressedStartButton = TRUE;
-            if (newKeys & SELECT_BUTTON)
+            if (newKeys & SELECT_BUTTON && !FlagGet(FLAG_SYS_DEXNAV_SEARCH))
                 input->pressedSelectButton = TRUE;
             if (newKeys & A_BUTTON)
                 input->pressedAButton = TRUE;
             if (newKeys & B_BUTTON)
                 input->pressedBButton = TRUE;
-            if (newKeys & R_BUTTON && !FlagGet(FLAG_SYS_DEXNAV_SEARCH))
+            if (newKeys & L_BUTTON)
+                input->pressedLButton = TRUE;
+            if (newKeys & R_BUTTON)
                 input->pressedRButton = TRUE;
         }
 
@@ -140,12 +143,12 @@ void FieldGetPlayerInput(struct FieldInput *input, u16 newKeys, u16 heldKeys)
     #ifdef TX_DEBUGGING
         if (!TX_DEBUG_MENU_OPTION)
         {
-            if (heldKeys & R_BUTTON) 
+            if (heldKeys & SELECT_BUTTON) 
             {
-                if(input->pressedSelectButton)
+                if(input->pressedRButton)
                 {
                     input->input_field_1_0 = TRUE;
-                    input->pressedSelectButton = FALSE;
+                    input->pressedRButton = FALSE;
                 }else if(input->pressedStartButton) 
                 {
                     input->input_field_1_2 = TRUE;
@@ -233,11 +236,15 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
     if (input->tookStep && TryFindHiddenPokemon())
         return TRUE;
     
-    if (input->pressedSelectButton && UseRegisteredKeyItemOnField() == TRUE)
+    if (input->pressedLButton && UseRegisteredKeyItemOnField(0) == TRUE)
         return TRUE;
     
-    if (input->pressedRButton && TryStartDexnavSearch())
+    if (input->pressedRButton && UseRegisteredKeyItemOnField(1) == TRUE)
         return TRUE;
+
+    if (input->pressedSelectButton && TryStartDexnavSearch())
+        return TRUE;
+
 
     #ifdef TX_DEBUGGING
         if (!TX_DEBUG_MENU_OPTION)
