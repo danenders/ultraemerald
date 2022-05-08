@@ -3,11 +3,17 @@
 
 Route101_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, Route101_OnTransition
+	map_script MAP_SCRIPT_ON_RESUME, Route101_OnResume
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, Route101_OnFrame
 	.byte 0
 
 Route101_OnTransition:
+	call Common_EventScript_GetDayOrNight
 	call ProfBirch_EventScript_UpdateLocation
+	end
+
+Route101_OnResume:
+	call Common_EventScript_GetDayOrNight
 	end
 
 Route101_OnFrame:

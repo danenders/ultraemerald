@@ -1005,6 +1005,20 @@ Common_EventScript_LegendaryFlewAway::
 	release
 	end
 
+Common_EventScript_GetDayOrNight::
+	special GetDayOrNight
+	goto_if_eq VAR_RESULT, 1, Common_EventScript_Night
+	goto_if_eq VAR_RESULT, 0, Common_EventScript_Day
+	end
+
+Common_EventScript_Night::
+	setvar VAR_DAYNIGHT, 1
+	end
+
+Common_EventScript_Day::
+	setvar VAR_DAYNIGHT, 0
+	end
+
 	.include "data/scripts/pc_transfer.inc"
 	.include "data/scripts/questionnaire.inc"
 	.include "data/scripts/abnormal_weather.inc"

@@ -4254,3 +4254,18 @@ u8 GetPlayerCostumeId(void)
 {
     return GetPlayerAvatarGraphicsIdByStateIdAndGender(PLAYER_AVATAR_STATE_NORMAL, gSaveBlock2Ptr->playerGender);
 }
+
+void GetDayOrNight(void)
+{
+    u8 nightorday;
+    RtcCalcLocalTime();
+    if (gLocalTime.hours >= 8 && gLocalTime.hours <=19)
+    {
+        nightorday = 0; //Day
+    }
+    else
+    {
+        nightorday = 1; //Night
+    }
+    gSpecialVar_Result = nightorday;
+}
