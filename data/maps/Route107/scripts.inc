@@ -52,3 +52,115 @@ Route107_EventScript_Camron::
 	msgbox Route107_Text_CamronPostBattle, MSGBOX_AUTOCLOSE
 	end
 
+
+Route107_EventScript_EggGiver::
+	lock
+	faceplayer
+	goto_if_set FLAG_DAILY_JOHTO_EGG, Route107_EventScript_ReceivedEgg
+	msgbox Route107_Text_HaveEggWillYouTakeIt, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, Route107_EventScript_DeclineEgg
+	getpartysize
+	goto_if_eq VAR_RESULT, PARTY_SIZE, Route107_EventScript_NoRoomForEgg
+	msgbox Route107_Text_HopeYoullWalkPlentyWithEgg, MSGBOX_DEFAULT
+	setflag FLAG_DAILY_JOHTO_EGG
+	playfanfare MUS_OBTAIN_ITEM
+	message Route107_Text_ReceivedTheEgg
+	waitfanfare
+	random 8
+	goto_if_eq VAR_RESULT, 1, Route107_EventScript_TogepiEgg
+	goto_if_eq VAR_RESULT, 2, Route107_EventScript_PichuEgg
+	goto_if_eq VAR_RESULT, 3, Route107_EventScript_MagbyEgg
+	goto_if_eq VAR_RESULT, 4, Route107_EventScript_ElekidEgg
+	goto_if_eq VAR_RESULT, 5, Route107_EventScript_CleffaEgg
+	goto_if_eq VAR_RESULT, 6, Route107_EventScript_IgglybuffEgg
+	goto_if_eq VAR_RESULT, 7, Route107_EventScript_SmoochumEgg
+	goto_if_eq VAR_RESULT, 8, Route107_EventScript_TyrogueEgg
+	end
+
+Route107_EventScript_TogepiEgg::
+	giveegg SPECIES_TOGEPI
+	release
+	end
+
+Route107_EventScript_TyrogueEgg::
+	giveegg SPECIES_TYROGUE
+	release
+	end
+
+Route107_EventScript_PichuEgg::
+	giveegg SPECIES_PICHU
+	release
+	end
+
+Route107_EventScript_MagbyEgg::
+	giveegg SPECIES_MAGBY
+	release
+	end
+
+Route107_EventScript_ElekidEgg::
+	giveegg SPECIES_ELEKID
+	release
+	end
+
+Route107_EventScript_CleffaEgg::
+	giveegg SPECIES_CLEFFA
+	release
+	end
+
+Route107_EventScript_IgglybuffEgg::
+	giveegg SPECIES_IGGLYBUFF
+	release
+	end
+
+Route107_EventScript_SmoochumEgg::
+	giveegg SPECIES_SMOOCHUM
+	release
+	end
+
+Route107_EventScript_ReceivedEgg::
+	msgbox Route107_Text_ThatsTheRumor, MSGBOX_DEFAULT
+	release
+	end
+
+Route107_EventScript_NoRoomForEgg::
+	msgbox Route107_Text_NoRoomForThisEgg, MSGBOX_DEFAULT
+	release
+	end
+
+Route107_EventScript_DeclineEgg::
+	msgbox Route107_Text_AsYouWishThen, MSGBOX_DEFAULT
+	release
+	end
+
+Route107_Text_HaveEggWillYouTakeIt:
+	.string "I was walking along the beach and came\n"
+	.string "across this strange Egg.\p"
+	.string "I've heard that keeping an Egg with you\n"
+	.string "as you travel is a good way to hatch a\l"
+	.string "Pokémon.\p"
+	.string "You are a Trainer, right?\n"
+	.string "You probably travel all over Hoenn.\p"
+	.string "Hey, I've got an idea!\n"
+	.string "Why don't you take this Egg to hatch?$"
+
+Route107_Text_HopeYoullWalkPlentyWithEgg:
+	.string "Good! I hope you'll enjoy your\n"
+	.string "travels with this Egg!$"
+
+Route107_Text_ReceivedTheEgg:
+	.string "{PLAYER} received the Egg.$"
+
+Route107_Text_NoRoomForThisEgg:
+	.string "Oh? You've too many Pokémon.\n"
+	.string "There's no room for this Egg…$"
+
+Route107_Text_AsYouWishThen:
+	.string "As you wish, then…\p"
+	.string "If you have a change of heart about\n"
+	.string "hatching this Egg, I will be here.$"
+
+Route107_Text_ThatsTheRumor:
+	.string "Somewhere there is an island full of\n"
+	.string "baby Pokémon.\p"
+	.string "Or at least that's how the rumor goes.$"
+

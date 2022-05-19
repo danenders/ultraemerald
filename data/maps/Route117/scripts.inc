@@ -206,3 +206,77 @@ Route117_Text_DayCareSign:
 	.string "Pokémon Day Care\n"
 	.string "“Let us raise your Pokémon.”$"
 
+
+Route117_EventScript_EggGiver::
+	lock
+	faceplayer
+	goto_if_set FLAG_DAILY_HOENN_EGG, Route117_EventScript_ReceivedEgg
+	msgbox Route117_Text_HaveEggWillYouTakeIt, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, Route117_EventScript_DeclineEgg
+	getpartysize
+	goto_if_eq VAR_RESULT, PARTY_SIZE, Route117_EventScript_NoRoomForEgg
+	msgbox Route117_Text_HopeYoullWalkPlentyWithEgg, MSGBOX_DEFAULT
+	setflag FLAG_DAILY_HOENN_EGG
+	playfanfare MUS_OBTAIN_ITEM
+	message Route117_Text_ReceivedTheEgg
+	waitfanfare
+	random 2
+	goto_if_eq VAR_RESULT, 1, Route117_EventScript_WynautEgg
+	goto_if_eq VAR_RESULT, 2, Route117_EventScript_AzurillEgg
+	end
+
+Route117_EventScript_WynautEgg::
+	giveegg SPECIES_WYNAUT
+	release
+	end
+
+Route117_EventScript_AzurillEgg::
+	giveegg SPECIES_AZURILL
+	release
+	end
+
+Route117_EventScript_ReceivedEgg::
+	msgbox Route117_Text_ThatsTheRumor, MSGBOX_DEFAULT
+	release
+	end
+
+Route117_EventScript_NoRoomForEgg::
+	msgbox Route117_Text_NoRoomForThisEgg, MSGBOX_DEFAULT
+	release
+	end
+
+Route117_EventScript_DeclineEgg::
+	msgbox Route117_Text_AsYouWishThen, MSGBOX_DEFAULT
+	release
+	end
+
+Route117_Text_HaveEggWillYouTakeIt:
+	.string "I volunteer at the Day Care, and I\n"
+	.string "came across this strange Egg.\p"
+	.string "It doesn't belong to any of the other\n"
+	.string "Trainers, either.\p"
+	.string "You are a Trainer, right?\p"
+	.string "I would really appreciate it if you.\n"
+	.string "you would take care of this Pokémon.\p"
+	.string "Would you do that for me?$"
+
+Route117_Text_HopeYoullWalkPlentyWithEgg:
+	.string "Good! I had a feeling you would\n"
+	.string "be a good trainer for this Egg!$"
+
+Route117_Text_ReceivedTheEgg:
+	.string "{PLAYER} received the Egg.$"
+
+Route117_Text_NoRoomForThisEgg:
+	.string "Oh? You've too many Pokémon.\n"
+	.string "There's no room for this Egg…$"
+
+Route117_Text_AsYouWishThen:
+	.string "As you wish, then…\p"
+	.string "If you have a change of heart about\n"
+	.string "hatching this Egg, I will be here.$"
+
+Route117_Text_ThatsTheRumor:
+	.string "There's an Old Woman in Lavaridge\n"
+	.string "that often finds baby Pokémon.\p"
+	.string "Or at least that's how the rumor goes.$"

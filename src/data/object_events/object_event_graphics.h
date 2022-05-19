@@ -340,9 +340,13 @@ const u16 gObjectEventPal_Gameboy[] = INCBIN_U16("graphics/object_events/palette
 const u32 gObjectEventPic_ContestJudge[] = INCBIN_U32("graphics/object_events/pics/people/contest_judge.4bpp");
 const u16 gObjectEventPal_Judge[] = INCBIN_U16("graphics/object_events/palettes/judge.gbapal");
 
-
 const u32 gObjectEventPic_MauvilleOldMan1[] = INCBIN_U32("graphics/object_events/pics/people/mauville_old_man_1.4bpp");
 const u32 gObjectEventPic_MauvilleOldMan2[] = INCBIN_U32("graphics/object_events/pics/people/mauville_old_man_2.4bpp");
+
+const u32 gObjectEventPic_BreederM[] = INCBIN_U32("graphics/object_events/pics/people/breeder_m.4bpp");
+const u32 gObjectEventPic_BreederF[] = INCBIN_U32("graphics/object_events/pics/people/breeder_f.4bpp");
+const u16 gObjectEventPal_Breeder[] = INCBIN_U16("graphics/object_events/palettes/breeder.gbapal");
+
 
 //Unused Object GFX
 const u32 gObjectEventPic_QuintyPlump[] = INCBIN_U32("graphics/object_events/pics/people/quinty_plump.4bpp");

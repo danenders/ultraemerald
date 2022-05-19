@@ -235,19 +235,124 @@ LavaridgeTown_EventScript_ExpertF::
 LavaridgeTown_EventScript_EggWoman::
 	lock
 	faceplayer
-	goto_if_set FLAG_RECEIVED_LAVARIDGE_EGG, LavaridgeTown_EventScript_ReceivedEgg
+	goto_if_set FLAG_DAILY_LAVARIDGE_EGG, LavaridgeTown_EventScript_ReceivedEgg
 	msgbox LavaridgeTown_Text_HaveEggWillYouTakeIt, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, LavaridgeTown_EventScript_DeclineEgg
 	getpartysize
 	goto_if_eq VAR_RESULT, PARTY_SIZE, LavaridgeTown_EventScript_NoRoomForEgg
 	msgbox LavaridgeTown_Text_HopeYoullWalkPlentyWithEgg, MSGBOX_DEFAULT
-	setflag FLAG_RECEIVED_LAVARIDGE_EGG
+	setflag FLAG_DAILY_LAVARIDGE_EGG
 	playfanfare MUS_OBTAIN_ITEM
 	message LavaridgeTown_Text_ReceivedTheEgg
 	waitfanfare
+	random 17
+	goto_if_eq VAR_RESULT, 1, LavaridgeTown_EventScript_WynautEgg
+	goto_if_eq VAR_RESULT, 2, LavaridgeTown_EventScript_AzurillEgg
+	goto_if_eq VAR_RESULT, 3, LavaridgeTown_EventScript_TogepiEgg
+	goto_if_eq VAR_RESULT, 4, LavaridgeTown_EventScript_PichuEgg
+	goto_if_eq VAR_RESULT, 5, LavaridgeTown_EventScript_MagbyEgg
+	goto_if_eq VAR_RESULT, 6, LavaridgeTown_EventScript_ElekidEgg
+	goto_if_eq VAR_RESULT, 7, LavaridgeTown_EventScript_CleffaEgg
+	goto_if_eq VAR_RESULT, 8, LavaridgeTown_EventScript_IgglybuffEgg
+	goto_if_eq VAR_RESULT, 9, LavaridgeTown_EventScript_SmoochumEgg
+	goto_if_eq VAR_RESULT, 10, LavaridgeTown_EventScript_TyrogueEgg
+	goto_if_eq VAR_RESULT, 11, LavaridgeTown_EventScript_BudewEgg
+	goto_if_eq VAR_RESULT, 12, LavaridgeTown_EventScript_BonslyEgg
+	goto_if_eq VAR_RESULT, 13, LavaridgeTown_EventScript_MimeJrEgg
+	goto_if_eq VAR_RESULT, 14, LavaridgeTown_EventScript_HappinyEgg
+	goto_if_eq VAR_RESULT, 15, LavaridgeTown_EventScript_ChinglingEgg
+	goto_if_eq VAR_RESULT, 16, LavaridgeTown_EventScript_MunchlaxEgg
+	goto_if_eq VAR_RESULT, 17, LavaridgeTown_EventScript_MantykeEgg
+	end
+
+@Gen 4 Eggs
+LavaridgeTown_EventScript_BudewEgg::
+	giveegg SPECIES_BUDEW
+	release
+	end
+
+LavaridgeTown_EventScript_BonslyEgg::
+	giveegg SPECIES_BONSLY
+	release
+	end
+
+LavaridgeTown_EventScript_MimeJrEgg::
+	giveegg SPECIES_MIME_JR
+	release
+	end
+
+LavaridgeTown_EventScript_HappinyEgg::
+	giveegg SPECIES_HAPPINY
+	release
+	end
+
+LavaridgeTown_EventScript_ChinglingEgg::
+	giveegg SPECIES_CHINGLING
+	release
+	end
+
+LavaridgeTown_EventScript_MunchlaxEgg::
+	giveegg SPECIES_MUNCHLAX
+	release
+	end
+
+LavaridgeTown_EventScript_MantykeEgg::
+	giveegg SPECIES_MANTYKE
+	release
+	end
+
+@Gen 3 Eggs
+LavaridgeTown_EventScript_WynautEgg::
 	giveegg SPECIES_WYNAUT
 	release
 	end
+
+LavaridgeTown_EventScript_AzurillEgg::
+	giveegg SPECIES_AZURILL
+	release
+	end
+
+@Gen 2 Eggs
+LavaridgeTown_EventScript_TogepiEgg::
+	giveegg SPECIES_TOGEPI
+	release
+	end
+
+LavaridgeTown_EventScript_TyrogueEgg::
+	giveegg SPECIES_TYROGUE
+	release
+	end
+
+LavaridgeTown_EventScript_PichuEgg::
+	giveegg SPECIES_PICHU
+	release
+	end
+
+LavaridgeTown_EventScript_MagbyEgg::
+	giveegg SPECIES_MAGBY
+	release
+	end
+
+LavaridgeTown_EventScript_ElekidEgg::
+	giveegg SPECIES_ELEKID
+	release
+	end
+
+LavaridgeTown_EventScript_CleffaEgg::
+	giveegg SPECIES_CLEFFA
+	release
+	end
+
+LavaridgeTown_EventScript_IgglybuffEgg::
+	giveegg SPECIES_IGGLYBUFF
+	release
+	end
+
+LavaridgeTown_EventScript_SmoochumEgg::
+	giveegg SPECIES_SMOOCHUM
+	release
+	end
+
 
 LavaridgeTown_EventScript_ReceivedEgg::
 	msgbox LavaridgeTown_Text_EverySoOftenEggFoundAtDayCare, MSGBOX_DEFAULT

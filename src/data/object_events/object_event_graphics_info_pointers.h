@@ -840,6 +840,8 @@ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_DawnPlatinumDecora
 
 const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Enby;
 const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_SnorlaxSleeping;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_BreederM;
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_BreederF;
 
 //Hats
 const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_BrendanHat;
@@ -1686,6 +1688,8 @@ const struct ObjectEventGraphicsInfo *const gObjectEventGraphicsInfoPointers[NUM
     [OBJ_EVENT_GFX_SCHOOL_KID_F] =           		 &gObjectEventGraphicsInfo_SchoolKidF,
     [OBJ_EVENT_GFX_COOL_TRAINER_M] =           	 	 &gObjectEventGraphicsInfo_CoolTrainerM,
     [OBJ_EVENT_GFX_COOL_TRAINER_F] =       		 	 &gObjectEventGraphicsInfo_CoolTrainerF,
+    [OBJ_EVENT_GFX_BREEDER_M] =           	 	 	 &gObjectEventGraphicsInfo_BreederM,
+    [OBJ_EVENT_GFX_BREEDER_F] =       		 	 	 &gObjectEventGraphicsInfo_BreederF,
 
     [OBJ_EVENT_GFX_SNORLAX_SLEEPING] =           	 &gObjectEventGraphicsInfo_SnorlaxSleeping,
 };
