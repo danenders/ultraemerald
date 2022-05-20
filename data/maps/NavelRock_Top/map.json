@@ -12,10 +12,10 @@
   "allow_running": true,
   "show_map_name": true,
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
-  "connections": null,
+  "connections": 0,
   "object_events": [
     {
-      "graphics_id": "OBJ_EVENT_GFX_HOOH",
+      "graphics_id": "OBJ_EVENT_GFX_HOOH_FOLLOWER",
       "x": 12,
       "y": 4,
       "elevation": 0,
