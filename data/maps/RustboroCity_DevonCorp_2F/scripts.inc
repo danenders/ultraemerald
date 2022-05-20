@@ -30,7 +30,32 @@ RustboroCity_DevonCorp_2F_EventScript_BallScientist::
 	end
 
 RustboroCity_DevonCorp_2F_EventScript_DevelopedBalls::
-	msgbox RustboroCity_DevonCorp_2F_Text_WeFinallyMadeNewBalls, MSGBOX_DEFAULT
+	msgbox RustboroCity_DevonCorp_2F_Text_WeFinallyMadeNewBalls, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, FALSE, RustboroCity_DevonCorp_2F_EventScript_ProudOfBalls
+	pokemart RustboroCity_DevonCorp_2F_EventScript_BallMart
+	msgbox RustboroCity_DevonCorp_2F_Text_ProudOfBalls, MSGBOX_DEFAULT
+	release
+	end
+
+RustboroCity_DevonCorp_2F_EventScript_ProudOfBalls::
+	msgbox RustboroCity_DevonCorp_2F_Text_ProudOfBalls, MSGBOX_DEFAULT
+	release
+	end
+
+
+	.align 2
+RustboroCity_DevonCorp_2F_EventScript_BallMart::
+	.2byte ITEM_TIMER_BALL
+	.2byte ITEM_REPEAT_BALL
+	.2byte ITEM_QUICK_BALL
+	.2byte ITEM_DUSK_BALL
+	.2byte ITEM_LEVEL_BALL
+	.2byte ITEM_LURE_BALL
+	.2byte ITEM_HEAVY_BALL
+	.2byte ITEM_LOVE_BALL
+	.2byte ITEM_FRIEND_BALL
+	.2byte ITEM_DREAM_BALL
+	.2byte ITEM_NONE
 	release
 	end
 
@@ -83,11 +108,11 @@ RustboroCity_DevonCorp_2F_Text_DevelopingNewBalls:
 RustboroCity_DevonCorp_2F_Text_WeFinallyMadeNewBalls:
 	.string "We finally made new kinds of\n"
 	.string "Poké Balls!\p"
-	.string "The Repeat Ball makes it easier to\n"
-	.string "catch Pokémon you've caught before.\p"
-	.string "The Timer Ball gets better at catching\n"
-	.string "Pokémon the longer a battle runs.\p"
-	.string "Both are proudly developed by\n"
+	.string "Would you like to be one of\n"
+	.string "the first trainers to buy one?$"
+
+RustboroCity_DevonCorp_2F_Text_ProudOfBalls:
+	.string "These are proudly developed by\n"
 	.string "the Devon Corporation.\p"
 	.string "Please give them a try!$"
 
