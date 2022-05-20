@@ -1,9 +1,15 @@
 EverGrandeCity_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, EverGrandeCity_OnTransition
+	map_script MAP_SCRIPT_ON_RESUME, EverGrandeCity_OnResume
 	.byte 0
 
 EverGrandeCity_OnTransition:
+	call Common_EventScript_GetDayOrNight
 	call_if_set FLAG_SYS_WEATHER_CTRL, Common_EventScript_SetAbnormalWeather
+	end
+
+EverGrandeCity_OnResume:
+	call Common_EventScript_GetDayOrNight
 	end
 
 EverGrandeCity_EventScript_VictoryRoadSign::

@@ -1,10 +1,12 @@
 Route127_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, Route127_OnTransition
+	map_script MAP_SCRIPT_ON_RESUME, Route127_OnResume
 	map_script MAP_SCRIPT_ON_LOAD, Route127_OnLoad
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, Route127_OnFrame
 	.byte 0
 
 Route127_OnTransition:
+	call Common_EventScript_GetDayOrNight
 	call_if_set FLAG_SYS_WEATHER_CTRL, Common_EventScript_SetAbnormalWeather
 	call_if_eq VAR_SHOULD_END_ABNORMAL_WEATHER, 1, AbnormalWeather_EventScript_HideMapNamePopup
 	call_if_eq VAR_ABNORMAL_WEATHER_LOCATION, ABNORMAL_WEATHER_ROUTE_127_NORTH, AbnormalWeather_StartKyogreWeather
@@ -14,6 +16,10 @@ Route127_OnTransition:
 Route127_OnLoad:
 	call_if_eq VAR_ABNORMAL_WEATHER_LOCATION, ABNORMAL_WEATHER_ROUTE_127_NORTH, AbnormalWeather_EventScript_PlaceTilesRoute127North
 	call_if_eq VAR_ABNORMAL_WEATHER_LOCATION, ABNORMAL_WEATHER_ROUTE_127_SOUTH, AbnormalWeather_EventScript_PlaceTilesRoute127South
+	end
+
+Route127_OnResume:
+	call Common_EventScript_GetDayOrNight
 	end
 
 Route127_OnFrame:

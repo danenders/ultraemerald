@@ -6,15 +6,21 @@
 
 PetalburgCity_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, PetalburgCity_OnTransition
+	map_script MAP_SCRIPT_ON_RESUME, PetalburgCity_OnResume
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, PetalburgCity_OnFrame
 	.byte 0
 
 PetalburgCity_OnTransition:
+	call Common_EventScript_GetDayOrNight
 	setflag FLAG_VISITED_PETALBURG_CITY
 	call_if_eq VAR_PETALBURG_CITY_STATE, 0, PetalburgCity_EventScript_MoveGymBoyToWestEntrance
 	call_if_eq VAR_PETALBURG_CITY_STATE, 2, PetalburgCity_EventScript_DisableMapNameAndMusic
 	call_if_eq VAR_PETALBURG_CITY_STATE, 4, PetalburgCity_EventScript_DisableMapNameAndMusic
 	call_if_eq VAR_PETALBURG_GYM_STATE, 8, PetalburgCity_EventScript_SetGymDoorsUnlocked
+	end
+
+PetalburgCity_OnResume:
+	call Common_EventScript_GetDayOrNight
 	end
 
 PetalburgCity_EventScript_MoveGymBoyToWestEntrance::

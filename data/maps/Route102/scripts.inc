@@ -1,5 +1,15 @@
 Route102_MapScripts::
+	map_script	MAP_SCRIPT_ON_TRANSITION, Route102_OnTransition
+	map_script  MAP_SCRIPT_ON_RESUME, Route102_OnResume
 	.byte 0
+
+Route102_OnTransition:
+	call Common_EventScript_GetDayOrNight
+	end
+
+Route102_OnResume:
+	call Common_EventScript_GetDayOrNight
+	end
 
 Route102_EventScript_LittleBoy::
 	msgbox Route102_Text_ImNotVeryTall, MSGBOX_NPC

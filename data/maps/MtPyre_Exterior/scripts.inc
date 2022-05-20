@@ -1,9 +1,15 @@
 MtPyre_Exterior_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, MtPyre_Exterior_OnTransition
+	map_script MAP_SCRIPT_ON_RESUME, MtPyre_Exterior_OnResume
 	.byte 0
 
 MtPyre_Exterior_OnTransition:
+	call Common_EventScript_GetDayOrNight
 	call MtPyre_Exterior_EventScript_CheckEnterFromSummit
+	end
+
+MtPyre_Exterior_OnResume:
+	call Common_EventScript_GetDayOrNight
 	end
 
 MtPyre_Exterior_EventScript_CheckEnterFromSummit::

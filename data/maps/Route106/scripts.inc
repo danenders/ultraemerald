@@ -1,6 +1,16 @@
 Route106_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, Route106_OnTransition
+	map_script MAP_SCRIPT_ON_RESUME, Route106_OnResume
 	.byte 0
 
+Route106_OnTransition:
+	call Common_EventScript_GetDayOrNight
+	end
+
+Route106_OnResume:
+	call Common_EventScript_GetDayOrNight
+	end
+	
 Route106_EventScript_TrainerTipsSign::
 	msgbox Route106_Text_TrainerTips, MSGBOX_SIGN
 	end

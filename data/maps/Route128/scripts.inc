@@ -5,10 +5,16 @@
 Route128_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, Route128_OnTransition
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, Route128_OnFrame
+	map_script MAP_SCRIPT_ON_RESUME, Route128_OnResume
 	.byte 0
 
 Route128_OnTransition:
+	call Common_EventScript_GetDayOrNight
 	call_if_set FLAG_SYS_WEATHER_CTRL, Common_EventScript_SetAbnormalWeather
+	end
+
+Route128_OnResume:
+	call Common_EventScript_GetDayOrNight
 	end
 
 Route128_OnFrame:

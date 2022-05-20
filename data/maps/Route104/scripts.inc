@@ -5,6 +5,7 @@
 Route104_MapScripts::
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, Route104_OnFrame
 	map_script MAP_SCRIPT_ON_TRANSITION, Route104_OnTransition
+	map_script MAP_SCRIPT_ON_RESUME, Route104_OnResume
 	.byte 0
 
 Route104_OnFrame:
@@ -17,9 +18,14 @@ Route104_EventScript_StartSailToDewford::
 	end
 
 Route104_OnTransition:
+	call Common_EventScript_GetDayOrNight
 	call Common_EventScript_SetupRivalGfxId
 	call Route104_EventScript_TrySetRivalPos
 	call Route104_EventScript_ShowOrHideWhiteHerbFlorist
+	end
+
+Route104_OnResume:
+	call Common_EventScript_GetDayOrNight
 	end
 
 Route104_EventScript_ShowOrHideWhiteHerbFlorist::

@@ -2,7 +2,17 @@
 .set LOCALID_DEVON_EMPLOYEE, 4
 
 PetalburgWoods_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, PetalburgWoods_OnTransition
+	map_script MAP_SCRIPT_ON_RESUME, PetalburgWoods_OnResume
 	.byte 0
+
+PetalburgWoods_OnTransition:
+	call Common_EventScript_GetDayOrNight
+	end
+
+PetalburgWoods_OnResume:
+	call Common_EventScript_GetDayOrNight
+	end
 
 PetalburgWoods_EventScript_DevonResearcherLeft::
 	lockall

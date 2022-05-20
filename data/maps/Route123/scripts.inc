@@ -1,9 +1,15 @@
 Route123_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, Route123_OnTransition
+	map_script MAP_SCRIPT_ON_RESUME, Route123_OnResume
 	.byte 0
 
 Route123_OnTransition:
+	call Common_EventScript_GetDayOrNight
 	special SetRoute123Weather
+	end
+
+Route123_OnResume:
+	call Common_EventScript_GetDayOrNight
 	end
 
 Route123_EventScript_GigaDrainGirl::

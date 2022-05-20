@@ -12,10 +12,16 @@
 
 DewfordTown_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, DewfordTown_OnTransition
+	map_script MAP_SCRIPT_ON_RESUME, DewfordTown_OnResume
 	.byte 0
 
 DewfordTown_OnTransition:
+	call Common_EventScript_GetDayOrNight
 	setflag FLAG_VISITED_DEWFORD_TOWN
+	end
+
+DewfordTown_OnResume:
+	call Common_EventScript_GetDayOrNight
 	end
 
 DewfordTown_EventScript_Briney::

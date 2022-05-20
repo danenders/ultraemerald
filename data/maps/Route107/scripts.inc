@@ -1,5 +1,15 @@
 Route107_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, Route107_OnTransition
+	map_script MAP_SCRIPT_ON_RESUME, Route107_OnResume
 	.byte 0
+
+Route107_OnTransition:
+	call Common_EventScript_GetDayOrNight
+	end
+
+Route107_OnResume:
+	call Common_EventScript_GetDayOrNight
+	end
 
 Route107_EventScript_Darrin::
 	trainerbattle_single TRAINER_DARRIN, Route107_Text_DarrinIntro, Route107_Text_DarrinDefeated

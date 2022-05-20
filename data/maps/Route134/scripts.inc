@@ -1,8 +1,14 @@
 Route134_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, Route134_OnTransition
 	map_script MAP_SCRIPT_ON_RESUME, Route134_OnResume
 	.byte 0
 
+Route134_OnTransition:
+	call Common_EventScript_GetDayOrNight
+	end
+
 Route134_OnResume:
+	call Common_EventScript_GetDayOrNight
 	setdivewarp MAP_UNDERWATER_ROUTE134, 8, 6
 	end
 

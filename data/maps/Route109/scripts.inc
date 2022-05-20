@@ -2,7 +2,17 @@
 @  These are labeled in DewfordTown/scripts.inc
 
 Route109_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, Route109_OnTransition
+	map_script MAP_SCRIPT_ON_RESUME, Route109_OnResume
 	.byte 0
+
+Route109_OnTransition:
+	call Common_EventScript_GetDayOrNight
+	end
+
+Route109_OnResume:
+	call Common_EventScript_GetDayOrNight
+	end
 
 Route109_EventScript_StartDepartForDewford::
 	call EventScript_BackupMrBrineyLocation

@@ -1,5 +1,15 @@
 Route108_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, Route108_OnTransition
+	map_script MAP_SCRIPT_ON_RESUME, Route108_OnResume
 	.byte 0
+
+Route108_OnTransition:
+	call Common_EventScript_GetDayOrNight
+	end
+
+Route108_OnResume:
+	call Common_EventScript_GetDayOrNight
+	end
 
 Route108_EventScript_Jerome::
 	trainerbattle_single TRAINER_JEROME, Route108_Text_JeromeIntro, Route108_Text_JeromeDefeated

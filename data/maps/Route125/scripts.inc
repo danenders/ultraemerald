@@ -2,9 +2,11 @@ Route125_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, Route125_OnTransition
 	map_script MAP_SCRIPT_ON_LOAD, Route125_OnLoad
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, Route125_OnFrame
+	map_script MAP_SCRIPT_ON_RESUME, Route125_OnResume
 	.byte 0
 
 Route125_OnTransition:
+	call Common_EventScript_GetDayOrNight
 	call_if_set FLAG_SYS_WEATHER_CTRL, Common_EventScript_SetAbnormalWeather
 	call_if_eq VAR_SHOULD_END_ABNORMAL_WEATHER, 1, AbnormalWeather_EventScript_HideMapNamePopup
 	call_if_eq VAR_ABNORMAL_WEATHER_LOCATION, ABNORMAL_WEATHER_ROUTE_125_WEST, AbnormalWeather_StartKyogreWeather
@@ -19,6 +21,10 @@ Route125_OnLoad:
 Route125_OnFrame:
 	map_script_2 VAR_SHOULD_END_ABNORMAL_WEATHER, 1, AbnormalWeather_EventScript_EndEventAndCleanup_1
 	.2byte 0
+
+Route125_OnResume:
+	call Common_EventScript_GetDayOrNight
+	end
 
 Route125_EventScript_Nolen::
 	trainerbattle_single TRAINER_NOLEN, Route125_Text_NolenIntro, Route125_Text_NolenDefeat

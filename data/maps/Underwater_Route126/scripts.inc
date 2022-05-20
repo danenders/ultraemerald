@@ -1,3 +1,12 @@
 Underwater_Route126_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, Underwater_Route126_OnTransition
+	map_script MAP_SCRIPT_ON_RESUME, Underwater_Route126_OnResume
 	.byte 0
 
+Underwater_Route126_OnResume:
+	call Common_EventScript_GetDayOrNight
+	end
+
+Underwater_Route126_OnTransition:
+	call Common_EventScript_GetDayOrNight
+	end

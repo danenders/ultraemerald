@@ -1,6 +1,7 @@
 Route105_MapScripts::
 	map_script MAP_SCRIPT_ON_LOAD, Route105_OnLoad
 	map_script MAP_SCRIPT_ON_TRANSITION, Route105_OnTransition
+	map_script MAP_SCRIPT_ON_RESUME, Route105_OnResume
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, Route105_OnFrame
 	.byte 0
 
@@ -10,12 +11,17 @@ Route105_OnLoad:
 	call_if_eq VAR_ABNORMAL_WEATHER_LOCATION, ABNORMAL_WEATHER_ROUTE_105_SOUTH, AbnormalWeather_EventScript_PlaceTilesRoute105South
 	end
 
+Route105_OnResume:
+	call Common_EventScript_GetDayOrNight
+	end
+
 Route105_CloseRegiEntrance::
 	setmetatile 9, 19, METATILE_General_RockWall_RockBase, TRUE
 	setmetatile 9, 20, METATILE_General_RockWall_SandBase, TRUE
 	return
 
 Route105_OnTransition:
+	call Common_EventScript_GetDayOrNight
 	call_if_eq VAR_SHOULD_END_ABNORMAL_WEATHER, 1, AbnormalWeather_EventScript_HideMapNamePopup
 	call_if_eq VAR_ABNORMAL_WEATHER_LOCATION, ABNORMAL_WEATHER_ROUTE_105_NORTH, AbnormalWeather_StartKyogreWeather
 	call_if_eq VAR_ABNORMAL_WEATHER_LOCATION, ABNORMAL_WEATHER_ROUTE_105_SOUTH, AbnormalWeather_StartKyogreWeather

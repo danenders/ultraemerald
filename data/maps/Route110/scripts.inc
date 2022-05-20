@@ -10,10 +10,12 @@ Route110_MapScripts::
 	.byte 0
 
 Route110_OnResume:
+	call Common_EventScript_GetDayOrNight
 	special UpdateCyclingRoadState
 	end
 
 Route110_OnTransition:
+	call Common_EventScript_GetDayOrNight
 	call Common_EventScript_SetupRivalGfxId
 	call Common_EventScript_SetupRivalOnBikeGfxId
 	call_if_eq VAR_CYCLING_CHALLENGE_STATE, 1, Route110_EventScript_SaveCyclingMusic

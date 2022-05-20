@@ -3,7 +3,17 @@
 .set LOCALID_GRUNT_3, 14
 
 Route121_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, Route121_OnTransition
+	map_script MAP_SCRIPT_ON_RESUME, Route121_OnResume
 	.byte 0
+
+Route121_OnTransition:
+	call Common_EventScript_GetDayOrNight
+	end
+
+Route121_OnResume:
+	call Common_EventScript_GetDayOrNight
+	end
 
 Route121_EventScript_Woman::
 	msgbox Route121_Text_AheadLoomsMtPyre, MSGBOX_NPC

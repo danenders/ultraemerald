@@ -1,5 +1,15 @@
 Route132_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, Route132_OnTransition
+	map_script MAP_SCRIPT_ON_RESUME, Route132_OnResume
 	.byte 0
+
+Route132_OnTransition:
+	call Common_EventScript_GetDayOrNight
+	end
+
+Route132_OnResume:
+	call Common_EventScript_GetDayOrNight
+	end
 
 Route132_EventScript_Gilbert::
 	trainerbattle_single TRAINER_GILBERT, Route132_Text_GilbertIntro, Route132_Text_GilbertDefeat

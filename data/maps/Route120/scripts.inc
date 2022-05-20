@@ -9,6 +9,7 @@ Route120_MapScripts::
 	.byte 0
 
 Route120_OnResume:
+	call Common_EventScript_GetDayOrNight
 	call_if_set FLAG_SYS_CTRL_OBJ_DELETE, Route120_EventScript_RemoveKecleonObject
 	end
 
@@ -57,6 +58,7 @@ Route120_EventScript_SetBridgeKecleonMovement::
 	return
 
 Route120_OnTransition:
+	call Common_EventScript_GetDayOrNight
 	call GabbyAndTy_EventScript_UpdateLocation
 	call Route120_EventScript_SetWeather
 	end

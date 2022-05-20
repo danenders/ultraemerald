@@ -2,10 +2,16 @@
 
 Route117_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, Route117_OnTransition
+	map_script MAP_SCRIPT_ON_RESUME, Route117_OnResume
 	.byte 0
 
 Route117_OnTransition:
+	call Common_EventScript_GetDayOrNight
 	call Route117_EventScript_TryMoveDayCareMan
+	end
+
+Route117_OnResume:
+	call Common_EventScript_GetDayOrNight
 	end
 
 Route117_EventScript_TryMoveDayCareMan::

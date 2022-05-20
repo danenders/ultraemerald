@@ -1,5 +1,15 @@
 Route133_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, Route133_OnTransition
+	map_script MAP_SCRIPT_ON_RESUME, Route133_OnResume
 	.byte 0
+
+Route133_OnTransition:
+	call Common_EventScript_GetDayOrNight
+	end
+
+Route133_OnResume:
+	call Common_EventScript_GetDayOrNight
+	end
 
 Route133_EventScript_Franklin::
 	trainerbattle_single TRAINER_FRANKLIN, Route133_Text_FranklinIntro, Route133_Text_FranklinDefeat
