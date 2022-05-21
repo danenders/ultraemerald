@@ -20,7 +20,7 @@ RustboroCity_DevonCorp_3F_OnWarp:
 	.2byte 0
 
 RustboroCity_DevonCorp_3F_EventScript_PlayerFaceEast::
-	turnobject OBJ_EVENT_ID_PLAYER, DIR_EAST
+	followerintopokeball
 	end
 
 RustboroCity_DevonCorp_3F_OnFrame:
@@ -28,7 +28,10 @@ RustboroCity_DevonCorp_3F_OnFrame:
 	.2byte 0
 
 RustboroCity_DevonCorp_3F_EventScript_MeetPresident::
+	waitmovement 0
+	followerintopokeball
 	lockall
+	turnobject OBJ_EVENT_ID_PLAYER, DIR_EAST
 	msgbox RustboroCity_DevonCorp_3F_Text_ThisIs3rdFloorWaitHere, MSGBOX_DEFAULT
 	closemessage
 	applymovement LOCALID_DEVON_EMPLOYEE, RustboroCity_DevonCorp_3F_Movement_EmployeeWalkOffscreen
@@ -79,7 +82,7 @@ RustboroCity_DevonCorp_3F_Movement_Unused:
 	walk_up
 	walk_in_place_faster_left
 	step_end
-
+	
 RustboroCity_DevonCorp_3F_Movement_LeadPlayerToPresident:
 	walk_right
 	walk_right

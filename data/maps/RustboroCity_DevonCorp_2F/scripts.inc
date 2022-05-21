@@ -1,4 +1,5 @@
 .set LOCALID_FOSSIL_SCIENTIST, 5
+.set LOCALID_PROF_OAK, 7
 
 RustboroCity_DevonCorp_2F_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, RustboroCity_DevonCorp_2F_OnTransition
@@ -6,7 +7,147 @@ RustboroCity_DevonCorp_2F_MapScripts::
 
 RustboroCity_DevonCorp_2F_OnTransition:
 	call_if_eq VAR_FOSSIL_RESURRECTION_STATE, 1, RustboroCity_DevonCorp_2F_EventScript_SetFossilReady
+	call RustboroCity_DevonCorp_2F_EventScript_CheckOak
 	end
+
+RustboroCity_DevonCorp_2F_EventScript_CheckOak::
+	goto_if_unset FLAG_RECEIVED_EXP_SHARE, RustboroCity_DevonCorp_2F_EventScript_HideOak
+	goto_if_set FLAG_SYS_DEXNAV_GET, RustboroCity_DevonCorp_2F_EventScript_HideOak
+	clearflag FLAG_HIDE_DEVON_CORP_OAK
+	setvar VAR_DEXNAV_STATE, 1
+	end
+
+RustboroCity_DevonCorp_2F_EventScript_HideOak::
+	setvar VAR_DEXNAV_STATE, 0
+	setflag FLAG_HIDE_DEVON_CORP_OAK
+	end
+
+RustboroCity_DevonCorp_2F_EventScript_OakDexnavEvent::
+	lockall
+	applymovement LOCALID_PROF_OAK, Common_Movement_ExclamationMark
+	waitmovement 7
+	savebgm MUS_DUMMY
+	fadedefaultbgm
+	playbgm MUS_RG_OAK, TRUE
+	msgbox RustboroCity_DevonCorp_2F_Text_ComeThisWayPlayer, MSGBOX_DEFAULT
+	closemessage
+	hidefollower
+	applymovement OBJ_EVENT_ID_PLAYER, RustboroCity_DevonCorp_2F_Movement_WalkToOak
+	waitmovement 0
+	goto RustboroCity_DevonCorp_2F_EventScript_GetDexNavFromOak
+	end
+
+RustboroCity_DevonCorp_2F_EventScript_OakDexnavEvent1::
+	lockall
+	applymovement LOCALID_PROF_OAK, Common_Movement_ExclamationMark
+	waitmovement 7
+	savebgm MUS_DUMMY
+	fadedefaultbgm
+	playbgm MUS_RG_OAK, TRUE
+	msgbox RustboroCity_DevonCorp_2F_Text_ComeThisWayPlayer, MSGBOX_DEFAULT
+	closemessage
+	hidefollower
+	applymovement OBJ_EVENT_ID_PLAYER, RustboroCity_DevonCorp_2F_Movement_WalkToOak1
+	waitmovement 0
+	goto RustboroCity_DevonCorp_2F_EventScript_GetDexNavFromOak
+	end
+
+RustboroCity_DevonCorp_2F_EventScript_OakDexnavEvent2::
+	lockall
+	applymovement LOCALID_PROF_OAK, Common_Movement_ExclamationMark
+	waitmovement 7
+	savebgm MUS_DUMMY
+	hidefollower
+	playbgm MUS_RG_OAK, TRUE
+	msgbox RustboroCity_DevonCorp_2F_Text_ComeThisWayPlayer, MSGBOX_DEFAULT
+	closemessage
+	hidefollower
+	applymovement OBJ_EVENT_ID_PLAYER, RustboroCity_DevonCorp_2F_Movement_WalkToOak2
+	waitmovement 0
+	goto RustboroCity_DevonCorp_2F_EventScript_GetDexNavFromOak
+	end
+
+RustboroCity_DevonCorp_2F_EventScript_GetDexNavFromOak::
+	turnobject LOCALID_PROF_OAK, DIR_EAST
+	turnobject OBJ_EVENT_ID_PLAYER, DIR_WEST
+	msgbox RustboroCity_DevonCorp_2F_Text_ThisIsADexNav, MSGBOX_DEFAULT
+	applymovement LOCALID_PROF_OAK, Common_Movement_WalkInPlaceFasterRight
+	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_WalkInPlaceFasterLeft
+	setflag FLAG_SYS_DEXNAV_GET
+	setflag FLAG_SYS_DETECTOR_MODE
+	playfanfare MUS_OBTAIN_ITEM
+	message RustboroCity_DevonCorp_2F_Text_DexNavReceived
+	waitmessage
+	waitfanfare
+	msgbox RustboroCity_DevonCorp_2F_Text_DiscoverNewPokemon, MSGBOX_DEFAULT
+	setflag FLAG_HIDE_DEVON_CORP_OAK
+	turnobject LOCALID_PROF_OAK, DIR_NORTH
+	fadedefaultbgm
+	releaseall
+	setvar VAR_DEXNAV_STATE, 0
+	end
+
+RustboroCity_DevonCorp_2F_EventScript_OakAfterDexNav::
+	lock
+	faceplayer
+	msgbox RustboroCity_DevonCorp_2F_Text_DiscoverNewPokemon, MSGBOX_DEFAULT
+	turnobject LOCALID_PROF_OAK, DIR_NORTH
+	release
+	end
+
+RustboroCity_DevonCorp_2F_Movement_WalkToOak:
+	walk_right
+	walk_right
+	walk_right
+	walk_down
+	walk_down
+	walk_down
+	walk_down
+	step_end
+
+RustboroCity_DevonCorp_2F_Movement_WalkToOak1:
+	walk_right
+	walk_right
+	walk_down
+	walk_down
+	walk_down
+	step_end
+
+RustboroCity_DevonCorp_2F_Movement_WalkToOak2:
+	walk_right
+	walk_down
+	walk_down
+	walk_down
+	walk_down
+	step_end
+
+RustboroCity_DevonCorp_2F_Text_ComeThisWayPlayer:
+	.string "Oak: Oh, {PLAYER}!\p"
+	.string "How convienent. I have something\n"
+	.string "that I think you may find interesting.\p"
+	.string "Why don't you come over here and see.$"
+
+RustboroCity_DevonCorp_2F_Text_ThisIsADexNav:
+	.string "Oak: As you know, I invented the\n"
+	.string "Pokédex to fulfill my dream of studying\l"
+	.string "every Pokémon in the world.\p"
+	.string "Since then, I've been working on a way\n"
+	.string "to improve the way Trainers can study\l"
+	.string "Pokémon in the field.\p"
+	.string "The scientists at Devon Corp have helped\n"
+	.string "turn my new dream into a reality!\p"
+	.string "We've called our project the DexNav!\p"
+	.string "We need a trainer like you to test our\n"
+	.string "prototype in the field.\p"
+	.string "Why don't you take this with you, {PLAYER}!$"
+
+RustboroCity_DevonCorp_2F_Text_DexNavReceived:
+	.string "{PLAYER} received the DexNav!$"
+
+RustboroCity_DevonCorp_2F_Text_DiscoverNewPokemon:
+	.string "Now that you have the DexNav, you\n"
+	.string "should have no trouble finding new\l"
+	.string "Pokémon during your travels!$"
 
 RustboroCity_DevonCorp_2F_EventScript_SetFossilReady::
 	setvar VAR_FOSSIL_RESURRECTION_STATE, 2

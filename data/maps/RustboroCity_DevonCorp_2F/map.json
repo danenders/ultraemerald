@@ -91,6 +91,19 @@
       "trainer_sight_or_berry_tree_id": "0",
       "script": "RustboroCity_DevonCorp_2F_EventScript_MatchCallScientist",
       "flag": "0"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_PROF_OAK",
+      "x": 3,
+      "y": 6,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_FACE_UP",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "RustboroCity_DevonCorp_2F_EventScript_OakAfterDexNav",
+      "flag": "FLAG_HIDE_DEVON_CORP_OAK"
     }
   ],
   "warp_events": [
@@ -110,7 +123,33 @@
     }
   ],
   "coord_events": [
-
+    {
+      "type": "trigger",
+      "x": 2,
+      "y": 3,
+      "elevation": 0,
+      "var": "VAR_DEXNAV_STATE",
+      "var_value": "1",
+      "script": "RustboroCity_DevonCorp_2F_EventScript_OakDexnavEvent1"
+    },
+    {
+      "type": "trigger",
+      "x": 3,
+      "y": 2,
+      "elevation": 0,
+      "var": "VAR_DEXNAV_STATE",
+      "var_value": "1",
+      "script": "RustboroCity_DevonCorp_2F_EventScript_OakDexnavEvent2"
+    },
+    {
+      "type": "trigger",
+      "x": 1,
+      "y": 2,
+      "elevation": 0,
+      "var": "VAR_DEXNAV_STATE",
+      "var_value": "1",
+      "script": "RustboroCity_DevonCorp_2F_EventScript_OakDexnavEvent"
+    }
   ],
   "bg_events": [
 
