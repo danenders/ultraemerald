@@ -192,11 +192,41 @@ MossdeepCity_SpaceCenter_1F_EventScript_OldManMagma::
 MossdeepCity_SpaceCenter_1F_EventScript_Steven::
 	lock
 	faceplayer
+	goto_if_set FLAG_RECEIVED_MEGA_RING, MossdeepCity_SpaceCenter_1F_EventScript_ReceivedMegaRing
 	msgbox MossdeepCity_SpaceCenter_1F_Text_StevenMagmaCantBeAllowedToTakeFuel, MSGBOX_DEFAULT
+	giveitem ITEM_MEGA_RING
+	setflag FLAG_RECEIVED_MEGA_RING
+	msgbox MossdeepCity_SpaceCenter_1F_Text_GetMegaRing, MSGBOX_DEFAULT
+	waitmessage
+	msgbox MossdeepCity_SpaceCenter_1F_Text_GetStarterMegaStone, MSGBOX_DEFAULT
+	call_if_eq VAR_STARTER_MON, 0, MossdeepCity_SpaceCenter_1F_EventScript_GetSceptilite
+	call_if_eq VAR_STARTER_MON, 1, MossdeepCity_SpaceCenter_1F_EventScript_GetBlazikenite
+	call_if_eq VAR_STARTER_MON, 2, MossdeepCity_SpaceCenter_1F_EventScript_GetSwampertite
+	waitmessage
+	goto MossdeepCity_SpaceCenter_1F_EventScript_ReceivedMegaRing
+	end
+
+MossdeepCity_SpaceCenter_1F_EventScript_ReceivedMegaRing::
+	msgbox MossdeepCity_SpaceCenter_1F_Text_StevenIllStayHere, MSGBOX_DEFAULT
 	applymovement VAR_LAST_TALKED, Common_Movement_FaceOriginalDirection
 	waitmovement 0
 	release
 	end
+
+MossdeepCity_SpaceCenter_1F_EventScript_GetSceptilite::
+	giveitem ITEM_SCEPTILITE
+	setflag FLAG_FOUND_SCEPTILITE
+	return
+
+MossdeepCity_SpaceCenter_1F_EventScript_GetBlazikenite::
+	giveitem ITEM_BLAZIKENITE
+	setflag FLAG_FOUND_BLAZIKENITE
+	return
+
+MossdeepCity_SpaceCenter_1F_EventScript_GetSwampertite::
+	giveitem ITEM_SWAMPERTITE
+	setflag FLAG_FOUND_SWAMPERTITE
+	return
 
 MossdeepCity_SpaceCenter_1F_EventScript_MagmaNote::
 	lockall
@@ -363,6 +393,24 @@ MossdeepCity_SpaceCenter_1F_Text_StevenMagmaCantBeAllowedToTakeFuel:
 	.string "fuel on this island.\p"
 	.string "I don't know what they'd need it for,\n"
 	.string "but they can't be allowed to take it.\p"
+	.string "If you are going to put a stop to them,\n"
+	.string "you should take this.$"
+
+MossdeepCity_SpaceCenter_1F_Text_GetMegaRing:
+	.string "That Mega Ring will allow you to harness\n"
+	.string "the power of a Mega Stone.\p"
+	.string "Some Pokemon are said to become more\n"
+	.string "powerful when exposed to a Mega Stone's\l"
+	.string "properties.$"
+
+MossdeepCity_SpaceCenter_1F_Text_GetStarterMegaStone:
+	.string "I came across this Mega Stone during my\n"
+	.string "travels, but I have no need for it.\p"
+	.string "With this power, I'm certain nothing\n"
+	.string "will stop you and your Pokemon from\l"
+	.string "stopping Team Magma's plans.$"
+
+MossdeepCity_SpaceCenter_1F_Text_StevenIllStayHere:
 	.string "I'll keep an eye on things for\n"
 	.string "a while longer.\p"
 	.string "In the meantime, why don't you go\n"
