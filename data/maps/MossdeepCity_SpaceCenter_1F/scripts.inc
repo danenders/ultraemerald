@@ -192,16 +192,16 @@ MossdeepCity_SpaceCenter_1F_EventScript_OldManMagma::
 MossdeepCity_SpaceCenter_1F_EventScript_Steven::
 	lock
 	faceplayer
-	goto_if_set FLAG_RECEIVED_MEGA_RING, MossdeepCity_SpaceCenter_1F_EventScript_ReceivedMegaRing
+	goto_if_set FLAG_RECEIVED_STARTER_MEGA_STONE, MossdeepCity_SpaceCenter_1F_EventScript_ReceivedMegaRing
 	msgbox MossdeepCity_SpaceCenter_1F_Text_StevenMagmaCantBeAllowedToTakeFuel, MSGBOX_DEFAULT
 	giveitem ITEM_MEGA_RING
-	setflag FLAG_RECEIVED_MEGA_RING
 	msgbox MossdeepCity_SpaceCenter_1F_Text_GetMegaRing, MSGBOX_DEFAULT
 	waitmessage
 	msgbox MossdeepCity_SpaceCenter_1F_Text_GetStarterMegaStone, MSGBOX_DEFAULT
 	call_if_eq VAR_STARTER_MON, 0, MossdeepCity_SpaceCenter_1F_EventScript_GetSceptilite
 	call_if_eq VAR_STARTER_MON, 1, MossdeepCity_SpaceCenter_1F_EventScript_GetBlazikenite
 	call_if_eq VAR_STARTER_MON, 2, MossdeepCity_SpaceCenter_1F_EventScript_GetSwampertite
+	setflag FLAG_RECEIVED_STARTER_MEGA_STONE
 	waitmessage
 	goto MossdeepCity_SpaceCenter_1F_EventScript_ReceivedMegaRing
 	end
@@ -215,17 +215,14 @@ MossdeepCity_SpaceCenter_1F_EventScript_ReceivedMegaRing::
 
 MossdeepCity_SpaceCenter_1F_EventScript_GetSceptilite::
 	giveitem ITEM_SCEPTILITE
-	setflag FLAG_FOUND_SCEPTILITE
 	return
 
 MossdeepCity_SpaceCenter_1F_EventScript_GetBlazikenite::
 	giveitem ITEM_BLAZIKENITE
-	setflag FLAG_FOUND_BLAZIKENITE
 	return
 
 MossdeepCity_SpaceCenter_1F_EventScript_GetSwampertite::
 	giveitem ITEM_SWAMPERTITE
-	setflag FLAG_FOUND_SWAMPERTITE
 	return
 
 MossdeepCity_SpaceCenter_1F_EventScript_MagmaNote::

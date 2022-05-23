@@ -177,6 +177,8 @@ MtPyre_Summit_EventScript_OldLady::
 
 MtPyre_Summit_EventScript_OldLadyOrbsReturned::
 	msgbox MtPyre_Summit_Text_ThoseTwoMenReturnedOrbs, MSGBOX_DEFAULT
+	giveitem ITEM_RED_ORB
+	giveitem ITEM_BLUE_ORB
 	setflag FLAG_RETURNED_RED_OR_BLUE_ORB
 	release
 	end
@@ -549,7 +551,13 @@ MtPyre_Summit_Text_ThoseTwoMenReturnedOrbs:
 	.string "The two men who took the Orbs came\n"
 	.string "back to return them on their own.\p"
 	.string "Those men…\n"
-	.string "Perhaps they are not so evil after all…$"
+	.string "Perhaps they are not so evil after all…\p"
+	.string "But...\p"
+	.string "It is clear the orbs are no longer safe\n"
+	.string "here.\p"
+	.string "You have proven yourself as a friend to\n"
+	.string "Pokémon…\p"
+	.string "The orbs will be safe in your hands...$"
 
 MtPyre_Summit_Text_SuperAncientPokemonTaughtUs:
 	.string "The embodiments of the land, sea,\n"

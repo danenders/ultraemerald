@@ -274,8 +274,8 @@
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
-      "x": 25,
-      "y": 76,
+      "x": 36,
+      "y": 50,
       "elevation": 3,
       "movement_type": "MOVEMENT_TYPE_LOOK_AROUND",
       "movement_range_x": 0,
@@ -583,6 +583,45 @@
       "trainer_sight_or_berry_tree_id": "0",
       "script": "0x0",
       "flag": "FLAG_HIDE_ROUTE_119_SCOTT"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_PREMIER_BALL",
+      "x": 25,
+      "y": 76,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_NONE",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "MegaStone_EventScript_Heraconrite",
+      "flag": "FLAG_FOUND_HERACRONITE"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_PREMIER_BALL",
+      "x": 17,
+      "y": 60,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_NONE",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "MegaStone_EventScript_Scizorite",
+      "flag": "FLAG_FOUND_SCIZORITE"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_PREMIER_BALL",
+      "x": 6,
+      "y": 5,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_NONE",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "MegaStone_EventScript_Pinsirite",
+      "flag": "FLAG_FOUND_PINSIRITE"
     }
   ],
   "warp_events": [

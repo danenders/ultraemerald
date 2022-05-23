@@ -657,3 +657,124 @@ MagmaHideout_4F_EventScript_ItemMaxRevive::
 MagmaHideout_3F_3R_EventScript_ItemEscapeRope::
 	finditem ITEM_ESCAPE_ROPE
 	end
+
+@MegaStones
+MegaStone_EventScript_Salamencite::
+	finditem ITEM_SALAMENCITE
+	end
+
+MegaStone_EventScript_Aggronite::
+	finditem ITEM_AGGRONITE
+	end
+
+MegaStone_EventScript_Sablenite::
+	finditem ITEM_SABLENITE
+	end
+
+MegaStone_EventScript_Beedrillite::
+	finditem ITEM_BEEDRILLITE
+	end
+
+MegaStone_EventScript_Pidgeotite::
+	finditem ITEM_PIDGEOTITE
+	end
+
+MegaStone_EventScript_Heraconrite::
+	finditem ITEM_HERACRONITE
+	end
+
+MegaStone_EventScript_Absolite::
+	finditem ITEM_ABSOLITE
+	end
+
+MegaStone_EventScript_Ampharosite::
+	finditem ITEM_AMPHAROSITE
+	end
+
+MegaStone_EventScript_Manectite::
+	finditem ITEM_MANECTITE
+	end
+
+MegaStone_EventScript_Tyranitarite::
+	finditem ITEM_TYRANITARITE
+	end
+
+MegaStone_EventScript_Cameruptite::
+	finditem ITEM_CAMERUPTITE
+	end
+
+MegaStone_EventScript_Gengarite::
+	finditem ITEM_GENGARITE
+	end
+
+MegaStone_EventScript_Steelixite::
+	finditem ITEM_STEELIXITE
+	end
+
+MegaStone_EventScript_Glalitite::
+	finditem ITEM_GLALITITE
+	end
+
+MegaStone_EventScript_Altarianite::
+	finditem ITEM_ALTARIANITE
+	end
+
+MegaStone_EventScript_Aerodactylite::
+	finditem ITEM_AERODACTYLITE
+	end
+
+MegaStone_EventScript_Gyaradosite::
+	finditem ITEM_GYARADOSITE
+	end
+
+MegaStone_EventScript_Sharpedonite::
+	finditem ITEM_SHARPEDONITE
+	end
+
+MegaStone_EventScript_Slowbronite::
+	finditem ITEM_SLOWBRONITE
+	end
+
+MegaStone_EventScript_Kangaskhanite::
+	finditem ITEM_KANGASKHANITE
+	end
+
+MegaStone_EventScript_Alakazite::
+	finditem ITEM_ALAKAZITE
+	end
+
+MegaStone_EventScript_Latiosite::
+	finditem ITEM_LATIOSITE
+	end
+
+MegaStone_EventScript_Latiasite::
+	finditem ITEM_LATIASITE
+	end
+
+MegaStone_EventScript_Houndoominite::
+	finditem ITEM_HOUNDOOMINITE
+	end
+
+MegaStone_EventScript_Scizorite::
+	finditem ITEM_SCIZORITE
+	end
+
+MegaStone_EventScript_Pinsirite::
+	finditem ITEM_PINSIRITE
+	end
+
+MegaStone_EventScript_Mawilite::
+	finditem ITEM_MAWILITE
+	end
+
+MegaStone_EventScript_Medichamite::
+	finditem ITEM_MEDICHAMITE
+	end
+
+MegaStone_EventScript_MewtoniteX::
+	finditem ITEM_MEWTONITE_X
+	end
+
+MegaStone_EventScript_MewtoniteY::
+	finditem ITEM_MEWTONITE_Y
+	end

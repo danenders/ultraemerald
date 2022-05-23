@@ -97,7 +97,7 @@
 #define FLAG_LEGENDARIES_IN_SOOTOPOLIS           0x53
 
 #define FLAG_HIDE_DEVON_CORP_OAK             0x54  // Prof Oak appears at Devon Corp to give DexNav
-#define FLAG_UNUSED_0x055                    0x55  // Unused Flag
+#define FLAG_HIDE_SKY_PILLAR_ZINNIA          0x55  // Zinnia appears at the top of Sky Pillar if Rayquaza has been captured
 
 #define FLAG_HIDE_CONTEST_POKE_BALL          0x56  // Always set after new game, object it hides is added directly
 #define FLAG_MET_RIVAL_MOM                   0x57
@@ -143,7 +143,7 @@
 #define FLAG_RECEIVED_HM08                   0x7B
 #define FLAG_REGISTER_RIVAL_POKENAV          0x7C
 #define FLAG_DEFEATED_RIVAL_ROUTE_104        0x7D
-#define FLAG_DEFEATED_WALLY_VICTORY_ROAD     0x7E
+#define FLAG_DEFEATED_WALLY_VICTORY_ROAD     0x7E // Also tracks getting the GALLADITE and GARDEVOIRITE
 #define FLAG_MET_PRETTY_PETAL_SHOP_OWNER     0x7F
 #define FLAG_ENABLE_ROXANNE_FIRST_CALL       0x80 // Set after defeating Brawly. This will activate a call with Roxanne in order to register her.
 #define FLAG_KYOGRE_ESCAPED_SEAFLOOR_CAVERN  0x81
@@ -280,7 +280,7 @@
 #define FLAG_RECEIVED_REPEAT_BALL            0x100
 #define FLAG_RECEIVED_OLD_ROD                0x101
 #define FLAG_RECEIVED_COIN_CASE              0x102
-#define FLAG_RETURNED_RED_OR_BLUE_ORB        0x103
+#define FLAG_RETURNED_RED_OR_BLUE_ORB        0x103 //also tracks getting the RED/BLUE orb for postgame
 #define FLAG_RECEIVED_TM49                   0x104
 #define FLAG_RECEIVED_TM28                   0x105
 #define FLAG_RECEIVED_TM09                   0x106
@@ -1217,44 +1217,44 @@
 #define FLAG_ITEM_SAFARI_ZONE_NORTH_EAST_NUGGET                     0x491
 #define FLAG_ITEM_SAFARI_ZONE_SOUTH_EAST_BIG_PEARL                  0x492
 
-#define FLAG_RECEIVED_MEGA_RING                                    	0x493 // Received from Steven in Mossdeep
-#define FLAG_FOUND_SCEPTILITE                                      	0x494 // Received from Steven in Mossdeep if starter, otherwise found in
-#define FLAG_FOUND_BLAZIKENITE                                     	0x495 // Received from Steven in Mossdeep if starter, otherwise found in
-#define FLAG_FOUND_SWAMPERTITE                                      0x496 // Received from Steven in Mossdeep if starter, otherwise found in
-#define FLAG_UNUSED_0x497                                           0x497 // Unused Flag
-#define FLAG_UNUSED_0x498                                           0x498 // Unused Flag
-#define FLAG_UNUSED_0x499                                           0x499 // Unused Flag
-#define FLAG_UNUSED_0x49A                                           0x49A // Unused Flag
-#define FLAG_UNUSED_0x49B                                           0x49B // Unused Flag
-#define FLAG_UNUSED_0x49C                                           0x49C // Unused Flag
-#define FLAG_UNUSED_0x49D                                           0x49D // Unused Flag
-#define FLAG_UNUSED_0x49E                                           0x49E // Unused Flag
-#define FLAG_UNUSED_0x49F                                           0x49F // Unused Flag
-#define FLAG_UNUSED_0x4A0                                           0x4A0 // Unused Flag
-#define FLAG_UNUSED_0x4A1                                           0x4A1 // Unused Flag
-#define FLAG_UNUSED_0x4A2                                           0x4A2 // Unused Flag
-#define FLAG_UNUSED_0x4A3                                           0x4A3 // Unused Flag
-#define FLAG_UNUSED_0x4A4                                           0x4A4 // Unused Flag
-#define FLAG_UNUSED_0x4A5                                           0x4A5 // Unused Flag
-#define FLAG_UNUSED_0x4A6                                           0x4A6 // Unused Flag
-#define FLAG_UNUSED_0x4A7                                           0x4A7 // Unused Flag
-#define FLAG_UNUSED_0x4A8                                           0x4A8 // Unused Flag
-#define FLAG_UNUSED_0x4A9                                           0x4A9 // Unused Flag
-#define FLAG_UNUSED_0x4AA                                           0x4AA // Unused Flag
-#define FLAG_UNUSED_0x4AB                                           0x4AB // Unused Flag
-#define FLAG_UNUSED_0x4AC                                           0x4AC // Unused Flag
-#define FLAG_UNUSED_0x4AD                                           0x4AD // Unused Flag
-#define FLAG_UNUSED_0x4AE                                           0x4AE // Unused Flag
-#define FLAG_UNUSED_0x4AF                                           0x4AF // Unused Flag
-#define FLAG_UNUSED_0x4B0                                           0x4B0 // Unused Flag
-#define FLAG_UNUSED_0x4B1                                           0x4B1 // Unused Flag
-#define FLAG_UNUSED_0x4B2                                           0x4B2 // Unused Flag
-#define FLAG_UNUSED_0x4B3                                           0x4B3 // Unused Flag
-#define FLAG_UNUSED_0x4B4                                           0x4B4 // Unused Flag
-#define FLAG_UNUSED_0x4B5                                           0x4B5 // Unused Flag
-#define FLAG_UNUSED_0x4B6                                           0x4B6 // Unused Flag
-#define FLAG_UNUSED_0x4B7                                           0x4B7 // Unused Flag
-#define FLAG_UNUSED_0x4B8                                           0x4B8 // Unused Flag
+#define FLAG_RECEIVED_STARTER_MEGA_STONE                           	0x493 // Received from Steven in Mossdeep
+#define FLAG_RECEIVED_RIVAL_MEGA_STONE                              0x494 // Received from Rival in Littleroot during post-game
+#define FLAG_RECEIVED_THIRD_STARTER_MEGA_STONE                      0x495 // Received from Hiker on Route114, gives mega stone for Hoenn Starter that is not yours/your rivals
+#define FLAG_FOUND_SALAMENCITE                                      0x496 // Found in Meteor Falls
+#define FLAG_FOUND_AGGRONITE                                        0x497 // Found in Victory Road
+#define FLAG_FOUND_SABLENITE                                        0x498 // Found in Cave of Origin
+#define FLAG_FOUND_BANENITE                                         0x499 // Found on MtPyre Summit
+#define FLAG_FOUND_BEEDRILLITE                                      0x49A // Found in Petalburg Woods
+#define FLAG_FOUND_PIDGEOTITE                                       0x49B // Found on Route 115
+#define FLAG_FOUND_HERACRONITE                                      0x49C // Found on Route 119
+#define FLAG_FOUND_ABSOLITE                                         0x49D // Found on Route 120
+#define FLAG_FOUND_AMPHAROSITE                                      0x49E // Found on Route 116
+#define FLAG_FOUND_MANECTITE                                        0x49F // Found on Route 110
+#define FLAG_FOUND_TYRANITARITE                                     0x4A0 // Found on Route 111
+#define FLAG_FOUND_CAMERUPTITE                                      0x4A1 // Found in Jagged Pass
+#define FLAG_FOUND_GENGARITE                                        0x4A2 // Found on MtPyre 6F
+#define FLAG_FOUND_STEELIXITE                                       0x4A3 // Found in RusturfTunnel
+#define FLAG_FOUND_GLALITITE                                        0x4A4 // Found in Glalitite
+#define FLAG_FOUND_ALTARIANITE                                      0x4A5 // Found on top of Sky Pillar
+#define FLAG_FOUND_AERODACTYLITE                                    0x4A6 // Found in the Desert Underpass
+#define FLAG_FOUND_GYARADOSITE                                     	0x4A7 // Found underwater on Route 124
+#define FLAG_FOUND_SHARPEDONITE                                     0x4A8 // Found underwater on Route 126
+#define FLAG_FOUND_SLOWBRONITE                                      0x4A9 // Found in the Southwest Safari Zone
+#define FLAG_FOUND_KANGASKHANITE                                    0x4AA // Found in the North Safari Zone
+#define FLAG_FOUND_LATIASITE                                        0x4AB // Found on Southern Island
+#define FLAG_FOUND_LATIOSITE                                       	0x4AC // Found on Southern Island
+#define FLAG_FOUND_HOUNDOOMINITE                                    0x4AD // Found on Route 123
+#define FLAG_FOUND_ALAKAZITE                                        0x4AE // Found on Route 121
+#define FLAG_FOUND_PINSIRITE                                        0x4AF // Found on Route 119
+#define FLAG_FOUND_SCIZORITE                                        0x4B0 // Found on Route 119
+#define FLAG_FOUND_MAWILITE                                         0x4B1 // Found in Granite Cave (B2F)
+#define FLAG_FOUND_MEDICHAMITE                                      0x4B2 // Found in Lilycove Cite
+#define FLAG_FOUND_MEWTWONITE_X                                     0x4B3 // Found in the Mysterious Cave
+#define FLAG_FOUND_MEWTWONITE_Y                                     0x4B4 // Found in the Mysterious Cave
+#define FLAG_RECEIVED_VENUSARITE                                   	0x4B5 // Given by Prof Oak in the postgame (reward for beating Red)
+#define FLAG_RECEIVED_BLASTOISINITE                                	0x4B6 // Given by Prof Oak in the postgame (reward for beating Red)
+#define FLAG_RECEIVED_CHARIZARDITE_Y                                0x4B7 // Given by Prof Oak in the postgame (reward for beating Red)
+#define FLAG_RECEIVED_CHARIZARDITE_X                               	0x4B8 // Received from Red in the postgame
 #define FLAG_UNUSED_0x4B9                                           0x4B9 // Unused Flag
 #define FLAG_UNUSED_0x4BA                                           0x4BA // Unused Flag
 #define FLAG_UNUSED_0x4BB                                           0x4BB // Unused Flag
@@ -1320,7 +1320,7 @@
 #define FLAG_DEFEATED_FORTREE_GYM                                   0x4F5
 #define FLAG_DEFEATED_MOSSDEEP_GYM                                  0x4F6
 #define FLAG_DEFEATED_SOOTOPOLIS_GYM                                0x4F7
-#define FLAG_DEFEATED_METEOR_FALLS_STEVEN                           0x4F8
+#define FLAG_DEFEATED_METEOR_FALLS_STEVEN                           0x4F8 //Also gives the METAGROSSITE
 
 #define FLAG_UNUSED_0x4F9                                           0x4F9 // Unused Flag
 #define FLAG_UNUSED_0x4FA                                           0x4FA // Unused Flag

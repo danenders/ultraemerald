@@ -206,3 +206,42 @@ Route114_Text_FossilManiacsHouseSign:
 Route114_Text_LanettesHouse:
 	.string "Lanette's House$"
 
+Route114_EventScript_MegaStoneGiver::
+	lock
+	faceplayer
+	goto_if_set FLAG_RECEIVED_THIRD_STARTER_MEGA_STONE, Route114_EventScript_ReceivedThirdStarterMegaStone
+	msgbox Route114_Text_IFoundThisMegaStone, MSGBOX_DEFAULT
+	call_if_eq VAR_STARTER_MON, 0, Route114_EventScript_GetSwampertite
+	call_if_eq VAR_STARTER_MON, 1, Route114_EventScript_GetSceptilite
+	call_if_eq VAR_STARTER_MON, 2, Route114_EventScript_GetBlazikenite
+	waitmessage
+	setflag FLAG_RECEIVED_THIRD_STARTER_MEGA_STONE
+	goto Route114_EventScript_ReceivedThirdStarterMegaStone
+	end	
+
+Route114_EventScript_GetSceptilite::
+	giveitem ITEM_SCEPTILITE
+	return
+
+Route114_EventScript_GetBlazikenite::
+	giveitem ITEM_BLAZIKENITE
+	return
+
+Route114_EventScript_GetSwampertite::
+	giveitem ITEM_SWAMPERTITE
+	return
+
+Route114_EventScript_ReceivedThirdStarterMegaStone::
+	msgbox Route114_Text_IWonderWhatItsFor, MSGBOX_DEFAULT
+	releaseall
+	end
+
+Route114_Text_IFoundThisMegaStone:
+	.string "I found this strange stone while\n"
+	.string "I was hiking up here.\p"
+	.string "I don't have any need for it, so\n"
+	.string "why don't you take it.$"
+
+Route114_Text_IWonderWhatItsFor:
+	.string "I've never seen a stone like that.'\p"
+	.string "I wonder what its for...$"

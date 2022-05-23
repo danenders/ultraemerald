@@ -183,3 +183,12 @@ SkyPillar_Top_Movement_CameraPanDown:
 SkyPillar_Top_Text_RayquazaFlewOff:
 	.string "The awakened Rayquaza flew off…$"
 
+SkyPillar_Top_EventScript_Zinnia::
+	lock
+	faceplayer
+	fadedefaultbgm
+	playbgm MUS_RAYQUAZA_APPEARS, TRUE
+	@saysomething mysterious
+	@tutor DRAGON ASCENT
+	release
+	end

@@ -586,6 +586,7 @@ LittlerootTown_ProfessorBirchsLab_EventScript_Machine::
 LittlerootTown_ProfessorBirchsLab_EventScript_Rival::
 	lock
 	faceplayer
+	call_if_unset FLAG_RECEIVED_RIVAL_MEGA_STONE, LittlerootTown_ProfessorBirchsLab_EventScript_RivalMegaStone
 	goto_if_eq VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 5, LittlerootTown_ProfessorBirchsLab_EventScript_RivalFuturePlans
 	goto_if_ge VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 6, LittlerootTown_ProfessorBirchsLab_EventScript_RivalHaveYouGoneToBattleFrontier
 	goto_if_ge VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 2, LittlerootTown_ProfessorBirchsLab_EventScript_RivalTakeBreakFromFieldwork
@@ -594,6 +595,43 @@ LittlerootTown_ProfessorBirchsLab_EventScript_Rival::
 	call_if_eq VAR_RESULT, FEMALE, LittlerootTown_ProfessorBirchsLab_EventScript_BrendanWhereShouldIGoNext
 	release
 	end
+
+LittlerootTown_ProfessorBirchsLab_EventScript_RivalMegaStone::
+	goto_if_set FLAG_SYS_GAME_CLEAR, LittlerootTown_ProfessorBirchsLab_EventScript_GetMegaStoneFromRival
+	return
+
+LittlerootTown_ProfessorBirchsLab_EventScript_GetMegaStoneFromRival::
+	msgbox LittlerootTown_ProfessorBirchsLab_Text_GetMegaStoneFromRival, MSGBOX_DEFAULT
+	call_if_eq VAR_STARTER_MON, 0, LittlerootTown_ProfessorBirchsLab_EventScript_GetBlazikenite
+	call_if_eq VAR_STARTER_MON, 1, LittlerootTown_ProfessorBirchsLab_EventScript_GetSwampertite
+	call_if_eq VAR_STARTER_MON, 2, LittlerootTown_ProfessorBirchsLab_EventScript_GetSceptilite
+	setflag FLAG_RECEIVED_RIVAL_MEGA_STONE
+	waitmessage
+	msgbox LittlerootTown_ProfessorBirchsLab_Text_GetMegaStoneFromRival, MSGBOXDEFAULT
+	return
+
+LittlerootTown_ProfessorBirchsLab_EventScript_GetSceptilite::
+	giveitem ITEM_SCEPTILITE
+	return
+
+LittlerootTown_ProfessorBirchsLab_EventScript_GetBlazikenite::
+	giveitem ITEM_BLAZIKENITE
+	return
+
+LittlerootTown_ProfessorBirchsLab_EventScript_GetSwampertite::
+	giveitem ITEM_SWAMPERTITE
+	return
+
+LittlerootTown_ProfessorBirchsLab_Text_GetMegaStoneFromRival:
+	.string "We've really been through a lot\n"
+	.string "since we met each other, haven't we\l"
+	.string "{PLAYER}...\p"
+	.string "I want you to have this.$"
+
+LittlerootTown_ProfessorBirchsLab_Text_GetMegaStoneFromRival
+	.string "Whenever you use that stone, I hope\n"
+	.string "you remember all the fun times we\l"
+	.string "had on our adventures...$"
 
 LittlerootTown_ProfessorBirchsLab_EventScript_MayWhereShouldIGoNext::
 	msgbox LittlerootTown_ProfessorBirchsLab_Text_MayWhereShouldIGoNext, MSGBOX_DEFAULT

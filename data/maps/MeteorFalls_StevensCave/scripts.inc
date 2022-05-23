@@ -16,6 +16,8 @@ MeteorFalls_StevensCave_EventScript_Steven::
 	waitmovement 0
 	msgbox MeteorFalls_StevensCave_Text_ShouldKnowHowGoodIAmExpectWorst, MSGBOX_DEFAULT
 	trainerbattle_no_intro TRAINER_STEVEN, MeteorFalls_StevensCave_Text_StevenDefeat
+	msgbox MeteorFalls_StevensCave_Text_TakeThisAsAToken, MSGBOX_DEFAULT
+	giveitem ITEM_METAGROSSITE
 	msgbox MeteorFalls_StevensCave_Text_MyPredictionCameTrue, MSGBOX_DEFAULT
 	setflag FLAG_DEFEATED_METEOR_FALLS_STEVEN
 	release
@@ -44,6 +46,10 @@ MeteorFalls_StevensCave_Text_ShouldKnowHowGoodIAmExpectWorst:
 MeteorFalls_StevensCave_Text_StevenDefeat:
 	.string "You…\n"
 	.string "I had no idea you'd become so strong…$"
+
+MeteorFalls_StevensCave_Text_TakeThisAsAToken:
+	.string "Here, {PLAYER}. Take this as a token\n"
+	.string "of your victory!$"
 
 MeteorFalls_StevensCave_Text_MyPredictionCameTrue:
 	.string "Steven: Come to think of it, ever since\n"
