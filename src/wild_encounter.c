@@ -511,12 +511,12 @@ u16 GetCurrentMapWildMonHeaderId(void)
                 gSaveBlock1Ptr->location.mapNum == MAP_NUM(JAGGED_PASS))
                 i += VarGet(VAR_DAYNIGHT);
 
-            if (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MTPYRE_EXTERIOR) &&
-                gSaveBlock1Ptr->location.mapNum == MAP_NUM(MTPYRE_EXTERIOR))
+            if (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MT_PYRE_EXTERIOR) &&
+                gSaveBlock1Ptr->location.mapNum == MAP_NUM(MT_PYRE_EXTERIOR))
                 i += VarGet(VAR_DAYNIGHT);
 
-            if (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MTPYRE_SUMMIT) &&
-                gSaveBlock1Ptr->location.mapNum == MAP_NUM(MTPYRE_SUMMIT))
+            if (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MT_PYRE_SUMMIT) &&
+                gSaveBlock1Ptr->location.mapNum == MAP_NUM(MT_PYRE_SUMMIT))
                 i += VarGet(VAR_DAYNIGHT);
             
             //Altering Cave
