@@ -772,9 +772,9 @@ MegaStone_EventScript_Medichamite::
 	end
 
 MegaStone_EventScript_MewtoniteX::
-	finditem ITEM_MEWTONITE_X
+	finditem ITEM_MEWTWONITE_X
 	end
 
 MegaStone_EventScript_MewtoniteY::
-	finditem ITEM_MEWTONITE_Y
+	finditem ITEM_MEWTWONITE_Y
 	end

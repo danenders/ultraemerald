@@ -4,9 +4,9 @@ Route131_MapScripts::
 	.byte 0
 
 Route131_OnTransition:
-	call Common_EventScript_GetDayOrNight
 	call_if_ge VAR_SOOTOPOLIS_CITY_STATE, 4, Route131_EventScript_CheckSetAbnormalWeather
 	call Route131_EventScript_SetLayout
+	call Common_EventScript_GetDayOrNight
 	end
 
 Route131_OnResume:

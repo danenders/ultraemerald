@@ -1025,7 +1025,7 @@ Common_EventScript_GetDayOrNight::
 	special GetDayOrNight
 	goto_if_eq VAR_RESULT, 1, Common_EventScript_Night
 	goto_if_eq VAR_RESULT, 0, Common_EventScript_Day
-	end
+	return
 
 Common_EventScript_Night::
 	setvar VAR_DAYNIGHT, 1

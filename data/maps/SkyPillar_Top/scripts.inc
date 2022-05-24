@@ -1,4 +1,5 @@
 .set LOCALID_RAYQUAZA_SLEEPING, 1
+.set LOCALID_ZINNIA, 4
 
 SkyPillar_Top_MapScripts::
 	map_script MAP_SCRIPT_ON_RESUME, SkyPillar_Top_OnResume
@@ -14,12 +15,18 @@ SkyPillar_Top_EventScript_TryRemoveRayquaza::
 	specialvar VAR_RESULT, GetBattleOutcome
 	goto_if_ne VAR_RESULT, B_OUTCOME_CAUGHT, Common_EventScript_NopReturn
 	removeobject VAR_LAST_TALKED
+	setflag FLAG_CAUGHT_RAYQUAZA
 	return
 
 SkyPillar_Top_OnTransition:
 	call_if_lt VAR_SKY_PILLAR_STATE, 2, SkyPillar_Top_EventScript_SetCleanLayout
 	call_if_ge VAR_SKY_PILLAR_STATE, 2, SkyPillar_Top_EventScript_TryShowRayquaza
+	call_if_set FLAG_CAUGHT_RAYQUAZA, SkyPillar_Top_ShowZinnia
 	end
+
+SkyPillar_Top_ShowZinnia::
+	clearflag FLAG_HIDE_SKY_PILLAR_ZINNIA
+	return
 
 SkyPillar_Top_EventScript_SetCleanLayout::
 	setmaplayoutindex LAYOUT_SKY_PILLAR_TOP_CLEAN
@@ -186,9 +193,117 @@ SkyPillar_Top_Text_RayquazaFlewOff:
 SkyPillar_Top_EventScript_Zinnia::
 	lock
 	faceplayer
+	goto_if_unset FLAG_MET_ZINNIA, SkyPillar_Top_EventScript_MeetZinnia
+	goto_if_set FLAG_ZINNIA_TAUGHT_DRAGON_ASCENT, SkyPillar_Top_EventScript_ZinniaTaughtMove
 	fadedefaultbgm
 	playbgm MUS_RAYQUAZA_APPEARS, TRUE
-	@saysomething mysterious
-	@tutor DRAGON ASCENT
+	fadescreen FADE_TO_BLACK
+	msgbox SkyPillar_Top_Text_ZinniaStory, MSGBOX_DEFAULT
+	fadescreen FADE_FROM_BLACK
+	msgbox SkyPillar_Top_Text_UnlockRayquazaPower, MSGBOX_DEFAULT
+	setvar VAR_0x8005, TUTOR_MOVE_DRAGON_ASCENT
+	call MoveTutor_EventScript_OpenPartyMenu
+	setflag FLAG_ZINNIA_TAUGHT_DRAGON_ASCENT
+	goto_if_eq VAR_RESULT, 0, SkyPillar_Top_EventScript_AnotherTime
+	msgbox SkyPillar_Top_Text_UseWisely, MSGBOX_DEFAULT
 	release
 	end
+
+SkyPillar_Top_EventScript_MeetZinnia::
+	setflag FLAG_MET_ZINNIA
+	msgbox SkyPillar_Top_Text_ZinniaIntro, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, SkyPillar_Top_EventScript_Zinnia
+	goto SkyPillar_Top_EventScript_AnotherTime
+	end
+
+SkyPillar_Top_EventScript_AnotherTime::
+	msgbox SkyPillar_Top_Text_ZinniaAnotherTime, MSGBOX_DEFAULT
+	waitmessage
+	turnobject LOCALID_ZINNIA, DIR_NORTH
+	release
+	end
+
+SkyPillar_Top_Text_ZinniaAnotherTime:
+	.string "Zinnia: Perhaps another time then.$"
+
+SkyPillar_Top_Text_ZinniaIntro:
+	.string "???: So, you have returned.\p"
+	.string "Do you also hear Rayquaza's call?\p"
+	.string "For thousands of years, my people\n"
+	.string "have lived in the shadows, waiting\l"
+	.string "until we were needed to summon\l"
+	.string "Rayquaza and protect Hoenn once\l"
+	.string "again...\p"
+	.string "It seems that you were able to\n"
+	.string "harness Rayquaza's power on your\l"
+	.string "own.\p"
+	.string "Hmm...could you be...?\p"
+	.string "No..that's impossible.\p"
+	.string "Even so...\p"
+	.string "You have used this power to\n"
+	.string "protect Hoenn, and for that my\l"
+	.string "people are grateful, but you have\l"
+	.string "not brought out Rayquaza's full\l"
+	.string "potential.\p"
+	.string "My name is Zinnia, and I am one\n"
+	.string "of the last Draconid People.\p"
+	.string "I can teach you this power.\p"
+	.string "Would you like to hear my story?$"
+
+SkyPillar_Top_EventScript_ZinniaTaughtMove::
+	msgbox SkyPillar_Top_Text_ZinniaToldStory, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, SkyPillar_Top_EventScript_ZinniaRepeat
+	msgbox SkyPillar_Top_Text_ZinniaAnotherTime, MSGBOX_DEFAULT
+	turnobject LOCALID_ZINNIA, DIR_NORTH
+	release
+	end
+
+SkyPillar_Top_EventScript_ZinniaRepeat::
+	clearflag FLAG_ZINNIA_TAUGHT_DRAGON_ASCENT
+	goto SkyPillar_Top_EventScript_Zinnia
+	end
+
+SkyPillar_Top_Text_ZinniaToldStory:
+	.string "Zinnia: You have already heard my\n"
+	.string "story...\p"
+	.string "Would you like me to repeat it?$"
+
+SkyPillar_Top_Text_ZinniaStory:
+	.string "Long ago, the battles between\n"
+	.string "Groudon and Kyogre were even\l"
+	.string "more terrible than what you saw.\p"
+	.string "In their primal forms, when these\n" 
+	.string "Pokemon would fight, the world\l"
+	.string "would tremble in fear.\p"
+	.string "When the battles became too\n"
+	.string "fierce, my people took shelter\l"
+	.string "in Meteor Falls.\p"
+	.string "Just when we thought the world\n"
+	.string "would be destoryed, my ancestors\l"
+	.string "made a wish on a strange stone...\p"
+	.string "They wished for a Pokemon to\n"
+	.string "bring an end to the conflict, so\l"
+	.string "that people and Pokemon could\l"
+	.string "finally live in peace.\p"
+	.string "Their wish was answered by\n"
+	.string "Rayquaza.\p"
+	.string "Rayquaza stopped the primal\n"
+	.string "ancient Pokemon, and then\l"
+	.string "ascended to the heavens...\p"
+	.string "My people built this tower to\n"
+	.string "remember that wish.\p"
+	.string "Just like my ancestors, you wish\n"
+	.string "for peace between people and\l"
+	.string "Pokemon.\p"
+	.string "Your bond with Rayquaza proves it.\n"
+	.string "By forging that bond, we can bring\l"
+	.string "out Rayquaza's true power!$"
+
+SkyPillar_Top_Text_UnlockRayquazaPower:
+	.string "Unlock Rayquaza's true power.$"
+
+SkyPillar_Top_Text_UseWisely:
+	.string "You have already defended this\n"
+	.string "world once.\p"
+	.string "I trust you will this power\n"
+	.string "wisely.$"

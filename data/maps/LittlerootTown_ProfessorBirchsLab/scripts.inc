@@ -607,7 +607,7 @@ LittlerootTown_ProfessorBirchsLab_EventScript_GetMegaStoneFromRival::
 	call_if_eq VAR_STARTER_MON, 2, LittlerootTown_ProfessorBirchsLab_EventScript_GetSceptilite
 	setflag FLAG_RECEIVED_RIVAL_MEGA_STONE
 	waitmessage
-	msgbox LittlerootTown_ProfessorBirchsLab_Text_GetMegaStoneFromRival, MSGBOXDEFAULT
+	msgbox LittlerootTown_ProfessorBirchsLab_Text_RememberTheGoodTimes, MSGBOX_DEFAULT
 	return
 
 LittlerootTown_ProfessorBirchsLab_EventScript_GetSceptilite::
@@ -628,7 +628,7 @@ LittlerootTown_ProfessorBirchsLab_Text_GetMegaStoneFromRival:
 	.string "{PLAYER}...\p"
 	.string "I want you to have this.$"
 
-LittlerootTown_ProfessorBirchsLab_Text_GetMegaStoneFromRival
+LittlerootTown_ProfessorBirchsLab_Text_RememberTheGoodTimes:
 	.string "Whenever you use that stone, I hope\n"
 	.string "you remember all the fun times we\l"
 	.string "had on our adventures...$"
