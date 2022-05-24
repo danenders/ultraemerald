@@ -4,8 +4,8 @@ Route123_MapScripts::
 	.byte 0
 
 Route123_OnTransition:
-	call Common_EventScript_GetDayOrNight
 	special SetRoute123Weather
+	call Common_EventScript_GetDayOrNight
 	end
 
 Route123_OnResume:

@@ -11,9 +11,9 @@ Route112_OnResume:
 	end
 
 Route112_OnTransition:
-	call Common_EventScript_GetDayOrNight
 	clearflag FLAG_FORCE_MIRAGE_TOWER_VISIBLE
 	setvar VAR_JAGGED_PASS_ASH_WEATHER, 0
+	call Common_EventScript_GetDayOrNight
 	end
 
 Route112_EventScript_MagmaGrunts::

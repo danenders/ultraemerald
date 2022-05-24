@@ -4,8 +4,8 @@ EverGrandeCity_MapScripts::
 	.byte 0
 
 EverGrandeCity_OnTransition:
-	call Common_EventScript_GetDayOrNight
 	call_if_set FLAG_SYS_WEATHER_CTRL, Common_EventScript_SetAbnormalWeather
+	call Common_EventScript_GetDayOrNight
 	end
 
 EverGrandeCity_OnResume:

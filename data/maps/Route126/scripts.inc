@@ -4,8 +4,8 @@ Route126_MapScripts::
 	.byte 0
 
 Route126_OnTransition:
-	call Common_EventScript_GetDayOrNight
 	call_if_set FLAG_SYS_WEATHER_CTRL, Common_EventScript_SetAbnormalWeather
+	call Common_EventScript_GetDayOrNight
 	end
 
 Route126_OnResume:

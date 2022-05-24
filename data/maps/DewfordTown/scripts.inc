@@ -16,8 +16,8 @@ DewfordTown_MapScripts::
 	.byte 0
 
 DewfordTown_OnTransition:
-	call Common_EventScript_GetDayOrNight
 	setflag FLAG_VISITED_DEWFORD_TOWN
+	call Common_EventScript_GetDayOrNight
 	end
 
 DewfordTown_OnResume:

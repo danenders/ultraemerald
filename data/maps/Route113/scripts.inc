@@ -4,14 +4,14 @@ Route113_MapScripts::
 	.byte 0
 
 Route113_OnResume:
-	call Common_EventScript_GetDayOrNight
 	setstepcallback STEP_CB_ASH
+	call Common_EventScript_GetDayOrNight
 	end
 
 Route113_OnTransition:
-	call Common_EventScript_GetDayOrNight
 	clearflag FLAG_FORCE_MIRAGE_TOWER_VISIBLE
 	call Route113_EventScript_CheckSetAshWeather
+	call Common_EventScript_GetDayOrNight
 	end
 
 Route113_EventScript_CheckSetAshWeather::

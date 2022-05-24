@@ -21,10 +21,10 @@ Route105_CloseRegiEntrance::
 	return
 
 Route105_OnTransition:
-	call Common_EventScript_GetDayOrNight
 	call_if_eq VAR_SHOULD_END_ABNORMAL_WEATHER, 1, AbnormalWeather_EventScript_HideMapNamePopup
 	call_if_eq VAR_ABNORMAL_WEATHER_LOCATION, ABNORMAL_WEATHER_ROUTE_105_NORTH, AbnormalWeather_StartKyogreWeather
 	call_if_eq VAR_ABNORMAL_WEATHER_LOCATION, ABNORMAL_WEATHER_ROUTE_105_SOUTH, AbnormalWeather_StartKyogreWeather
+	call Common_EventScript_GetDayOrNight
 	end
 
 Route105_OnFrame:

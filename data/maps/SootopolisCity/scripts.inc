@@ -50,7 +50,6 @@ SootopolisCity_EventScript_LockGymDoor::
 	return
 
 SootopolisCity_OnTransition:
-	call Common_EventScript_GetDayOrNight
 	setflag FLAG_VISITED_SOOTOPOLIS_CITY
 	call_if_eq VAR_SOOTOPOLIS_CITY_STATE, 1, SootopolisCity_EventScript_HideMapNamePopup
 	call_if_eq VAR_SKY_PILLAR_STATE, 1, SootopolisCity_EventScript_HideMapNamePopup
@@ -66,6 +65,7 @@ SootopolisCity_OnTransition:
 	call_if_eq VAR_SOOTOPOLIS_CITY_STATE, 4, SootopolisCity_EventScript_SetExitCaveOfOriginObjPos
 	call_if_eq VAR_SOOTOPOLIS_CITY_STATE, 5, SootopolisCity_EventScript_SetOutsideGymObjPos
 	call_if_eq VAR_SOOTOPOLIS_CITY_STATE, 6, SootopolisCity_EventScript_SetExpertBlockCaveEntrance
+	call Common_EventScript_GetDayOrNight
 	end
 
 SootopolisCity_EventScript_HideMapNamePopup::
@@ -178,8 +178,8 @@ SootopolisCity_EventScript_PlayerFaceLegendaries2::
 	return
 
 SootopolisCity_OnResume:
-	call Common_EventScript_GetDayOrNight
 	setdivewarp MAP_UNDERWATER_SOOTOPOLIS_CITY, 9, 6
+	call Common_EventScript_GetDayOrNight
 	end
 
 SootopolisCity_OnFrame:

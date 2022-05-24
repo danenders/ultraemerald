@@ -9,8 +9,8 @@ Route128_MapScripts::
 	.byte 0
 
 Route128_OnTransition:
-	call Common_EventScript_GetDayOrNight
 	call_if_set FLAG_SYS_WEATHER_CTRL, Common_EventScript_SetAbnormalWeather
+	call Common_EventScript_GetDayOrNight
 	end
 
 Route128_OnResume:

@@ -8,8 +8,8 @@ Route119_MapScripts::
 	.byte 0
 
 Route119_OnResume:
-	call Common_EventScript_GetDayOrNight
 	call_if_set FLAG_SYS_CTRL_OBJ_DELETE, Route119_EventScript_TryRemoveKecleon
+	call Common_EventScript_GetDayOrNight
 	end
 
 Route119_EventScript_TryRemoveKecleon::
@@ -19,11 +19,11 @@ Route119_EventScript_TryRemoveKecleon::
 	return
 
 Route119_OnTransition:
-	call Common_EventScript_GetDayOrNight
 	call Common_EventScript_SetupRivalGfxId
 	call Common_EventScript_SetupRivalOnBikeGfxId
 	call_if_eq VAR_WEATHER_INSTITUTE_STATE, 1, Route119_EventScript_MoveInstituteWorkersDownstairs
 	special SetRoute119Weather
+	call Common_EventScript_GetDayOrNight
 	end
 
 Route119_EventScript_MoveInstituteWorkersDownstairs::

@@ -4,7 +4,6 @@ Route130_MapScripts::
 	.byte 0
 
 Route130_OnTransition:
-	call Common_EventScript_GetDayOrNight
 	call_if_ge VAR_SOOTOPOLIS_CITY_STATE, 4, Route130_EventScript_CheckSetAbnormalWeather
 	specialvar VAR_RESULT, IsMirageIslandPresent
 	goto_if_eq VAR_RESULT, TRUE, Route130_EventScript_SetMirageIslandLayout
@@ -24,6 +23,7 @@ Route130_OnTransition:
 	setflag FLAG_TEMP_1E
 	setflag FLAG_TEMP_1F
 	setmaplayoutindex LAYOUT_ROUTE130
+	call Common_EventScript_GetDayOrNight
 	end
 
 Route130_OnResume:
@@ -32,6 +32,7 @@ Route130_OnResume:
 
 Route130_EventScript_SetMirageIslandLayout::
 	setmaplayoutindex LAYOUT_ROUTE130_MIRAGE_ISLAND
+	call Common_EventScript_GetDayOrNight
 	end
 
 Route130_EventScript_CheckSetAbnormalWeather::

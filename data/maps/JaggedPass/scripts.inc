@@ -7,9 +7,9 @@ JaggedPass_MapScripts::
 	.byte 0
 
 JaggedPass_OnResume:
-	call Common_EventScript_GetDayOrNight
 	setstepcallback STEP_CB_ASH
 	call_if_eq VAR_JAGGED_PASS_STATE, 0, JaggedPass_EventScript_CheckHasMagmaEmblem
+	call Common_EventScript_GetDayOrNight
 	end
 
 JaggedPass_EventScript_CheckHasMagmaEmblem::
@@ -22,8 +22,8 @@ JaggedPass_EventScript_SetReadyToOpenHideout::
 	return
 
 JaggedPass_OnTransition:
-	call Common_EventScript_GetDayOrNight
 	call_if_eq VAR_JAGGED_PASS_ASH_WEATHER, 1, JaggedPass_EventScript_SetWeatherAsh
+	call Common_EventScript_GetDayOrNight
 	end
 
 JaggedPass_EventScript_SetWeatherAsh::

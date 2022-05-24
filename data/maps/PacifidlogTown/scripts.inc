@@ -4,13 +4,13 @@ PacifidlogTown_MapScripts::
 	.byte 0
 
 PacifidlogTown_OnTransition:
-	call Common_EventScript_GetDayOrNight
 	setflag FLAG_VISITED_PACIFIDLOG_TOWN
+	call Common_EventScript_GetDayOrNight
 	end
 
 PacifidlogTown_OnResume:
-	call Common_EventScript_GetDayOrNight
 	setstepcallback STEP_CB_PACIFIDLOG_BRIDGE
+	call Common_EventScript_GetDayOrNight
 	end
 
 PacifidlogTown_EventScript_NinjaBoy::

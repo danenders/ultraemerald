@@ -4,8 +4,8 @@ MtPyre_Exterior_MapScripts::
 	.byte 0
 
 MtPyre_Exterior_OnTransition:
-	call Common_EventScript_GetDayOrNight
 	call MtPyre_Exterior_EventScript_CheckEnterFromSummit
+	call Common_EventScript_GetDayOrNight
 	end
 
 MtPyre_Exterior_OnResume:

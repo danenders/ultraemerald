@@ -10,10 +10,10 @@ Route114_OnResume:
 	end
 
 Route114_OnTransition:
-	call Common_EventScript_GetDayOrNight
 	call_if_eq VAR_SHOULD_END_ABNORMAL_WEATHER, 1, AbnormalWeather_EventScript_HideMapNamePopup
 	call_if_eq VAR_ABNORMAL_WEATHER_LOCATION, ABNORMAL_WEATHER_ROUTE_114_NORTH, AbnormalWeather_StartGroudonWeather
 	call_if_eq VAR_ABNORMAL_WEATHER_LOCATION, ABNORMAL_WEATHER_ROUTE_114_SOUTH, AbnormalWeather_StartGroudonWeather
+	call Common_EventScript_GetDayOrNight
 	end
 
 Route114_OnLoad:

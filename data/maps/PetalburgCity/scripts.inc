@@ -11,12 +11,12 @@ PetalburgCity_MapScripts::
 	.byte 0
 
 PetalburgCity_OnTransition:
-	call Common_EventScript_GetDayOrNight
 	setflag FLAG_VISITED_PETALBURG_CITY
 	call_if_eq VAR_PETALBURG_CITY_STATE, 0, PetalburgCity_EventScript_MoveGymBoyToWestEntrance
 	call_if_eq VAR_PETALBURG_CITY_STATE, 2, PetalburgCity_EventScript_DisableMapNameAndMusic
 	call_if_eq VAR_PETALBURG_CITY_STATE, 4, PetalburgCity_EventScript_DisableMapNameAndMusic
 	call_if_eq VAR_PETALBURG_GYM_STATE, 8, PetalburgCity_EventScript_SetGymDoorsUnlocked
+	call Common_EventScript_GetDayOrNight
 	end
 
 PetalburgCity_OnResume:

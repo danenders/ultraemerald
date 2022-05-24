@@ -7,9 +7,9 @@ Route103_MapScripts::
 	.byte 0
 
 Route103_OnTransition:
-	call Common_EventScript_GetDayOrNight
 	call Common_EventScript_SetupRivalGfxId
 	call ProfBirch_EventScript_UpdateLocation
+	call Common_EventScript_GetDayOrNight
 	end
 
 Route103_OnResume::

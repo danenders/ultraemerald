@@ -6,8 +6,8 @@ Route117_MapScripts::
 	.byte 0
 
 Route117_OnTransition:
-	call Common_EventScript_GetDayOrNight
 	call Route117_EventScript_TryMoveDayCareMan
+	call Common_EventScript_GetDayOrNight
 	end
 
 Route117_OnResume:

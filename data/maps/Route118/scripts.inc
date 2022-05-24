@@ -8,11 +8,11 @@ Route118_MapScripts::
 	.byte 0
 
 Route118_OnTransition:
-	call Common_EventScript_GetDayOrNight
 	call GabbyAndTy_EventScript_UpdateLocation
 	call_if_eq VAR_SHOULD_END_ABNORMAL_WEATHER, 1, AbnormalWeather_EventScript_HideMapNamePopup
 	call_if_eq VAR_ABNORMAL_WEATHER_LOCATION, ABNORMAL_WEATHER_ROUTE_118_EAST, AbnormalWeather_StartGroudonWeather
 	call_if_eq VAR_ABNORMAL_WEATHER_LOCATION, ABNORMAL_WEATHER_ROUTE_118_WEST, AbnormalWeather_StartGroudonWeather
+	call Common_EventScript_GetDayOrNight
 	end
 
 Route118_OnResume:

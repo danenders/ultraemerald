@@ -8,8 +8,8 @@ Route134_OnTransition:
 	end
 
 Route134_OnResume:
-	call Common_EventScript_GetDayOrNight
 	setdivewarp MAP_UNDERWATER_ROUTE134, 8, 6
+	call Common_EventScript_GetDayOrNight
 	end
 
 Route134_EventScript_Jack::

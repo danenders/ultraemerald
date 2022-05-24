@@ -12,8 +12,8 @@ MtPyre_Summit_MapScripts::
 	.byte 0
 
 MtPyre_Summit_OnTransition:
-	call Common_EventScript_GetDayOrNight
 	call_if_eq VAR_MT_PYRE_STATE, 2, MtPyre_Summit_EventScript_SetArchieMaxiePositions
+	call Common_EventScript_GetDayOrNight
 	end
 
 MtPyre_Summit_OnResume:

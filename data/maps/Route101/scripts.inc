@@ -8,8 +8,8 @@ Route101_MapScripts::
 	.byte 0
 
 Route101_OnTransition:
-	call Common_EventScript_GetDayOrNight
 	call ProfBirch_EventScript_UpdateLocation
+	call Common_EventScript_GetDayOrNight
 	end
 
 Route101_OnResume:

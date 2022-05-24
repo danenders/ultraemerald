@@ -18,10 +18,10 @@ Route104_EventScript_StartSailToDewford::
 	end
 
 Route104_OnTransition:
-	call Common_EventScript_GetDayOrNight
 	call Common_EventScript_SetupRivalGfxId
 	call Route104_EventScript_TrySetRivalPos
 	call Route104_EventScript_ShowOrHideWhiteHerbFlorist
+	call Common_EventScript_GetDayOrNight
 	end
 
 Route104_OnResume:

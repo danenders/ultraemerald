@@ -51,7 +51,6 @@ Route111_EventScript_ShowTemporaryMirageTower::
 	return
 
 Route111_OnTransition:
-	call Common_EventScript_GetDayOrNight
 	setvar VAR_TRAINER_HILL_IS_ACTIVE, 0
 	special SetMirageTowerVisibility
 	call_if_unset FLAG_MIRAGE_TOWER_VISIBLE, Route111_EventScript_SetLayoutNoMirageTower
@@ -60,6 +59,7 @@ Route111_OnTransition:
 	call Route111_EventScript_CheckSetSandstorm
 	call GabbyAndTy_EventScript_UpdateLocation
 	goto_if_not_defeated TRAINER_VICKY, Route111_EventScript_SetWinstratesNotDefeated
+	call Common_EventScript_GetDayOrNight
 	end
 
 Route111_EventScript_SetFallingPlayerGfx::
