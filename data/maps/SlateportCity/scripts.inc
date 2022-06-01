@@ -289,6 +289,10 @@ SlateportCity_EventScript_BattleTentSign::
 	msgbox SlateportCity_Text_BattleTentSign, MSGBOX_SIGN
 	end
 
+SlateportCity_EventScript_DojoSign::
+	msgbox SlateportCity_Text_DojoSign, MSGBOX_SIGN
+	end
+
 SlateportCity_EventScript_SternsShipyardSign::
 	lockall
 	goto_if_set FLAG_SYS_GAME_CLEAR, SlateportCity_EventScript_SternsShipyardFerryComplete
@@ -560,20 +564,66 @@ SlateportCity_PokemartDecor:
 	release
 	end
 
-SlateportCity_EventScript_PowerTMClerk::
+SlateportCity_EventScript_AbilityInventor::
 	lock
 	faceplayer
-	message gText_HowMayIServeYou
-	waitmessage
-	pokemart SlateportCity_Pokemart_PowerTMs
+	msgbox SlateportCity_Text_Abilities, MSGBOX_DEFAULT
+	pokemart SlateportCity_Pokemart_AbilityItems
 	msgbox gText_PleaseComeAgain, MSGBOX_DEFAULT
 	release
 	end
 
 	.align 2
-SlateportCity_Pokemart_PowerTMs:
-	.2byte ITEM_TM10  @ Hidden Power
-	.2byte ITEM_TM43  @ Secret Power
+SlateportCity_Pokemart_AbilityItems:
+	.2byte ITEM_ABILITY_PATCH
+	.2byte ITEM_ABILITY_CAPSULE
+	.2byte ITEM_NONE
+	release
+	end
+
+SlateportCity_Text_Abilities::
+	.string "I've unlocked the secrets of\n"
+	.string "Pokémon Abilities!\p"
+	.string "My research has led me to invent\n"
+	.string "these items!$"
+
+SlateportCity_EventScript_MintLady::
+	lock
+	faceplayer
+	msgbox SlateportCity_Text_MintLady, MSGBOX_DEFAULT
+	pokemart SlateportCity_Pokemart_Mints
+	msgbox gText_PleaseComeAgain, MSGBOX_DEFAULT
+	release
+	end
+
+SlateportCity_Text_MintLady::
+	.string "Pokémon just love my mints!\p"
+	.string "The flavors can make them change\n"
+	.string "their entire mood!$"
+
+	.align 2
+SlateportCity_Pokemart_Mints:
+	.2byte ITEM_LONELY_MINT
+	.2byte ITEM_ADAMANT_MINT
+	.2byte ITEM_NAUGHTY_MINT
+	.2byte ITEM_BRAVE_MINT
+	.2byte ITEM_BOLD_MINT
+	.2byte ITEM_IMPISH_MINT
+	.2byte ITEM_LAX_MINT
+	.2byte ITEM_RELAXED_MINT
+	.2byte ITEM_MODEST_MINT
+	.2byte ITEM_MILD_MINT
+	.2byte ITEM_RASH_MINT
+	.2byte ITEM_QUIET_MINT
+	.2byte ITEM_CALM_MINT
+	.2byte ITEM_GENTLE_MINT
+	.2byte ITEM_CAREFUL_MINT
+	.2byte ITEM_SASSY_MINT
+	.2byte ITEM_TIMID_MINT
+	.2byte ITEM_HASTY_MINT
+	.2byte ITEM_JOLLY_MINT
+	.2byte ITEM_NAIVE_MINT
+	.2byte ITEM_SERIOUS_MINT
 	.2byte ITEM_NONE
 	release
 	end
@@ -1250,6 +1300,10 @@ SlateportCity_Text_PleaseComeWithMe:
 SlateportCity_Text_BattleTentSign:
 	.string "Battle Tent Slateport Site\n"
 	.string "“Find it! The ultimate Pokémon!”$"
+
+SlateportCity_Text_DojoSign:
+	.string "Pokémon Dojo\n"
+	.string "“Push yourself to the next level!”$"
 
 SlateportCity_Text_SternsShipyardWantedSign:
 	.string "Stern's Shipyard\p"
