@@ -1097,3 +1097,5 @@ Common_EventScript_Day::
 	.include "data/maps/LilycoveCity_DepartmentStore_7F/scripts.inc"
 	.include "data/maps/LilycoveCity_DepartmentStore_8F/scripts.inc"
     .include "data/scripts/dexnav.inc"
+
+	.include "data/maps/SlateportCity_Dojo/scripts.inc"

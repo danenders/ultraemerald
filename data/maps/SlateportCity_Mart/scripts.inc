@@ -21,18 +21,29 @@ SlateportCity_Mart_Pokemart:
 	.2byte ITEM_PARALYZE_HEAL
 	.2byte ITEM_ESCAPE_ROPE
 	.2byte ITEM_REPEL
+	.2byte ITEM_FRESH_WATER
 	.2byte ITEM_HARBOR_MAIL
 	.2byte ITEM_NONE
 	release
 	end
 
 SlateportCity_Mart_EventScript_BlackBelt::
+	msgbox SlateportCity_Mart_Text_Refreshed, MSGBOX_NPC
+	end
+
+SlateportCity_Mart_EventScript_Woman::
 	msgbox SlateportCity_Mart_Text_SomeItemsOnlyAtMart, MSGBOX_NPC
 	end
 
 SlateportCity_Mart_EventScript_Man::
 	msgbox SlateportCity_Mart_Text_GreatBallIsBetter, MSGBOX_NPC
 	end
+
+SlateportCity_Mart_Text_Refreshed:
+	.string "After a hard day of training at the\n"
+	.string "Dojo, nothing hits the spot like some\l"
+	.string "Fresh Water!\p"
+	.string "After a drink, I can take on anyone!$"
 
 SlateportCity_Mart_Text_SomeItemsOnlyAtMart:
 	.string "The Market does have some interesting\n"

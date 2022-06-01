@@ -1591,12 +1591,13 @@
 #define FLAG_UNUSED_0x933                           (DAILY_FLAGS_START + 0x13) // Unused Flag
 #define FLAG_DAILY_APPRENTICE_LEAVES                (DAILY_FLAGS_START + 0x14)
 
-#define FLAG_UNUSED_0x935                           (DAILY_FLAGS_START + 0x15) // Unused Flag
-#define FLAG_UNUSED_0x936                           (DAILY_FLAGS_START + 0x16) // Unused Flag
-#define FLAG_UNUSED_0x937                           (DAILY_FLAGS_START + 0x17) // Unused Flag
-#define FLAG_UNUSED_0x938                           (DAILY_FLAGS_START + 0x18) // Unused Flag
-#define FLAG_UNUSED_0x939                           (DAILY_FLAGS_START + 0x19) // Unused Flag
-#define FLAG_UNUSED_0x93A                           (DAILY_FLAGS_START + 0x1A) // Unused Flag
+#define FLAG_DAILY_DOJO_ATTACK                      (DAILY_FLAGS_START + 0x15) // Free battle for the Dojo pupil
+#define FLAG_DAILY_DOJO_DEFENSE                     (DAILY_FLAGS_START + 0x16) // Free battle for the Dojo pupil
+#define FLAG_DAILY_DOJO_SPATTACK                    (DAILY_FLAGS_START + 0x17) // Free battle for the Dojo pupil
+#define FLAG_DAILY_DOJO_SPDEFENSE                   (DAILY_FLAGS_START + 0x18) // Free battle for the Dojo pupil
+#define FLAG_DAILY_DOJO_SPEED                       (DAILY_FLAGS_START + 0x19) // Free battle for the Dojo pupil
+#define FLAG_DAILY_DOJO_HP                          (DAILY_FLAGS_START + 0x1A) // Free battle for the Dojo pupil
+
 #define FLAG_UNUSED_0x93B                           (DAILY_FLAGS_START + 0x1B) // Unused Flag
 #define FLAG_UNUSED_0x93C                           (DAILY_FLAGS_START + 0x1C) // Unused Flag
 #define FLAG_UNUSED_0x93D                           (DAILY_FLAGS_START + 0x1D) // Unused Flag

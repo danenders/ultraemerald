@@ -12434,3 +12434,141 @@ static const struct TrainerMonNoItemDefaultMoves sParty_MayLinkPlaceholder[] = {
     .species = SPECIES_KYOGRE,
     }
 };
+
+static const struct TrainerMonNoItemDefaultMoves sParty_DojoHp[] = {
+    {
+    .iv = 0,
+    .lvl = 50,
+    .species = SPECIES_WIGGLYTUFF,
+    },
+    {
+    .iv = 0,
+    .lvl = 50,
+    .species = SPECIES_CLEFABLE,
+    },
+    {
+    .iv = 0,
+    .lvl = 50,
+    .species = SPECIES_WIGGLYTUFF,
+    },
+    {
+    .iv = 0,
+    .lvl = 50,
+    .species = SPECIES_CLEFABLE,
+    },
+};
+
+static const struct TrainerMonNoItemDefaultMoves sParty_DojoAttack[] = {
+    {
+    .iv = 0,
+    .lvl = 50,
+    .species = SPECIES_SHIFTRY,
+    },
+    {
+    .iv = 0,
+    .lvl = 50,
+    .species = SPECIES_VICTREEBEL,
+    },
+    {
+    .iv = 0,
+    .lvl = 50,
+    .species = SPECIES_VICTREEBEL,
+    },
+    {
+    .iv = 0,
+    .lvl = 50,
+    .species = SPECIES_SHIFTRY,
+    },
+};
+
+static const struct TrainerMonNoItemDefaultMoves sParty_DojoDefense[] = {
+    {
+    .iv = 0,
+    .lvl = 50,
+    .species = SPECIES_POLIWRATH,
+    },
+    {
+    .iv = 0,
+    .lvl = 50,
+    .species = SPECIES_GOLEM,
+    },
+    {
+    .iv = 0,
+    .lvl = 50,
+    .species = SPECIES_GOLEM,
+    },
+    {
+    .iv = 0,
+    .lvl = 50,
+    .species = SPECIES_POLIWRATH,
+    },
+};
+
+static const struct TrainerMonNoItemDefaultMoves sParty_DojoSpAttack[] = {
+    {
+    .iv = 0,
+    .lvl = 50,
+    .species = SPECIES_VILEPLUME,
+    },
+    {
+    .iv = 0,
+    .lvl = 50,
+    .species = SPECIES_AMPHAROS,
+    },
+    {
+    .iv = 0,
+    .lvl = 50,
+    .species = SPECIES_VILEPLUME,
+    },
+    {
+    .iv = 0,
+    .lvl = 50,
+    .species = SPECIES_AMPHAROS,
+    },
+};
+
+static const struct TrainerMonNoItemDefaultMoves sParty_DojoSpDefense[] = {
+    {
+    .iv = 0,
+    .lvl = 50,
+    .species = SPECIES_BELLOSSOM,
+    },
+    {
+    .iv = 0,
+    .lvl = 50,
+    .species = SPECIES_BELLOSSOM,
+    },
+    {
+    .iv = 0,
+    .lvl = 50,
+    .species = SPECIES_LUDICOLO,
+    },
+    {
+    .iv = 0,
+    .lvl = 50,
+    .species = SPECIES_LUDICOLO,
+    },
+};
+
+static const struct TrainerMonNoItemDefaultMoves sParty_DojoSpeed[] = {
+    {
+    .iv = 0,
+    .lvl = 50,
+    .species = SPECIES_PIDGEOT,
+    },
+    {
+    .iv = 0,
+    .lvl = 50,
+    .species = SPECIES_RAICHU,
+    },
+    {
+    .iv = 0,
+    .lvl = 50,
+    .species = SPECIES_PIDGEOT,
+    },
+    {
+    .iv = 0,
+    .lvl = 50,
+    .species = SPECIES_RAICHU,
+    },
+};

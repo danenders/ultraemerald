@@ -856,12 +856,21 @@
 #define TRAINER_LEAF                        852
 #define TRAINER_BRENDAN_PLACEHOLDER         853
 #define TRAINER_MAY_PLACEHOLDER             854
+#define TRAINER_DOJO_ATTACK            		855
+#define TRAINER_DOJO_DEFENSE           		856
+#define TRAINER_DOJO_SPATTACK            	857
+#define TRAINER_DOJO_SPDEFENSE            	858
+#define TRAINER_DOJO_SPEED           		859
+#define TRAINER_DOJO_HP        				860
+#define TRAINER_PLACEHOLDER_1            	861 //unused
+#define TRAINER_PLACEHOLDER_2           	862 //unused
+#define TRAINER_PLACEHOLDER_3            	863 //unused
 
 // NOTE: Because each Trainer uses a flag to determine when they are defeated, there is only space for 9 additional trainers before trainer flag space overflows
 //       More space can be made by shifting flags around in constants/flags.h or changing how trainer flags are handled
 //       MAX_TRAINERS_COUNT can be increased but will take up additional saveblock space
 
-#define TRAINERS_COUNT                      855
+#define TRAINERS_COUNT                      863
 #define MAX_TRAINERS_COUNT                  864
 
 #endif  // GUARD_CONSTANTS_OPPONENTS_H

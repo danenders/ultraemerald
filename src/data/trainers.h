@@ -11968,4 +11968,89 @@ const struct Trainer gTrainers[] = {
         .partySize = ARRAY_COUNT(sParty_MayLinkPlaceholder),
         .party = {.NoItemDefaultMoves = sParty_MayLinkPlaceholder},
     },
+
+    [TRAINER_DOJO_ATTACK] =
+    {
+        .partyFlags = 0,
+        .trainerClass = TRAINER_CLASS_BLACK_BELT,
+        .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_INTENSE,
+        .trainerPic = TRAINER_PIC_BLACK_BELT,
+        .trainerName = _("Iwao"),
+        .items = {},
+        .doubleBattle = FALSE,
+        .aiFlags = AI_FLAG_CHECK_BAD_MOVE,
+        .partySize = ARRAY_COUNT(sParty_DojoAttack),
+        .party = {.NoItemDefaultMoves = sParty_DojoAttack},
+    },
+
+    [TRAINER_DOJO_DEFENSE] =
+    {
+        .partyFlags = 0,
+        .trainerClass = TRAINER_CLASS_BLACK_BELT,
+        .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_INTENSE,
+        .trainerPic = TRAINER_PIC_BLACK_BELT,
+        .trainerName = _("Tatsuma"),
+        .items = {},
+        .doubleBattle = FALSE,
+        .aiFlags = AI_FLAG_CHECK_BAD_MOVE,
+        .partySize = ARRAY_COUNT(sParty_DojoDefense),
+        .party = {.NoItemDefaultMoves = sParty_DojoDefense},
+    },
+
+    [TRAINER_DOJO_SPATTACK] =
+    {
+        .partyFlags = 0,
+        .trainerClass = TRAINER_CLASS_BLACK_BELT,
+        .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_INTENSE,
+        .trainerPic = TRAINER_PIC_BLACK_BELT,
+        .trainerName = _("Taiki"),
+        .items = {},
+        .doubleBattle = FALSE,
+        .aiFlags = AI_FLAG_CHECK_BAD_MOVE,
+        .partySize = ARRAY_COUNT(sParty_DojoSpAttack),
+        .party = {.NoItemDefaultMoves = sParty_DojoSpAttack},
+    },
+
+
+    [TRAINER_DOJO_SPDEFENSE] =
+    {
+        .partyFlags = 0,
+        .trainerClass = TRAINER_CLASS_BLACK_BELT,
+        .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_INTENSE,
+        .trainerPic = TRAINER_PIC_BLACK_BELT,
+        .trainerName = _("Noboru"),
+        .items = {},
+        .doubleBattle = FALSE,
+        .aiFlags = AI_FLAG_CHECK_BAD_MOVE,
+        .partySize = ARRAY_COUNT(sParty_DojoSpDefense),
+        .party = {.NoItemDefaultMoves = sParty_DojoSpDefense},
+    },
+
+    [TRAINER_DOJO_SPEED] =
+    {
+        .partyFlags = 0,
+        .trainerClass = TRAINER_CLASS_BLACK_BELT,
+        .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_INTENSE,
+        .trainerPic = TRAINER_PIC_BLACK_BELT,
+        .trainerName = _("Kunji"),
+        .items = {},
+        .doubleBattle = FALSE,
+        .aiFlags = AI_FLAG_CHECK_BAD_MOVE,
+        .partySize = ARRAY_COUNT(sParty_DojoSpeed),
+        .party = {.NoItemDefaultMoves = sParty_DojoSpeed},
+    },
+
+    [TRAINER_DOJO_HP] =
+    {
+        .partyFlags = 0,
+        .trainerClass = TRAINER_CLASS_BLACK_BELT,
+        .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_INTENSE,
+        .trainerPic = TRAINER_PIC_BLACK_BELT,
+        .trainerName = _("Tsuyoshi"),
+        .items = {},
+        .doubleBattle = FALSE,
+        .aiFlags = AI_FLAG_CHECK_BAD_MOVE,
+        .partySize = ARRAY_COUNT(sParty_DojoHp),
+        .party = {.NoItemDefaultMoves = sParty_DojoHp},
+    },
 };

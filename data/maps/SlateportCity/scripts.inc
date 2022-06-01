@@ -956,6 +956,19 @@ SlateportCity_EventScript_BerryCrushRankingsSign::
 	releaseall
 	end
 
+SlateportCity_EventScript_BlackBeltBlocker::
+	lock
+	faceplayer
+	msgbox SlateportCity_Text_NoMorePupils, MSGBOX_DEFAULT
+	release
+	end
+
+SlateportCity_Text_NoMorePupils:
+	.string "I came here to train under the\n"
+	.string "Offense and Defense masters, but\l"
+	.string "they're not taking any more pupils!\p"
+	.string "I'll have to try again later...$"
+
 SlateportCity_Text_EnergyGuruSellWhatYouNeed:
 	.string "I'm the Energy Guru! I'll go for it and\n"
 	.string "sell you what you need!$"
