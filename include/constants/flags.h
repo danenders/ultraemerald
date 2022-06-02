@@ -1234,7 +1234,7 @@
 #define FLAG_FOUND_CAMERUPTITE                                      0x4A1 // Found in Jagged Pass
 #define FLAG_FOUND_GENGARITE                                        0x4A2 // Found on MtPyre 6F
 #define FLAG_FOUND_STEELIXITE                                       0x4A3 // Found in RusturfTunnel
-#define FLAG_FOUND_GLALITITE                                        0x4A4 // Found in Glalitite
+#define FLAG_FOUND_GLALITITE                                        0x4A4 // Found in Shoal Cave
 #define FLAG_FOUND_ALTARIANITE                                      0x4A5 // Found on top of Sky Pillar
 #define FLAG_FOUND_AERODACTYLITE                                    0x4A6 // Found in the Desert Underpass
 #define FLAG_FOUND_GYARADOSITE                                     	0x4A7 // Found underwater on Route 124
@@ -1248,7 +1248,7 @@
 #define FLAG_FOUND_PINSIRITE                                        0x4AF // Found on Route 119
 #define FLAG_FOUND_SCIZORITE                                        0x4B0 // Found on Route 119
 #define FLAG_FOUND_MAWILITE                                         0x4B1 // Found in Granite Cave (B2F)
-#define FLAG_FOUND_MEDICHAMITE                                      0x4B2 // Found in Lilycove Cite
+#define FLAG_FOUND_MEDICHAMITE                                      0x4B2 // Found in Lilycove City
 #define FLAG_FOUND_MEWTWONITE_X                                     0x4B3 // Found in the Mysterious Cave
 #define FLAG_FOUND_MEWTWONITE_Y                                     0x4B4 // Found in the Mysterious Cave
 #define FLAG_RECEIVED_VENUSARITE                                   	0x4B5 // Given by Prof Oak in the postgame (reward for beating Red)

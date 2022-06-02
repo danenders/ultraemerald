@@ -90,12 +90,12 @@
 #define ITEM_PP_MAX 	72 //Pocket = Training
 
 // EV Feathers
-#define ITEM_HEALTH_FEATHER 73
-#define ITEM_MUSCLE_FEATHER 74
-#define ITEM_RESIST_FEATHER 75
-#define ITEM_GENIUS_FEATHER 76
-#define ITEM_CLEVER_FEATHER 77
-#define ITEM_SWIFT_FEATHER 	78
+#define ITEM_HEALTH_FEATHER 73 //Pocket = Training
+#define ITEM_MUSCLE_FEATHER 74 //Pocket = Training
+#define ITEM_RESIST_FEATHER 75 //Pocket = Training
+#define ITEM_GENIUS_FEATHER 76 //Pocket = Training
+#define ITEM_CLEVER_FEATHER 77 //Pocket = Training
+#define ITEM_SWIFT_FEATHER 	78 //Pocket = Training
 
 // Ability Modifiers
 #define ITEM_ABILITY_CAPSULE 	79 //Pocket = Training
@@ -171,7 +171,7 @@
 #define ITEM_MAX_MUSHROOMS 	132 //unused
 
 // Treasures
-#define ITEM_BOTTLE_CAP 		133 //unused
+#define ITEM_BOTTLE_CAP 		133 //Pocket = Treasures
 #define ITEM_GOLD_BOTTLE_CAP 	134 //unused
 #define ITEM_NUGGET 			135 //Pocket = Treasures
 #define ITEM_BIG_NUGGET 		136 //unused

@@ -100,6 +100,8 @@ void GetNumMovesSelectedMonHas(void);
 void MoveDeleterChooseMoveToForget(void);
 void ItemUseCB_Mints(u8 taskId, TaskFunc task);
 void ItemUseCB_AbilityPatch(u8 taskId, TaskFunc task);
+void ItemUseCB_ReduceIV(u8 taskId, TaskFunc task);
+void ItemUseCB_IncreaseIV(u8 taskId, TaskFunc task);
 
 bool8 CanLearnTutorMove(u16, u8);
 

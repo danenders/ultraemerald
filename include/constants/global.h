@@ -56,7 +56,7 @@
 #define BAG_BATTLEITEMS_COUNT 90 //original value 47
 #define BAG_TREASURES_COUNT 20 //20 obtainable currently. original value 18
 #define BAG_MEGASTONES_COUNT 43 // 43 obtainable. original value 47
-#define BAG_TRAINING_COUNT 40 //39 obtainable currently
+#define BAG_TRAINING_COUNT 40 //46 obtainable currently
 #define OBJECT_EVENT_TEMPLATES_COUNT 64
 #define DECOR_MAX_SECRET_BASE 16
 #define DECOR_MAX_PLAYERS_HOUSE 12
