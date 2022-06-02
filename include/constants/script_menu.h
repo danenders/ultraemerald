@@ -127,6 +127,7 @@
 #define MULTI_JOHTO_OUTFIT                 116
 #define MULTI_HOENN_OUTFIT                 117
 #define MULTI_SINNOH_OUTFIT                118
+#define MULTI_BOTTLE_CAP_TRADE 			   119
 
 
 // Lilycove SS Tidal Multichoice Selections

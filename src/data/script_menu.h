@@ -811,6 +811,15 @@ static const struct MenuAction MultichoiceList_SinnohOutfits[] =
     {gText_Cancel2},
 };
 
+static const struct MenuAction MultichoiceList_BottleCapTrade[] =
+{
+    {gText_HealthFeather},
+    {gText_MuscleFeather},
+    {gText_ResistFeather},
+    {gText_GeniusFeather},
+    {gText_CleverFeather},
+    {gText_SwiftFeather},
+};
 
 static const struct MenuAction MultichoiceList_Exit[] =
 {
@@ -944,6 +953,7 @@ static const struct MultichoiceListStruct sMultichoiceLists[] =
     [MULTI_JOHTO_OUTFIT]               = MULTICHOICE(MultichoiceList_JohtoOutfits),
     [MULTI_HOENN_OUTFIT]               = MULTICHOICE(MultichoiceList_HoennOutfits),
     [MULTI_SINNOH_OUTFIT]              = MULTICHOICE(MultichoiceList_SinnohOutfits),
+    [MULTI_BOTTLE_CAP_TRADE]           = MULTICHOICE(MultichoiceList_BottleCapTrade),
 };
 
 const u8 *const gStdStrings[] =

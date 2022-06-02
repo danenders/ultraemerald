@@ -3172,4 +3172,11 @@ extern const u8 gText_OldAmber[];
 
 extern const u8 gText_YouAlreadyHaveThis[];
 
+extern const u8 gText_HealthFeather[];
+extern const u8 gText_MuscleFeather[];
+extern const u8 gText_ResistFeather[];
+extern const u8 gText_CleverFeather[];
+extern const u8 gText_GeniusFeather[];
+extern const u8 gText_SwiftFeather[];
+
 #endif // GUARD_STRINGS_H

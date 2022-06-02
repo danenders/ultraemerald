@@ -1985,3 +1985,9 @@ const u8 gText_OldAmber[] = _("Old Amber");
 
 const u8 gText_YouAlreadyHaveThis[] = _("You already have this item.{PAUSE_UNTIL_PRESS}");
 
+const u8 gText_HealthFeather[] = _("Health Feather");
+const u8 gText_MuscleFeather[] = _("Muscle Feather");
+const u8 gText_ResistFeather[] = _("Resist Feather");
+const u8 gText_GeniusFeather[] = _("Genius Feather");
+const u8 gText_CleverFeather[] = _("Clever Feather");
+const u8 gText_SwiftFeather[] = _("Swift Feather");

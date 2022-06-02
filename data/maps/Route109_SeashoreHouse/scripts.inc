@@ -1,3 +1,5 @@
+.set LOCALID_COLLECTOR, 5
+
 Route109_SeashoreHouse_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, Route109_SeashoreHouse_OnTransition
 	.byte 0
@@ -16,6 +18,129 @@ Route109_SeashoreHouse_EventScript_Owner::
 	setflag FLAG_TEMP_2
 	release
 	end
+
+Route109_SeashoreHouse_EventScript_BottleCapCollector::
+	lock
+	faceplayer
+	call_if_unset FLAG_MET_BOTTLE_CAP_COLLECTOR, Route109_SeashoreHouse_EventScript_CollectorIntroduction
+	checkitem ITEM_BOTTLE_CAP
+	goto_if_eq VAR_RESULT, FALSE, Route109_SeashoreHouse_EventScript_BringMeThoseCaps
+	msgbox Route109_SeashoreHouse_Text_GotAnyCaps, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, Route109_SeashoreHouse_EventScript_BringMeThoseCaps
+	applymovement LOCALID_COLLECTOR, Common_Movement_ExclamationMark
+	msgbox Route109_SeashoreHouse_Text_ThatsARareOne, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, Route109_SeashoreHouse_EventScript_BottleCapTrade
+	goto Route109_SeashoreHouse_EventScript_DeclineFeather
+	end
+
+Route109_SeashoreHouse_Text_ThatsARareOne:
+	.string "Ooh! That's a rare one!\p"
+	.string "Can I have it? I'll trade you\n"
+	.string "a rare feather for it!$"
+
+Route109_SeashoreHouse_EventScript_BottleCapTrade::
+	message Route109_SeashoreHouse_Text_WhichFeather
+	multichoice 0, 0, MULTI_BOTTLE_CAP_TRADE, FALSE
+	switch VAR_RESULT
+	case 0, Route109_SeashoreHouse_EventScript_HealthFeather
+	case 1, Route109_SeashoreHouse_EventScript_MuscleFeather
+	case 2, Route109_SeashoreHouse_EventScript_ResistFeather
+	case 3, Route109_SeashoreHouse_EventScript_GeniusFeather
+	case 4, Route109_SeashoreHouse_EventScript_CleverFeather
+	case 5, Route109_SeashoreHouse_EventScript_SwiftFeather
+	case MULTI_B_PRESSED, Route109_SeashoreHouse_EventScript_DeclineFeather
+	end
+
+Route109_SeashoreHouse_Text_WhichFeather:
+	.string "Which Feather would you like?$"
+
+Route109_SeashoreHouse_EventScript_HealthFeather::
+	msgbox Route109_SeashoreHouse_Text_FeatherThanks, MSGBOX_DEFAULT
+	giveitem ITEM_HEALTH_FEATHER
+	removeitem ITEM_BOTTLE_CAP
+	release
+	end
+
+Route109_SeashoreHouse_EventScript_MuscleFeather::
+	msgbox Route109_SeashoreHouse_Text_FeatherThanks, MSGBOX_DEFAULT
+	giveitem ITEM_MUSCLE_FEATHER
+	removeitem ITEM_BOTTLE_CAP
+	release
+	end
+
+Route109_SeashoreHouse_EventScript_ResistFeather::
+	msgbox Route109_SeashoreHouse_Text_FeatherThanks, MSGBOX_DEFAULT
+	giveitem ITEM_RESIST_FEATHER
+	removeitem ITEM_BOTTLE_CAP
+	release
+	end
+
+Route109_SeashoreHouse_EventScript_GeniusFeather::
+	msgbox Route109_SeashoreHouse_Text_FeatherThanks, MSGBOX_DEFAULT
+	giveitem ITEM_GENIUS_FEATHER
+	removeitem ITEM_BOTTLE_CAP
+	release
+	end
+
+Route109_SeashoreHouse_EventScript_CleverFeather::
+	msgbox Route109_SeashoreHouse_Text_FeatherThanks, MSGBOX_DEFAULT
+	giveitem ITEM_CLEVER_FEATHER
+	removeitem ITEM_BOTTLE_CAP
+	release
+	end
+
+Route109_SeashoreHouse_EventScript_SwiftFeather::
+	msgbox Route109_SeashoreHouse_Text_FeatherThanks, MSGBOX_DEFAULT
+	giveitem ITEM_SWIFT_FEATHER
+	removeitem ITEM_BOTTLE_CAP
+	release
+	end
+
+Route109_SeashoreHouse_Text_FeatherThanks:
+	.string "Thanks! This will make a fine\n"
+	.string "addition to my collection!$"
+
+Route109_SeashoreHouse_EventScript_DeclineFeather::
+	msgbox Route109_SeashoreHouse_Text_DeclineFeather, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, Route109_SeashoreHouse_EventScript_BottleCapTrade
+	release
+	end
+
+Route109_SeashoreHouse_Text_DeclineFeather:
+	.string "Are you sure?\n"
+	.string "That Bottle Cap is useless to you!$"
+
+Route109_SeashoreHouse_Text_GotAnyCaps:
+	.string "Got any Bottle Caps for me?$"
+
+Route109_SeashoreHouse_EventScript_BringMeThoseCaps::
+	msgbox Route109_SeashoreHouse_Text_BringMeThoseCaps, MSGBOX_DEFAULT
+	release
+	end
+
+Route109_SeashoreHouse_Text_BringMeThoseCaps:
+	.string "I don't have time to chat, unless\n"
+	.string "you have some Bottle Caps to trade.$"
+
+Route109_SeashoreHouse_EventScript_CollectorIntroduction::
+	msgbox Route109_SeashoreHouse_Text_ICollectCaps, MSGBOX_DEFAULT
+	applymovement LOCALID_COLLECTOR, Common_Movement_ExclamationMark
+	msgbox Route109_SeashoreHouse_Text_ICollectCaps2, MSGBOX_DEFAULT
+	setflag FLAG_MET_BOTTLE_CAP_COLLECTOR
+	return
+
+Route109_SeashoreHouse_Text_ICollectCaps:
+	.string "The Soda Pop here is pretty good,\n"
+	.string "but I'm not here for the drinks.\p"
+	.string "I'm here for the Bottle Caps!$"
+
+Route109_SeashoreHouse_Text_ICollectCaps2:
+	.string "What! You don't collect Bottle Caps?\p"
+	.string "If you don't collect them, you should\n"
+	.string "bring them to me.\p"
+	.string "I'll give you something really good in\n"
+	.string "return!$"
+
 
 Route109_SeashoreHouse_EventScript_AlreadyGaveIntroduction::
 	msgbox Route109_SeashoreHouse_Text_ShowMeSomeHotMatches, MSGBOX_DEFAULT
